@@ -6,7 +6,7 @@
 <title>Beat the DJ — Stage 1</title>
 
 <style>
-:root {
+:root{
   --bg:#090909;
   --panel:#151515;
   --panel2:#202020;
@@ -17,28 +17,26 @@
   --danger:#ff7777;
 }
 
-* {
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
-body {
+body{
   margin:0;
   background:var(--bg);
   color:var(--text);
   font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
-.wrap {
+.wrap{
   max-width:720px;
   margin:auto;
   padding:28px 16px 45px;
 }
 
-header {
+header{
   padding:8px 0 28px;
 }
 
-.eyebrow {
+.eyebrow{
   font-size:12px;
   letter-spacing:.2em;
   text-transform:uppercase;
@@ -46,21 +44,21 @@ header {
   font-weight:800;
 }
 
-h1 {
+h1{
   font-size:clamp(44px,11vw,72px);
   line-height:.88;
   letter-spacing:-.055em;
   margin:10px 0;
 }
 
-.strap {
+.strap{
   margin:0;
   color:#c9c9c4;
   font-size:17px;
   line-height:1.4;
 }
 
-.status {
+.status{
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -73,7 +71,7 @@ h1 {
   margin-bottom:14px;
 }
 
-.dot {
+.dot{
   display:inline-block;
   width:8px;
   height:8px;
@@ -82,17 +80,17 @@ h1 {
   margin-right:8px;
 }
 
-.live .dot {
+.live .dot{
   background:var(--accent);
   box-shadow:0 0 12px rgba(232,255,56,.4);
 }
 
-.timer {
+.timer{
   font-variant-numeric:tabular-nums;
   font-weight:800;
 }
 
-.card {
+.card{
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:16px;
@@ -100,7 +98,7 @@ h1 {
   margin-bottom:14px;
 }
 
-.card h2 {
+.card h2{
   font-size:12px;
   text-transform:uppercase;
   letter-spacing:.14em;
@@ -108,23 +106,23 @@ h1 {
   margin:0 0 11px;
 }
 
-.round-title {
+.round-title{
   font-size:25px;
   font-weight:800;
 }
 
-.round-sub {
+.round-sub{
   color:var(--muted);
   font-size:14px;
   margin-top:4px;
 }
 
-.choices {
+.choices{
   display:grid;
   gap:10px;
 }
 
-.choice {
+.choice{
   width:100%;
   text-align:left;
   background:var(--panel2);
@@ -136,33 +134,33 @@ h1 {
   font:inherit;
 }
 
-.choice:hover {
+.choice:hover{
   border-color:#666;
 }
 
-.choice:disabled {
+.choice:disabled{
   opacity:.65;
   cursor:not-allowed;
 }
 
-.choice.picked {
+.choice.picked{
   border-color:var(--accent);
   box-shadow:0 0 0 1px var(--accent) inset;
 }
 
-.track {
+.track{
   font-size:17px;
   font-weight:800;
   line-height:1.2;
 }
 
-.artist {
+.artist{
   font-size:14px;
   color:#aaa;
   margin-top:4px;
 }
 
-.votes {
+.votes{
   height:7px;
   background:#2b2b2b;
   border-radius:99px;
@@ -170,13 +168,13 @@ h1 {
   margin-top:11px;
 }
 
-.bar {
+.bar{
   height:100%;
   background:var(--accent);
   transition:width .3s ease;
 }
 
-.vote-row {
+.vote-row{
   display:flex;
   justify-content:space-between;
   margin-top:7px;
@@ -184,27 +182,27 @@ h1 {
   color:#aaa;
 }
 
-.vote-row strong {
+.vote-row strong{
   color:var(--text);
 }
 
-.message {
+.message{
   min-height:22px;
   margin-top:9px;
   font-size:14px;
 }
 
-.error {
+.error{
   color:var(--danger);
 }
 
-.small {
+.small{
   font-size:12px;
   color:#777;
   line-height:1.45;
 }
 
-.refresh {
+.refresh{
   border:0;
   background:none;
   color:var(--accent);
@@ -213,15 +211,15 @@ h1 {
   padding:0;
 }
 
-footer {
+.hidden{
+  display:none;
+}
+
+footer{
   text-align:center;
   color:#555;
   font-size:11px;
   padding-top:10px;
-}
-
-.hidden {
-  display:none;
 }
 </style>
 </head>
@@ -231,777 +229,554 @@ footer {
 <div class="wrap">
 
 <header>
-<div class="eyebrow">Beat the DJ</div>
-
-<h1>Stage 1</h1>
-
-<p class="strap">
-Your track. The crowd. The DJ. Who wins?
-</p>
+  <div class="eyebrow">Beat the DJ</div>
+  <h1>Stage 1</h1>
+  <p class="strap">Your track. The crowd. The DJ. Who wins?</p>
 </header>
 
-
 <div id="status" class="status">
-
-<span>
-<span class="dot"></span>
-<span id="statusText">Connecting…</span>
-</span>
-
-<span id="timer" class="timer"></span>
-
+  <span>
+    <span class="dot"></span>
+    <span id="statusText">Connecting…</span>
+  </span>
+  <span id="timer" class="timer"></span>
 </div>
-
 
 <section id="roundCard" class="card hidden">
-
-<h2>Voting now</h2>
-
-<div id="roundTitle" class="round-title">
-Stage 1
-</div>
-
-<div id="roundSub" class="round-sub">
-Choose the track you want next.
-</div>
-
+  <h2>Voting now</h2>
+  <div id="roundTitle" class="round-title">Stage 1</div>
+  <div class="round-sub">Choose the track you want next.</div>
 </section>
-
 
 <section id="choicesCard" class="card hidden">
-
-<h2>Pick one</h2>
-
-<div id="choices" class="choices"></div>
-
-<div id="message" class="message"></div>
-
+  <h2>Pick one</h2>
+  <div id="choices" class="choices"></div>
+  <div id="message" class="message"></div>
 </section>
-
 
 <section id="waitingCard" class="card">
-
-<div class="round-title">
-Stand by.
-</div>
-
-<div class="round-sub">
-The next vote will appear here.
-</div>
-
+  <div class="round-title">Stand by.</div>
+  <div class="round-sub">The next vote will appear here.</div>
 </section>
 
-
 <div class="small">
-
-One vote per device/browser for the current round.
-Results update automatically.
-
-<button id="refreshBtn" class="refresh">
-Refresh
-</button>
-
+  One vote per device/browser for the current round.
+  Results update automatically.
+  <button id="refreshBtn" class="refresh">Refresh</button>
 </div>
 
-
 <footer>
-BEAT THE DJ • STAGE 1
+  BEAT THE DJ • STAGE 1
 </footer>
 
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 
 <script>
 
-const CONFIG = {
+const SUPABASE_URL =
+  "https://lxojmyujlljkhtnudzmr.supabase.co";
 
-SUPABASE_URL:
-"https://lxojmyujlljkhtnudzmr.supabase.co",
-
-SUPABASE_ANON_KEY:
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4b21teXVqbGxqa2h0bnVkem1yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNTU2MTgsImV4cCI6MjEwNDkzMTYxOH0.AicCDkKSifzeK9pE1aHhTbyY4exRMvUD771_vld9wKk",
-
-ROUND_TABLE:
-"rounds",
-
-ENTRY_TABLE:
-"round_entries",
-
-VOTE_RPC:
-"cast_vote",
-
-TEST_ROUND_ID:
-""
-
-};
-
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4b2pteXVqbGxqa2h0bnVkem1yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNTU2MTgsImV4cCI6MjEwNDkzMTYxOH0.AicCDkKSifzeK9pE1aHhTbyY4exRMvUD771_vld9wKk";
 
 const db = supabase.createClient(
-CONFIG.SUPABASE_URL,
-CONFIG.SUPABASE_ANON_KEY
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
 );
 
-
-const $ = id =>
-document.getElementById(id);
-
-
 let currentRound = null;
-let currentEntries = [];
-
+let currentOptions = [];
+let voteCounts = {};
+let votesReadable = true;
 
 let voterToken =
-localStorage.getItem("btd_voter_token");
-
+  localStorage.getItem("btd_voter_token");
 
 if (!voterToken) {
 
-voterToken =
-crypto.randomUUID
-? crypto.randomUUID()
-: "voter-" +
-Date.now() +
-"-" +
-Math.random().toString(36).slice(2);
+  voterToken =
+    crypto.randomUUID
+      ? crypto.randomUUID()
+      : "voter-" +
+        Date.now() +
+        "-" +
+        Math.random().toString(36).slice(2);
 
-localStorage.setItem(
-"btd_voter_token",
-voterToken
-);
-
+  localStorage.setItem(
+    "btd_voter_token",
+    voterToken
+  );
 }
 
-
-function field(object,names,fallback="") {
-
-for (const name of names) {
-
-if (
-object &&
-object[name] !== null &&
-object[name] !== undefined
-) {
-
-return object[name];
-
+function $(id){
+  return document.getElementById(id);
 }
 
+function setStatus(text, live=false, error=false){
+
+  $("statusText").textContent = text;
+
+  $("status").classList.toggle(
+    "live",
+    live
+  );
+
+  $("statusText").classList.toggle(
+    "error",
+    error
+  );
 }
 
-return fallback;
+function esc(value){
 
+  return String(value ?? "")
+    .replace(
+      /[&<>"']/g,
+      character => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      }[character])
+    );
 }
 
+async function getOpenRound(){
 
-function esc(value) {
+  const result =
+    await db
+      .from("rounds")
+      .select("*")
+      .eq("status","open")
+      .order(
+        "round_number",
+        {ascending:false}
+      )
+      .limit(1)
+      .maybeSingle();
 
-return String(value ?? "")
-.replace(
-/[&<>"']/g,
-character => ({
-"&":"&amp;",
-"<":"&lt;",
-">":"&gt;",
-'"':"&quot;",
-"'":"&#039;"
-}[character])
-);
+  if(result.error){
+    throw result.error;
+  }
 
+  return result.data;
 }
 
+async function getOptions(roundId){
 
-function setStatus(
-text,
-live=false,
-error=false
-) {
+  const result =
+    await db
+      .from("options")
+      .select(
+        "id,round_id,position,label,artist,track"
+      )
+      .eq("round_id",roundId)
+      .order(
+        "position",
+        {ascending:true}
+      );
 
-$("statusText").textContent=text;
+  if(result.error){
+    throw result.error;
+  }
 
-$("status").classList.toggle(
-"live",
-live
-);
-
-$("statusText").classList.toggle(
-"error",
-error
-);
-
+  return result.data || [];
 }
 
+async function getVoteCounts(roundId){
 
-async function findRound() {
+  const result =
+    await db
+      .from("votes")
+      .select("option_id")
+      .eq("round_id",roundId);
 
-if (CONFIG.TEST_ROUND_ID) {
+  if(result.error){
 
-const result =
-await db
-.from(CONFIG.ROUND_TABLE)
-.select("*")
-.eq(
-"id",
-CONFIG.TEST_ROUND_ID
-)
-.single();
+    console.warn(
+      "Vote totals unavailable:",
+      result.error
+    );
 
-if (result.error) {
-throw result.error;
+    votesReadable = false;
+
+    return {};
+  }
+
+  votesReadable = true;
+
+  const counts = {};
+
+  for(const vote of result.data || []){
+
+    counts[vote.option_id] =
+      (counts[vote.option_id] || 0) + 1;
+
+  }
+
+  return counts;
 }
 
-return result.data;
+function renderOptions(){
 
+  const box = $("choices");
+
+  box.innerHTML = "";
+
+  if(!currentOptions.length){
+
+    box.innerHTML =
+      "<div class='round-sub'>No choices have been added to this round yet.</div>";
+
+    return;
+  }
+
+  const total =
+    Object.values(voteCounts)
+      .reduce(
+        (sum,n) => sum + n,
+        0
+      );
+
+  const alreadyVoted =
+    localStorage.getItem(
+      "btd_voted_" +
+      currentRound.id
+    );
+
+  currentOptions.forEach(
+    (option,index) => {
+
+      const votes =
+        Number(
+          voteCounts[option.id] || 0
+        );
+
+      const percentage =
+        total
+          ? Math.round(
+              votes / total * 100
+            )
+          : 0;
+
+      const button =
+        document.createElement("button");
+
+      button.className = "choice";
+
+      button.dataset.id =
+        option.id;
+
+      if(
+        alreadyVoted &&
+        alreadyVoted === option.id
+      ){
+
+        button.classList.add("picked");
+
+      }
+
+      button.innerHTML = `
+
+        <div class="track">
+          ${index + 1}. ${esc(option.track || option.label)}
+        </div>
+
+        ${
+          option.artist
+            ? `<div class="artist">${esc(option.artist)}</div>`
+            : ""
+        }
+
+        <div class="votes">
+          <div
+            class="bar"
+            style="width:${percentage}%"
+          ></div>
+        </div>
+
+        <div class="vote-row">
+
+          <span>
+            ${
+              votesReadable
+                ? votes +
+                  " vote" +
+                  (votes === 1 ? "" : "s")
+                : "Voting live"
+            }
+          </span>
+
+          <strong>
+            ${
+              votesReadable
+                ? percentage + "%"
+                : ""
+            }
+          </strong>
+
+        </div>
+      `;
+
+      if(alreadyVoted){
+
+        button.disabled = true;
+
+      }else{
+
+        button.onclick =
+          () => castVote(
+            option.id,
+            button
+          );
+
+      }
+
+      box.appendChild(button);
+
+    }
+  );
+
+  if(alreadyVoted){
+
+    $("message").textContent =
+      "You've already voted in this round.";
+
+  }else{
+
+    $("message").textContent = "";
+
+  }
 }
 
+async function castVote(
+  optionId,
+  button
+){
 
-for (
-const status of
-["live","open","active"]
-) {
+  document
+    .querySelectorAll(".choice")
+    .forEach(
+      item => item.disabled = true
+    );
 
-const result =
-await db
-.from(CONFIG.ROUND_TABLE)
-.select("*")
-.eq(
-"status",
-status
-);
+  button.classList.add("picked");
 
+  $("message").textContent =
+    "Submitting your vote…";
 
-if (
-!result.error &&
-result.data &&
-result.data.length
-) {
+  try{
 
-const stageOne =
-result.data.find(
-round =>
-/stage\s*1/i.test(
-field(
-round,
-["title","name"],
-""
-)
-)
-);
+    const result =
+      await db.rpc(
+        "cast_vote",
+        {
+          p_round_id:
+            currentRound.id,
 
+          p_option_id:
+            optionId,
 
-if (stageOne) {
-return stageOne;
+          p_voter_token:
+            voterToken
+        }
+      );
+
+    if(result.error){
+      throw result.error;
+    }
+
+    localStorage.setItem(
+      "btd_voted_" +
+      currentRound.id,
+      optionId
+    );
+
+    $("message").textContent =
+      "Vote counted. Watch the screen.";
+
+    await refresh();
+
+  }catch(error){
+
+    console.error(
+      "Vote error:",
+      error
+    );
+
+    document
+      .querySelectorAll(".choice")
+      .forEach(
+        item => item.disabled = false
+      );
+
+    button.classList.remove("picked");
+
+    $("message").innerHTML =
+      '<span class="error">' +
+      esc(
+        error.message ||
+        "Vote failed."
+      ) +
+      "</span>";
+
+  }
 }
 
-return result.data[0];
+function updateCountdown(){
 
+  if(
+    !currentRound ||
+    !currentRound.closed_at
+  ){
+
+    $("timer").textContent = "";
+
+    return;
+  }
+
+  const remaining =
+    Math.max(
+      0,
+      Math.floor(
+        (
+          new Date(
+            currentRound.closed_at
+          ) -
+          Date.now()
+        ) / 1000
+      )
+    );
+
+  if(remaining <= 0){
+
+    $("timer").textContent =
+      "Closing…";
+
+    return;
+  }
+
+  const minutes =
+    Math.floor(
+      remaining / 60
+    );
+
+  const seconds =
+    remaining % 60;
+
+  $("timer").textContent =
+    String(minutes)
+      .padStart(2,"0") +
+    ":" +
+    String(seconds)
+      .padStart(2,"0");
 }
 
+async function refresh(){
+
+  try{
+
+    currentRound =
+      await getOpenRound();
+
+    if(!currentRound){
+
+      currentOptions = [];
+      currentRound = null;
+
+      $("roundCard")
+        .classList.add("hidden");
+
+      $("choicesCard")
+        .classList.add("hidden");
+
+      $("waitingCard")
+        .classList.remove("hidden");
+
+      setStatus(
+        "Waiting for Stage 1"
+      );
+
+      $("timer").textContent = "";
+
+      return;
+    }
+
+    currentOptions =
+      await getOptions(
+        currentRound.id
+      );
+
+    voteCounts =
+      await getVoteCounts(
+        currentRound.id
+      );
+
+    $("roundCard")
+      .classList.remove("hidden");
+
+    $("choicesCard")
+      .classList.remove("hidden");
+
+    $("waitingCard")
+      .classList.add("hidden");
+
+    $("roundTitle")
+      .textContent =
+        currentRound.title ||
+        "Stage 1";
+
+    renderOptions();
+
+    setStatus(
+      votesReadable
+        ? "Voting is live"
+        : "Voting is live • totals hidden",
+      true
+    );
+
+    updateCountdown();
+
+  }catch(error){
+
+    console.error(
+      "Beat the DJ error:",
+      error
+    );
+
+    setStatus(
+      "Connection problem",
+      false,
+      true
+    );
+
+    $("message").innerHTML =
+      '<span class="error">' +
+      esc(
+        error.message ||
+        "Unable to connect to the database."
+      ) +
+      "</span>";
+
+  }
 }
-
-
-const result =
-await db
-.from(CONFIG.ROUND_TABLE)
-.select("*")
-.order(
-"created_at",
-{
-ascending:false
-}
-)
-.limit(20);
-
-
-if (result.error) {
-throw result.error;
-}
-
-
-return (
-result.data || []
-).find(
-round =>
-/stage\s*1/i.test(
-field(
-round,
-["title","name"],
-""
-)
-)
-) || null;
-
-}
-
-
-async function loadEntries(roundId) {
-
-const result =
-await db
-.from(CONFIG.ENTRY_TABLE)
-.select("*")
-.eq(
-"round_id",
-roundId
-);
-
-
-if (result.error) {
-throw result.error;
-}
-
-
-return result.data || [];
-
-}
-
-
-function render() {
-
-const box =
-$("choices");
-
-box.innerHTML = "";
-
-
-const entries =
-currentEntries.map(entry => ({
-
-...entry,
-
-title:
-field(
-entry,
-[
-"title",
-"track_title",
-"song",
-"track"
-],
-"Untitled track"
-),
-
-artist:
-field(
-entry,
-[
-"artist",
-"artist_name",
-"performer"
-],
-""
-),
-
-votes:
-Number(
-field(
-entry,
-[
-"votes",
-"vote_count",
-"score"
-],
-0
-)
-) || 0
-
-}));
-
-
-const total =
-entries.reduce(
-(sum,entry) =>
-sum + entry.votes,
-0
-);
-
-
-entries.forEach(
-(entry,index) => {
-
-const button =
-document.createElement(
-"button"
-);
-
-button.className =
-"choice";
-
-button.dataset.id =
-entry.id;
-
-
-const percentage =
-total
-? Math.round(
-entry.votes /
-total *
-100
-)
-: 0;
-
-
-button.innerHTML = `
-
-<div class="track">
-${index + 1}. ${esc(entry.title)}
-</div>
-
-<div class="artist">
-${esc(entry.artist)}
-</div>
-
-<div class="votes">
-
-<div
-class="bar"
-style="width:${percentage}%"
-></div>
-
-</div>
-
-<div class="vote-row">
-
-<span>
-${entry.votes}
-vote${entry.votes === 1 ? "" : "s"}
-</span>
-
-<strong>
-${percentage}%
-</strong>
-
-</div>
-
-`;
-
-
-button.onclick =
-() =>
-vote(
-entry.id,
-button
-);
-
-
-box.appendChild(
-button
-);
-
-}
-);
-
-
-const alreadyVoted =
-localStorage.getItem(
-"btd_voted_" +
-currentRound.id
-);
-
-
-if (alreadyVoted) {
-
-document
-.querySelectorAll(
-".choice"
-)
-.forEach(button => {
-
-button.disabled = true;
-
-if (
-button.dataset.id ===
-alreadyVoted
-) {
-
-button.classList.add(
-"picked"
-);
-
-}
-
-});
-
-
-$("message").textContent =
-"You've already voted in this round.";
-
-}
-
-}
-
-
-async function vote(
-entryId,
-button
-) {
-
-document
-.querySelectorAll(
-".choice"
-)
-.forEach(
-button =>
-button.disabled = true
-);
-
-
-button.classList.add(
-"picked"
-);
-
-
-$("message").textContent =
-"Submitting your vote…";
-
-
-try {
-
-const result =
-await db.rpc(
-CONFIG.VOTE_RPC,
-{
-
-p_round_id:
-currentRound.id,
-
-p_entry_id:
-entryId,
-
-p_voter_token:
-voterToken
-
-}
-);
-
-
-if (result.error) {
-throw result.error;
-}
-
-
-localStorage.setItem(
-"btd_voted_" +
-currentRound.id,
-entryId
-);
-
-
-$("message").textContent =
-"Vote counted. Watch the screen.";
-
-
-await refresh();
-
-
-} catch (error) {
-
-document
-.querySelectorAll(
-".choice"
-)
-.forEach(
-button =>
-button.disabled = false
-);
-
-
-$("message").innerHTML =
-'<span class="error">' +
-esc(
-error.message ||
-"Vote failed."
-) +
-"</span>";
-
-}
-
-}
-
-
-function countdown() {
-
-if (
-!currentRound ||
-!currentRound.ends_at
-) {
-
-$("timer").textContent =
-"";
-
-return;
-
-}
-
-
-const seconds =
-Math.max(
-0,
-Math.floor(
-(
-new Date(
-currentRound.ends_at
-) -
-Date.now()
-) / 1000
-)
-);
-
-
-if (seconds <= 0) {
-
-$("timer").textContent =
-"Closing…";
-
-return;
-
-}
-
-
-const minutes =
-Math.floor(
-seconds / 60
-);
-
-
-const remainingSeconds =
-seconds % 60;
-
-
-$("timer").textContent =
-String(minutes)
-.padStart(2,"0") +
-":" +
-String(remainingSeconds)
-.padStart(2,"0");
-
-}
-
-
-async function refresh() {
-
-try {
-
-currentRound =
-await findRound();
-
-
-if (!currentRound) {
-
-$("roundCard")
-.classList
-.add("hidden");
-
-$("choicesCard")
-.classList
-.add("hidden");
-
-$("waitingCard")
-.classList
-.remove("hidden");
-
-setStatus(
-"Waiting for Stage 1"
-);
-
-return;
-
-}
-
-
-currentEntries =
-await loadEntries(
-currentRound.id
-);
-
-
-$("waitingCard")
-.classList
-.add("hidden");
-
-$("roundCard")
-.classList
-.remove("hidden");
-
-$("choicesCard")
-.classList
-.remove("hidden");
-
-
-$("roundTitle").textContent =
-field(
-currentRound,
-[
-"title",
-"name"
-],
-"Stage 1"
-);
-
-
-render();
-
-
-setStatus(
-"Voting is live",
-true
-);
-
-
-countdown();
-
-
-} catch (error) {
-
-console.error(
-"Beat the DJ error:",
-error
-);
-
-
-setStatus(
-"Connection problem",
-false,
-true
-);
-
-
-$("waitingCard")
-.classList
-.remove("hidden");
-
-
-$("message").innerHTML =
-'<span class="error">' +
-esc(
-error.message ||
-"Unable to load the round."
-) +
-"</span>";
-
-}
-
-}
-
 
 $("refreshBtn").onclick =
-refresh;
-
+  refresh;
 
 refresh();
 
-
 setInterval(
-refresh,
-5000
+  refresh,
+  5000
 );
 
-
 setInterval(
-countdown,
-1000
+  updateCountdown,
+  1000
 );
 
 </script>
