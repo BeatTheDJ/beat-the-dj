@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beat The DJ — DJ Control</title>
+
+<style>
+:root{
+  --bg:#090909;
+  --panel:#151515;
+  --panel2:#202020;
+  --text:#f5f5f2;
+  --muted:#999;
+  --line:#333;
+  --accent:#e8ff38;
+  --danger:#ff7777;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+.wrap{
+  max-width:760px;
+  margin:auto;
+  padding:24px 16px 45px;
+}
+
+header{
+  padding:8px 0 24px;
+}
+
+.eyebrow{
+  font-size:12px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--accent);
+  font-weight:800;
+}
+
+h1{
+  font-size:clamp(42px,10vw,64px);
+  line-height:.9;
+  letter-spacing:-.05em;
+  margin:8px 0;
+}
+
+.strap{
+  margin:0;
+  color:#aaa;
+  font-size:16px;
+}
+
+.status{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px;
+  border:1px solid var(--line);
+  background:var(--panel);
+  border-radius:12px;
+  font-size:13px;
+  margin-bottom:14px;
+}
+
+.dot{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#777;
+  margin-right:8px;
+}
+
+.live .dot{
+  background:var(--accent);
+}
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:14px;
+}
+
+.card h2{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:#aaa;
+  margin:0 0 14px;
+}
+
+.request{
+  background:var(--panel2);
+  border:1px solid #383838;
+  border-radius:13px;
+  padding:16px;
+  margin-bottom:10px;
+}
+
+.request:last-child{
+  margin-bottom:0;
+}
+
+.song{
+  font-size:21px;
+  font-weight:800;
+  line-height:1.15;
+}
+
+.artist{
+  font-size:15px;
+  color:#aaa;
+  margin-top:4px;
+}
+
+.requester{
+  margin-top:13px;
+  padding-top:10px;
+  border-top:1px solid #383838;
+  font-size:12px;
+  color:var(--accent);
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.time{
+  margin-top:5px;
+  font-size:11px;
+  color:#666;
+}
+
+.empty{
+  color:#777;
+  font-size:14px;
+  padding:10px 0;
+}
+
+button{
+  width:100%;
+  border:0;
+  border-radius:12px;
+  padding:13px;
+  background:var(--accent);
+  color:#090909;
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.error{
+  color:var(--danger);
+  font-size:13px;
+}
+
+footer{
+  text-align:center;
+  color:#555;
+  font-size:11px;
+  padding-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Beat The DJ</div>
+  <h1>DJ Control</h1>
+  <p class="strap">Incoming requests</p>
+</header>
+
+<div id="status" class="status">
+  <span>
+    <span class="dot"></span>
+    <span id="statusText">Connecting…</span>
+  </span>
+  <span id="requestCount">0 requests</span>
+</div>
+
+<section class="card">
+  <h2>Requests</h2>
+  <div id="requests">
+    <div class="empty">Loading requests…</div>
+  </div>
+</section>
+
+<section class="card">
+  <button id="refreshBtn">Refresh requests</button>
+</section>
+
+<footer>
+  BEAT THE DJ • DJ CONTROL
+</footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL =
+  "https://lxojmyujlljkhtnudzmr.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4b2pteXVqbGxqa2h0bnVkem1yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNTU2MTgsImV4cCI6MjEwNDkzMTYxOH0.AicCDkKSifzeK9pE1aHhTbyY4exRMvUD771_vld9wKk";
+
+const EVENT_ID =
+  "4f56de4d-be9c-4312-b56d-2950286bacc2";
+
+const db = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+function esc(value){
+  return String(value ?? "")
+    .replace(/[&<>"']/g, character => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[character]));
+}
+
+function setStatus(text,live=false){
+  document.getElementById("statusText").textContent = text;
+  document.getElementById("status").classList.toggle("live",live);
+}
+
+async function loadRequests(){
+
+  try{
+
+    const result = await db
+      .from("requests")
+      .select(
+        "requester_name,artist,song,status,created_at"
+      )
+      .eq("event_id",EVENT_ID)
+      .order("created_at",{ascending:false});
+
+    if(result.error){
+      throw result.error;
+    }
+
+    const requests = result.data || [];
+    const box = document.getElementById("requests");
+
+    document.getElementById("requestCount").textContent =
+      requests.length +
+      " request" +
+      (requests.length === 1 ? "" : "s");
+
+    if(!requests.length){
+      box.innerHTML =
+        '<div class="empty">No requests yet.</div>';
+
+      setStatus("Waiting for requests",true);
+      return;
+    }
+
+    box.innerHTML = requests.map(request => {
+
+      const time = request.created_at
+        ? new Date(request.created_at).toLocaleTimeString(
+            [],
+            {hour:"2-digit",minute:"2-digit"}
+          )
+        : "";
+
+      return `
+        <div class="request">
+
+          <div class="song">
+            ${esc(request.song)}
+          </div>
+
+          <div class="artist">
+            ${esc(request.artist)}
+          </div>
+
+          <div class="requester">
+            Requested by ${esc(request.requester_name)}
+          </div>
+
+          <div class="time">
+            ${esc(request.status || "pending")} • ${esc(time)}
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+    setStatus("Live • requests updating",true);
+
+  }catch(error){
+
+    console.error("Request loading error:",error);
+
+    document.getElementById("requests").innerHTML =
+      '<div class="error">' +
+      esc(error.message || "Unable to load requests.") +
+      '</div>';
+
+    setStatus("Connection problem",false);
+  }
+}
+
+document.getElementById("refreshBtn").onclick =
+  loadRequests;
+
+loadRequests();
+
+setInterval(
+  loadRequests,
+  5000
+);
+</script>
+
+</body>
+</html>
