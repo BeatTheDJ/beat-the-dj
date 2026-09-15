@@ -221,7 +221,48 @@ footer{
   font-size:11px;
   padding-top:10px;
 }
-</style>
+
+label{
+  display:block;
+  margin-top:12px;
+  margin-bottom:6px;
+  font-size:12px;
+  color:#aaa;
+  font-weight:700;
+}
+
+input{
+  width:100%;
+  background:var(--panel2);
+  border:1px solid #383838;
+  color:var(--text);
+  border-radius:13px;
+  padding:14px;
+  font:inherit;
+  outline:none;
+}
+
+input:focus{
+  border-color:var(--accent);
+}
+
+#requestBtn{
+  width:100%;
+  margin-top:14px;
+  background:var(--accent);
+  color:#090909;
+  border:0;
+  border-radius:13px;
+  padding:14px;
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+}
+
+#requestBtn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}</style>
 </head>
 
 <body>
@@ -253,6 +294,19 @@ footer{
   <div id="choices" class="choices"></div>
   <div id="message" class="message"></div>
 </section>
+  <section id="requestCard" class="card">
+  <h2>Request a track</h2>
+  <div class="round-sub">Suggest a song for the DJ.</div>
+
+  <label for="requestArtist">Artist</label>
+  <input id="requestArtist" type="text" maxlength="100" placeholder="Artist">
+
+  <label for="requestSong">Song</label>
+  <input id="requestSong" type="text" maxlength="150" placeholder="Song">
+
+  <button id="requestBtn" type="button">Send request</button>
+  <div id="requestMessage" class="message"></div>
+  </section>
 
 <section id="waitingCard" class="card">
   <div class="round-title">Stand by.</div>
@@ -779,7 +833,47 @@ setInterval(
   1000
 );
 
-</script>
+
+const EVENT_ID = "4f56de4d-be9c-4312-b56d-2950286bacc2";
+
+async function submitRequest(){
+  const artist = $("requestArtist").value.trim();
+  const song = $("requestSong").value.trim();
+  const button = $("requestBtn");
+  const message = $("requestMessage");
+
+  if(!artist || !song){
+    message.textContent = "Please enter both the artist and song.";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "Sending request…";
+
+  try{
+    const result = await db
+      .from("requests")
+      .insert({
+        event_id: EVENT_ID,
+        artist: artist,
+        song: song
+      });
+
+    if(result.error) throw result.error;
+
+    $("requestArtist").value = "";
+    $("requestSong").value = "";
+    message.textContent = "Request sent. The DJ will decide.";
+  }catch(error){
+    console.error("Request error:", error);
+    message.textContent =
+      error.message || "Request failed.";
+  }finally{
+    button.disabled = false;
+  }
+}
+
+$("requestBtn").onclick = submitRequest;</script>
 
 </body>
 </html>
