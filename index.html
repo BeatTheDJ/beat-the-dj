@@ -298,7 +298,9 @@ input:focus{
   <h2>Request a track</h2>
   <div class="round-sub">Suggest a song for the DJ.</div>
 
-  <label for="requestArtist">Artist</label>
+<label for="requestName">Your name / nickname</label>
+<input id="requestName" type="text" maxlength="50" placeholder="e.g. Jason / Disco Dave" required>
+    <label for="requestArtist">Artist</label>
   <input id="requestArtist" type="text" maxlength="100" placeholder="Artist">
 
   <label for="requestSong">Song</label>
@@ -837,13 +839,14 @@ setInterval(
 const EVENT_ID = "4f56de4d-be9c-4312-b56d-2950286bacc2";
 
 async function submitRequest(){
+const name = $("requestName").value.trim();
   const artist = $("requestArtist").value.trim();
   const song = $("requestSong").value.trim();
   const button = $("requestBtn");
   const message = $("requestMessage");
 
-  if(!artist || !song){
-    message.textContent = "Please enter both the artist and song.";
+  if(!name || !artist || !song){
+    message.textContent = "Please enter your name/nickname, artist and song.";
     return;
   }
 
@@ -854,7 +857,7 @@ async function submitRequest(){
     const result = await db
       .from("requests")
       .insert({
-        event_id: EVENT_ID,
+        event_id: EVENT_ID,requester_name: name,
         artist: artist,
         song: song
       });
@@ -862,6 +865,7 @@ async function submitRequest(){
     if(result.error) throw result.error;
 
     $("requestArtist").value = "";
+    $("requestName").value = "";
     $("requestSong").value = "";
     message.textContent = "Request sent. The DJ will decide.";
   }catch(error){
