@@ -267,8 +267,6 @@ async function loadRequests(){
         "id,requester_name,artist,song,status,created_at"
       )
       .eq("event_id",EVENT_ID)
-.select("id")
-.single();
       .order("created_at",{ascending:false});
 
     if(result.error){
