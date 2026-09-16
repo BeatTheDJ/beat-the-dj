@@ -385,9 +385,10 @@ const updateResult = await db
     closed_at:new Date().toISOString()
   })
   .eq("id",round.id);
-    if(updateResult.error){
+
+if(updateResult.error){
   throw updateResult.error;
-    }
+}
     document.getElementById("closeRoundBtn").disabled = true;
 
     await loadRound();
