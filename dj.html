@@ -429,7 +429,72 @@ if(requestUpdate.error){
 
   }
 }
-  
+ async function loadRoundResult(){
+
+  try{
+
+    const roundResult = await db
+      .from("rounds")
+      .select("id,winning_option_id")
+      .eq("event_id",EVENT_ID)
+      .eq("status","closed")
+      .order("round_number",{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(roundResult.error){
+      throw roundResult.error;
+    }
+
+    const round = roundResult.data;
+
+    if(!round || !round.winning_option_id){
+      document.getElementById("winnerCard").style.display = "none";
+      return;
+    }
+
+    const optionResult = await db
+      .from("options")
+      .select("artist,track")
+      .eq("id",round.winning_option_id)
+      .maybeSingle();
+
+    if(optionResult.error){
+      throw optionResult.error;
+    }
+
+    const votesResult = await db
+      .from("votes")
+      .select("option_id")
+      .eq("round_id",round.id);
+
+    if(votesResult.error){
+      throw votesResult.error;
+    }
+
+    const voteCount = votesResult.data.filter(
+      vote => vote.option_id === round.winning_option_id
+    ).length;
+
+    document.getElementById("winnerTrack").textContent =
+      optionResult.data.track;
+
+    document.getElementById("winnerArtist").textContent =
+      optionResult.data.artist;
+
+    document.getElementById("winnerVotes").textContent =
+      voteCount +
+      (voteCount === 1 ? " vote" : " votes");
+
+    document.getElementById("winnerCard").style.display =
+      "block";
+
+  }catch(error){
+
+    console.error("Load round result error:",error);
+
+  }
+  } 
 async function closeRound(){
 
   try{
@@ -837,6 +902,7 @@ playWinner;
 loadRequests();
   loadRound();
   loadVoteTotals();
+  loadRoundResult();
 
 setInterval(
   loadRequests,
