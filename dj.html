@@ -381,7 +381,6 @@ async function closeRound(){
   status:"closed",
   closed_at:new Date().toISOString()
 })
-      }
       .eq("id",round.id);
 
     if(updateResult.error){
