@@ -337,7 +337,96 @@ async function loadRound(){
   }
 
   }
-  async function loadRequests(){
+ async function loadVoteTotals(){
+
+  try{
+
+    const roundResult = await db
+      .from("rounds")
+      .select("id")
+      .eq("event_id",EVENT_ID)
+      .eq("status","open")
+      .order("round_number",{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(roundResult.error){
+      throw roundResult.error;
+    }
+
+    const round = roundResult.data;
+
+    const container =
+      document.getElementById("roundVotes");
+
+    if(!round){
+
+      container.textContent =
+        "No active vote";
+
+      return;
+    }
+
+    const optionsResult = await db
+      .from("options")
+      .select("id,artist,track,position")
+      .eq("round_id",round.id)
+      .order("position");
+
+    if(optionsResult.error){
+      throw optionsResult.error;
+    }
+
+    const votesResult = await db
+      .from("votes")
+      .select("option_id")
+      .eq("round_id",round.id);
+
+    if(votesResult.error){
+      throw votesResult.error;
+    }
+
+    const counts = {};
+
+    votesResult.data.forEach(vote => {
+
+      counts[vote.option_id] =
+        (counts[vote.option_id] || 0) + 1;
+
+    });
+
+    container.innerHTML =
+      optionsResult.data.map(option => {
+
+        const votes =
+          counts[option.id] || 0;
+
+        return `
+          <div class="voteRow">
+            <span>
+              ${option.artist} — ${option.track}
+            </span>
+            <strong>
+              ${votes}
+            </strong>
+          </div>
+        `;
+
+      }).join("");
+
+  }catch(error){
+
+    console.error(
+      "Vote loading error:",
+      error
+    );
+
+    document.getElementById("roundVotes").textContent =
+      "Unable to load votes";
+
+  }
+
+  } async function loadRequests(){
 
   try{
 
