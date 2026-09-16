@@ -492,7 +492,8 @@ if(requestUpdate.error){
   }catch(error){
 
     console.error("Load round result error:",error);
-
+    
+alert(error.message || "Load round result failed");
   }
   } 
 async function closeRound(){
