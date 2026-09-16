@@ -311,14 +311,14 @@ async function loadRequests(){
 
           <div class="requester">
             Requested by ${esc(request.requester_name)}
-          </div>          <div class="actions">
-            <button onclick="updateRequest('${request.id}','played')">
-              ✓ PLAY IT
-            </button>
-            <button class="reject" onclick="updateRequest('${request.id}','rejected')">
-              ✕ NOT TONIGHT
-            </button>
-          </div>
+          <div class="actions">
+  <button onclick="updateRequest('${request.id}','submitted')">
+    ✓ ACCEPT
+  </button>
+  <button class="reject" onclick="updateRequest('${request.id}','rejected')">
+    ✕ NOT TONIGHT
+  </button>
+</div>
 
           <div class="time">
             ${esc(request.status || "pending")} • ${esc(time)}
