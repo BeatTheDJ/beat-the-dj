@@ -273,7 +273,69 @@ function setStatus(text,live=false){
   document.getElementById("status").classList.toggle("live",live);
 }
 
-async function loadRequests(){
+async function loadRound(){
+
+  try{
+
+    const result = await db
+      .from("rounds")
+      .select("id,title,status,round_number")
+      .eq("event_id",EVENT_ID)
+      .eq("status","open")
+      .order("round_number",{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(result.error){
+      throw result.error;
+    }
+
+    const round = result.data;
+
+    const title =
+      document.getElementById("roundTitle");
+
+    const status =
+      document.getElementById("roundStatus");
+
+    if(!round){
+
+      title.textContent =
+        "No open round";
+
+      status.textContent =
+        "Waiting for a round";
+
+      return;
+    }
+
+    title.textContent =
+      round.title ||
+      "Round " + round.round_number;
+
+    status.textContent =
+      "Round " +
+      round.round_number +
+      " • VOTING OPEN";
+
+  }catch(error){
+
+    console.error(
+      "Round loading error:",
+      error
+    );
+
+    document.getElementById("roundTitle").textContent =
+      "Unable to load round";
+
+    document.getElementById("roundStatus").textContent =
+      error.message ||
+      "Connection problem";
+
+  }
+
+  }
+  async function loadRequests(){
 
   try{
 
