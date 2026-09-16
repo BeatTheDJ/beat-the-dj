@@ -312,7 +312,7 @@ async function loadRequests(){
           <div class="requester">
             Requested by ${esc(request.requester_name)}
           <div class="actions">
-  <button onclick="updateRequest('${request.id}','submitted')"
+  <button onclick="updateRequest('${request.id}','submitted')">
     ✓ ACCEPT
   </button>
   <button class="reject" onclick="updateRequest('${request.id}','rejected')">
