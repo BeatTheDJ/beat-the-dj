@@ -425,10 +425,30 @@ async function closeRound(){
       highest > 0 && winners.length === 1
         ? winners[0]
         : null;
+  
+    if(winningOption){
 
-    
+  document.getElementById("winnerCard").style.display =
+    "block";
 
-    
+  document.getElementById("winnerTrack").textContent =
+    winningOption.track;
+
+  document.getElementById("winnerArtist").textContent =
+    winningOption.artist;
+
+  document.getElementById("winnerVotes").textContent =
+    highest +
+    (highest === 1 ? " vote" : " votes");
+
+}else{
+
+  document.getElementById("winnerCard").style.display =
+    "none";
+
+  }
+
+  
 const updateResult = await db
   .from("rounds")
   .update({
