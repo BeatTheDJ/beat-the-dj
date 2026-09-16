@@ -243,9 +243,11 @@ footer{
 </div>
 
 <section class="card">
+
   <h2>Current Round</h2>
 
   <div class="request">
+
     <div class="song" id="roundTitle">
       No open round
     </div>
@@ -254,13 +256,58 @@ footer{
       Waiting for a round
     </div>
 
-  <div id="roundVotes">
-  Loading votes...
-  </div>  <button id="closeRoundBtn" disabled>
+    <div id="roundVotes">
+      Loading votes...
+    </div>
+
+    <button id="closeRoundBtn" disabled>
       CLOSE VOTE
     </button>
+
   </div>
-</section><section class="card">
+
+</section>
+<section class="card" id="winnerCard" style="display:none;">
+
+  <h2>ROUND RESULT</h2>
+
+  <div class="request">
+
+    <div class="artist">
+      WINNER
+    </div>
+
+    <div class="song" id="winnerTrack">
+      —
+    </div>
+
+    <div class="artist" id="winnerArtist">
+      —
+    </div>
+
+    <div id="winnerVotes">
+      —
+    </div>
+
+    <div class="actions">
+
+      <button id="playWinnerBtn">
+        ✓ PLAY IT
+      </button>
+
+      <button
+        id="rejectWinnerBtn"
+        class="reject"
+      >
+        ✕ NOT TONIGHT
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+<section class="card">
   <h2>Requests</h2>
   <div id="requests">
     <div class="empty">Loading requests…</div>
