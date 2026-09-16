@@ -416,6 +416,9 @@ const requestUpdate = await db
 if(requestUpdate.error){
   throw requestUpdate.error;
 }
+    document.getElementById("playWinnerBtn").textContent = "✓ PLAYED";
+document.getElementById("playWinnerBtn").disabled = true;
+document.getElementById("rejectWinnerBtn").disabled = true;
     alert("Winner marked to PLAY.");
 
   }catch(error){
@@ -435,7 +438,7 @@ if(requestUpdate.error){
 
     const roundResult = await db
       .from("rounds")
-      .select("id,winning_option_id")
+      .select("id,winning_option_id,dj_decision")
       .eq("event_id",EVENT_ID)
       .eq("status","closed")
       .order("round_number",{ascending:false})
@@ -485,6 +488,13 @@ if(requestUpdate.error){
     document.getElementById("winnerVotes").textContent =
       voteCount +
       (voteCount === 1 ? " vote" : " votes");
+    if(round.dj_decision === "play"){
+  document.getElementById("playWinnerBtn").textContent =
+    "✓ PLAYED";
+  document.getElementById("playWinnerBtn").disabled = true;
+  document.getElementById("rejectWinnerBtn").disabled = true;
+    }
+    
 
     document.getElementById("winnerCard").style.display =
       "block";
