@@ -379,7 +379,22 @@ async function playWinner(){
       alert("There is no winning track to play.");
       return;
     }
+const optionResult = await db
+  .from("options")
+  .select("request_id")
+  .eq("id",round.winning_option_id)
+  .maybeSingle();
 
+if(optionResult.error){
+  throw optionResult.error;
+}
+
+const winningOption = optionResult.data;
+
+if(!winningOption || !winningOption.request_id){
+  alert("The winning track is not linked to a request.");
+  return;
+  }
     const updateResult = await db
       .from("rounds")
       .update({
@@ -391,7 +406,16 @@ async function playWinner(){
     if(updateResult.error){
       throw updateResult.error;
     }
+const requestUpdate = await db
+  .from("requests")
+  .update({
+    status:"played"
+  })
+  .eq("id",winningOption.request_id);
 
+if(requestUpdate.error){
+  throw requestUpdate.error;
+}
     alert("Winner marked to PLAY.");
 
   }catch(error){
