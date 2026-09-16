@@ -330,8 +330,10 @@ async function loadRound(){
 
     const status =
       document.getElementById("roundStatus");
+    const closeButton =
+  document.getElementById("closeRoundBtn");
 
-    if(!round){
+    if(!round){closeButton.disabled = true;
 
       title.textContent =
         "No open round";
@@ -342,6 +344,7 @@ async function loadRound(){
       return;
     }
 
+  closeButton.disabled = false;
     title.textContent =
       round.title ||
       "Round " + round.round_number;
