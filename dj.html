@@ -452,9 +452,10 @@ async function closeRound(){
 const updateResult = await db
   .from("rounds")
   .update({
-    status:"closed",
-    closed_at:new Date().toISOString()
-  })
+  status:"closed",
+  closed_at:new Date().toISOString(),
+  winning_option_id: winningOption ? winningOption.id : null
+})
   .eq("id",round.id);
 if(updateResult.error){
   throw updateResult.error;
