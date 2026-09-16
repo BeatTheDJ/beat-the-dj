@@ -356,6 +356,56 @@ function setStatus(text,live=false){
   document.getElementById("statusText").textContent = text;
   document.getElementById("status").classList.toggle("live",live);
 }
+async function playWinner(){
+
+  try{
+
+    const roundResult = await db
+      .from("rounds")
+      .select("id,winning_option_id")
+      .eq("event_id",EVENT_ID)
+      .eq("status","closed")
+      .order("round_number",{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(roundResult.error){
+      throw roundResult.error;
+    }
+
+    const round = roundResult.data;
+
+    if(!round || !round.winning_option_id){
+      alert("There is no winning track to play.");
+      return;
+    }
+
+    const updateResult = await db
+      .from("rounds")
+      .update({
+        dj_decision:"play",
+        decided_at:new Date().toISOString()
+      })
+      .eq("id",round.id);
+
+    if(updateResult.error){
+      throw updateResult.error;
+    }
+
+    alert("Winner marked to PLAY.");
+
+  }catch(error){
+
+    console.error("Play winner error:",error);
+
+    alert(
+      error.message ||
+      "Unable to mark the winner to play."
+    );
+
+  }
+}
+  
 async function closeRound(){
 
   try{
@@ -758,6 +808,8 @@ document.getElementById("refreshBtn").onclick =
   loadRequests;
 document.getElementById("closeRoundBtn").onclick =
   closeRound;
+  document.getElementById("playWinnerBtn").onclick =
+playWinner;
 loadRequests();
   loadRound();
   loadVoteTotals();
