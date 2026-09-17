@@ -957,16 +957,27 @@ async function loadRound(){
   </button>
 
 </div>
+
+` : request.status === "submitted" ? `
+
+<div class="actions">
+
+  <button onclick="addToVote('${request.id}')">
+    + ADD TO VOTE
+  </button>
+
+</div>
+
 ` : `
+
 <div class="time">
   ${
-    request.status === "submitted"
-      ? "✓ ACCEPTED — READY FOR VOTE"
-      : request.status === "played"
-        ? "✓ PLAYED"
-        : "✕ REJECTED"
+    request.status === "played"
+      ? "✓ PLAYED"
+      : "✕ REJECTED"
   }
 </div>
+
 `}
 
           
