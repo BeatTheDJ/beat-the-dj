@@ -945,7 +945,7 @@ async function loadRound(){
           <div class="requester">
             Requested by ${esc(request.requester_name)}
             </div>
-          ${request.status === "submitted" || !request.status ? `
+          ${request.status === "submitted" || request.status === "pending" || !request.status ? `
 <div class="actions">
 
   <button onclick="updateRequest('${request.id}','submitted')">
