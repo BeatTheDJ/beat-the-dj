@@ -422,9 +422,13 @@ async function playWinner(){
       throw requestUpdate.error;
     }
 
-    alert("Winner marked to PLAY.");
+    document.getElementById("playWinnerBtn").textContent = "✓ PLAYED";
+document.getElementById("playWinnerBtn").disabled = true;
+document.getElementById("rejectWinnerBtn").disabled = true;
 
-    await loadRoundResult();
+alert("Winner marked to PLAY.");
+
+await loadRequests();
 
   }catch(error){
 
