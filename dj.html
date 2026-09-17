@@ -357,7 +357,7 @@ function setStatus(text,live=false){
   document.getElementById("status").classList.toggle("live",live);
 }
 async function playWinner(){
-alert("PLAY WINNER CLICKED");
+
   try{
 
     const roundResult = await db
@@ -379,47 +379,52 @@ alert("PLAY WINNER CLICKED");
       alert("There is no winning track to play.");
       return;
     }
-const optionResult = await db
-  .from("options")
-  .select("request_id")
-  .eq("id",round.winning_option_id)
-  .maybeSingle();
 
-if(optionResult.error){
-  throw optionResult.error;
-}
+    const optionResult = await db
+      .from("options")
+      .select("request_id")
+      .eq("id",round.winning_option_id)
+      .maybeSingle();
 
-const winningOption = optionResult.data;
+    if(optionResult.error){
+      throw optionResult.error;
+    }
 
-if(!winningOption || !winningOption.request_id){
-  alert("The winning track is not linked to a request.");
-  return;
-  }
+    const winningOption = optionResult.data;
+
+    if(!winningOption || !winningOption.request_id){
+      alert("The winning track is not linked to a request.");
+      return;
+    }
+
     const updateResult = await db
-      .from("rounds")
-      .update({
-        dj_decision:"play",
-        decided_at:new Date().toISOString()
-      })
-      .eq("id",round.id);
+  .from("rounds")
+  .update({
+    dj_decision:"play",
+    decided_at:new Date().toISOString()
+  })
+  .eq("id",round.id)
+  .select("id,dj_decision")
+  .single();
 
     if(updateResult.error){
       throw updateResult.error;
     }
-const requestUpdate = await db
-  .from("requests")
-  .update({
-    status:"played"
-  })
-  .eq("id",winningOption.request_id);
 
-if(requestUpdate.error){
-  throw requestUpdate.error;
-}
-    document.getElementById("playWinnerBtn").textContent = "✓ PLAYED";
-document.getElementById("playWinnerBtn").disabled = true;
-document.getElementById("rejectWinnerBtn").disabled = true;
+    const requestUpdate = await db
+      .from("requests")
+      .update({
+        status:"played"
+      })
+      .eq("id",winningOption.request_id);
+
+    if(requestUpdate.error){
+      throw requestUpdate.error;
+    }
+
     alert("Winner marked to PLAY.");
+
+    await loadRoundResult();
 
   }catch(error){
 
@@ -431,6 +436,7 @@ document.getElementById("rejectWinnerBtn").disabled = true;
     );
 
   }
+
 }
  async function rejectWinner(){
 
