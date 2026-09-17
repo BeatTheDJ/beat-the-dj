@@ -945,18 +945,25 @@ async function loadRound(){
           <div class="requester">
             Requested by ${esc(request.requester_name)}
             </div>
-          <div class="actions">
+          ${request.status === "submitted" || !request.status ? `
+<div class="actions">
+
   <button onclick="updateRequest('${request.id}','submitted')">
     ✓ ACCEPT
   </button>
+
   <button class="reject" onclick="updateRequest('${request.id}','rejected')">
     ✕ NOT TONIGHT
   </button>
-</div>
 
-          <div class="time">
-            ${esc(request.status || "pending")} • ${esc(time)}
-          </div>
+</div>
+` : `
+<div class="time">
+  ${request.status === "played" ? "✓ PLAYED" : "✕ REJECTED"}
+</div>
+`}
+
+          
 
         </div>
       `;
