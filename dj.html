@@ -578,7 +578,12 @@ document.getElementById("rejectWinnerBtn").disabled = true;
   document.getElementById("playWinnerBtn").disabled = true;
   document.getElementById("rejectWinnerBtn").disabled = true;
     }
-    
+    else if(round.dj_decision === "reject"){
+  document.getElementById("rejectWinnerBtn").textContent =
+    "✕ REJECTED";
+  document.getElementById("rejectWinnerBtn").disabled = true;
+  document.getElementById("playWinnerBtn").disabled = true;
+  }
 
     document.getElementById("winnerCard").style.display =
       "block";
