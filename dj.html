@@ -432,7 +432,91 @@ document.getElementById("rejectWinnerBtn").disabled = true;
 
   }
 }
- async function loadRoundResult(){
+ async function rejectWinner(){
+
+  try{
+
+    const roundResult = await db
+      .from("rounds")
+      .select("id,winning_option_id")
+      .eq("event_id",EVENT_ID)
+      .eq("status","closed")
+      .order("round_number",{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(roundResult.error){
+      throw roundResult.error;
+    }
+
+    const round = roundResult.data;
+
+    if(!round || !round.winning_option_id){
+      alert("There is no winning track to reject.");
+      return;
+    }
+
+    const optionResult = await db
+      .from("options")
+      .select("request_id")
+      .eq("id",round.winning_option_id)
+      .maybeSingle();
+
+    if(optionResult.error){
+      throw optionResult.error;
+    }
+
+    const winningOption = optionResult.data;
+
+    if(!winningOption || !winningOption.request_id){
+      alert("The winning track is not linked to a request.");
+      return;
+    }
+
+    const updateResult = await db
+      .from("rounds")
+      .update({
+        dj_decision:"reject",
+        decided_at:new Date().toISOString()
+      })
+      .eq("id",round.id);
+
+    if(updateResult.error){
+      throw updateResult.error;
+    }
+
+    const requestUpdate = await db
+      .from("requests")
+      .update({
+        status:"rejected"
+      })
+      .eq("id",winningOption.request_id);
+
+    if(requestUpdate.error){
+      throw requestUpdate.error;
+    }
+
+    document.getElementById("rejectWinnerBtn").textContent =
+      "✕ NOT TONIGHT";
+
+    document.getElementById("rejectWinnerBtn").disabled = true;
+
+    document.getElementById("playWinnerBtn").disabled = true;
+
+    alert("Winner marked NOT TONIGHT.");
+
+  }catch(error){
+
+    console.error("Reject winner error:",error);
+
+    alert(
+      error.message ||
+      "Unable to reject the winner."
+    );
+
+  }
+ }
+  async function loadRoundResult(){
 
   try{
 
@@ -910,7 +994,9 @@ document.getElementById("closeRoundBtn").onclick =
   closeRound;
   document.getElementById("playWinnerBtn").onclick =
 playWinner;
-loadRequests();
+document.getElementById("rejectWinnerBtn").onclick =
+  rejectWinner;
+  loadRequests();
   loadRound();
   loadVoteTotals();
   loadRoundResult();
