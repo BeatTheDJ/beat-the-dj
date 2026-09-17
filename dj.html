@@ -959,7 +959,13 @@ async function loadRound(){
 </div>
 ` : `
 <div class="time">
-  ${request.status === "played" ? "✓ PLAYED" : "✕ REJECTED"}
+  ${
+    request.status === "submitted"
+      ? "✓ ACCEPTED — READY FOR VOTE"
+      : request.status === "played"
+        ? "✓ PLAYED"
+        : "✕ REJECTED"
+  }
 </div>
 `}
 
