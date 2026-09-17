@@ -989,10 +989,12 @@ async function updateRequest(id,status){
   try{
 
     const result = await db
-      .from("requests")
-      .update({status:status})
-      .eq("id",id)
-      .eq("event_id",EVENT_ID);
+  .from("requests")
+  .update({status:status})
+  .eq("id",id)
+  .eq("event_id",EVENT_ID)
+  .select("id,status")
+  .single();
 
     if(result.error){
       throw result.error;
