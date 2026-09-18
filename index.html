@@ -891,12 +891,13 @@ const name = $("requestName").value.trim();
 
   try{
     const result = await db
-      .from("requests")
-      .insert({
-        event_id: EVENT_ID,requester_name: name,
-        artist: artist,
-        song: song
-      });
+  .from("requests")
+  .insert({
+    event_id: EVENT_ID,requester_name: name,
+    artist: artist,
+    song: song,
+    status: "pending"
+  });
 
     if(result.error) throw result.error;
 
