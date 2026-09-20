@@ -698,6 +698,10 @@ await loadRequests();
     document.getElementById("winnerVotes").textContent =
       voteCount +
       (voteCount === 1 ? " vote" : " votes");
+  document.getElementById("playWinnerBtn").textContent = "✓ PLAY IT";
+document.getElementById("rejectWinnerBtn").textContent = "✕ NOT TONIGHT";
+document.getElementById("playWinnerBtn").disabled = false;
+document.getElementById("rejectWinnerBtn").disabled = false;
     if(round.dj_decision === "play"){
   document.getElementById("playWinnerBtn").textContent =
     "✓ PLAYED";
