@@ -1315,8 +1315,26 @@ async function addToCurrentRound(requestId){
     );
   }
 }
-  document.getElementById("refreshBtn").onclick =
-  loadRequests;
+document.getElementById("refreshBtn").onclick =
+  async function(){
+
+    const button =
+      document.getElementById("refreshBtn");
+
+    button.textContent = "REFRESHING...";
+    button.disabled = true;
+
+    await loadRequests();
+
+    button.textContent = "✓ REFRESHED";
+
+    setTimeout(() => {
+      button.textContent = "REFRESH REQUESTS";
+      button.disabled = false;
+    }, 800);
+
+  };
+  
 document.getElementById("closeRoundBtn").onclick =
   closeRound;
   document.getElementById("playWinnerBtn").onclick =
