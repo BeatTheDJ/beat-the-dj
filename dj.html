@@ -707,6 +707,9 @@ await loadRequests();
 document.getElementById("rejectWinnerBtn").textContent = "✕ NOT TONIGHT";
 document.getElementById("playWinnerBtn").disabled = false;
 document.getElementById("rejectWinnerBtn").disabled = false;
+  document.getElementById("rejectWinnerBtn").style.background = "";
+document.getElementById("rejectWinnerBtn").style.color = "";
+document.getElementById("rejectWinnerBtn").style.border = "";
     if(round.dj_decision === "play"){
   document.getElementById("playWinnerBtn").textContent =
     "✓ PLAYED";
