@@ -688,7 +688,7 @@ async function castVote(
     );
 
     $("message").textContent =
-      "Vote counted. Watch the screen.";
+      "Vote counted. Watch the screens for live updates!";
 
     await refresh();
 
@@ -789,7 +789,7 @@ async function refresh(){
         .classList.remove("hidden");
 
       setStatus(
-        "Waiting for Stage 1"
+        "Waiting for the next public vote"
       );
 
       $("timer").textContent = "";
