@@ -638,6 +638,9 @@ await loadRequests();
 
     document.getElementById("playWinnerBtn").disabled = true;
 
+await loadRoundResult();
+await loadRequests();
+    
     alert("Winner marked NOT TONIGHT.");
 
   }catch(error){
