@@ -962,9 +962,9 @@ async function loadRound(){
 
 <div class="actions">
 
-  <button onclick="addToVote('${request.id}')">
-    + ADD TO VOTE
-  </button>
+  <button onclick="addToCurrentRound('${request.id}')">
+  + ADD TO CURRENT ROUND
+</button>
 
 </div>
 
@@ -1027,7 +1027,104 @@ async function updateRequest(id,status){
     );
   }
   }
-document.getElementById("refreshBtn").onclick =
+async function addToCurrentRound(requestId){
+
+  try{
+
+    const roundResult = await db
+      .from("rounds")
+      .select("id")
+      .eq("event_id",EVENT_ID)
+      .eq("status","open")
+      .order("round_number",{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(roundResult.error){
+      throw roundResult.error;
+    }
+
+    const round = roundResult.data;
+
+    if(!round){
+      alert("There is no open round.");
+      return;
+    }
+
+    const requestResult = await db
+      .from("requests")
+      .select("id,artist,song,status")
+      .eq("id",requestId)
+      .eq("event_id",EVENT_ID)
+      .maybeSingle();
+
+    if(requestResult.error){
+      throw requestResult.error;
+    }
+
+    const request = requestResult.data;
+
+    if(!request){
+      alert("Request not found.");
+      return;
+    }
+
+    const optionsResult = await db
+      .from("options")
+      .select("position")
+      .eq("round_id",round.id)
+      .order("position",{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(optionsResult.error){
+      throw optionsResult.error;
+    }
+
+    const nextPosition =
+      optionsResult.data
+        ? optionsResult.data.position + 1
+        : 1;
+
+    const insertResult = await db
+      .from("options")
+      .insert({
+        round_id:round.id,
+        position:nextPosition,
+        label:request.artist + " — " + request.song,
+        artist:request.artist,
+        track:request.song,
+        request_id:request.id
+      });
+
+    if(insertResult.error){
+      throw insertResult.error;
+    }
+
+    alert(
+      request.artist +
+      " — " +
+      request.song +
+      " added to the current round."
+    );
+
+    await loadRequests();
+    await loadVoteTotals();
+
+  }catch(error){
+
+    console.error(
+      "Add to current round error:",
+      error
+    );
+
+    alert(
+      error.message ||
+      "Unable to add this request to the current round."
+    );
+  }
+}
+  document.getElementById("refreshBtn").onclick =
   loadRequests;
 document.getElementById("closeRoundBtn").onclick =
   closeRound;
