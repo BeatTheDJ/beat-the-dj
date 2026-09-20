@@ -746,8 +746,104 @@ document.getElementById("rejectWinnerBtn").style.color = "#f5f5f2";
 alert(error.message || "Load round result failed");
   }
   } 
-async function closeRound(){
 
+  function showCloseVoteConfirm(){
+
+  return new Promise(resolve => {
+
+    const overlay = document.createElement("div");
+
+    overlay.style.position = "fixed";
+    overlay.style.inset = "0";
+    overlay.style.background = "rgba(0,0,0,.75)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.padding = "20px";
+    overlay.style.zIndex = "9999";
+
+    overlay.innerHTML = `
+      <div style="
+        width:100%;
+        max-width:420px;
+        background:#1b1b1b;
+        border:2px solid #8b1e1e;
+        border-radius:16px;
+        padding:24px;
+        box-sizing:border-box;
+        text-align:center;
+      ">
+
+        <div style="
+          font-size:22px;
+          font-weight:800;
+          margin-bottom:12px;
+        ">
+          ⚠️ CLOSE VOTE?
+        </div>
+
+        <div style="
+          color:#ddd;
+          line-height:1.5;
+          margin-bottom:22px;
+        ">
+          This will end voting for the current round.
+          Customers will no longer be able to vote.
+        </div>
+
+        <div style="
+          display:flex;
+          gap:10px;
+        ">
+
+          <button id="cancelCloseVote" style="
+            flex:1;
+            background:#333;
+            color:#f5f5f2;
+            border:1px solid #555;
+          ">
+            CANCEL
+          </button>
+
+          <button id="confirmCloseVote" style="
+            flex:1;
+            background:#8b1e1e;
+            color:#fff;
+            border:1px solid #8b1e1e;
+          ">
+            CONFIRM
+          </button>
+
+        </div>
+
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document
+      .getElementById("cancelCloseVote")
+      .onclick = () => {
+        overlay.remove();
+        resolve(false);
+      };
+
+    document
+      .getElementById("confirmCloseVote")
+      .onclick = () => {
+        overlay.remove();
+        resolve(true);
+      };
+
+  });
+
+  }
+async function closeRound(){
+const confirmed = await showCloseVoteConfirm();
+
+if(!confirmed){
+  return;
+}
   try{
 
     const roundResult = await db
