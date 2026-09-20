@@ -1043,7 +1043,38 @@ async function loadRound(){
     if(result.error){
       throw result.error;
     }
+const openRoundResult = await db
+  .from("rounds")
+  .select("id")
+  .eq("event_id",EVENT_ID)
+  .eq("status","open")
+  .limit(1)
+  .maybeSingle();
 
+if(openRoundResult.error){
+  throw openRoundResult.error;
+}
+
+let roundRequestIds = new Set();
+
+if(openRoundResult.data){
+
+  const optionsResult = await db
+    .from("options")
+    .select("request_id")
+    .eq("round_id",openRoundResult.data.id);
+
+  if(optionsResult.error){
+    throw optionsResult.error;
+  }
+
+  roundRequestIds = new Set(
+    (optionsResult.data || [])
+      .map(option => option.request_id)
+      .filter(Boolean)
+  );
+}
+    
     const requests = result.data || [];
     const box = document.getElementById("requests");
 
@@ -1100,9 +1131,19 @@ async function loadRound(){
 
 <div class="actions">
 
-  <button onclick="addToCurrentRound('${request.id}')">
-  + ADD TO CURRENT ROUND
-</button>
+  ${
+    roundRequestIds.has(request.id)
+      ? `
+        <button disabled>
+          ✓ ADDED TO ROUND
+        </button>
+      `
+      : `
+        <button onclick="addToCurrentRound('${request.id}')">
+          + ADD TO CURRENT ROUND
+        </button>
+      `
+  }
 
 </div>
 
