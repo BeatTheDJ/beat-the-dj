@@ -907,6 +907,9 @@ if(!confirmed){
         (counts[option.id] || 0) === highest
       );
 
+    const isTie =
+  highest > 0 && winners.length > 1;
+    
     const winningOption =
       highest > 0 && winners.length === 1
         ? winners[0]
