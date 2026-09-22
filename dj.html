@@ -832,8 +832,21 @@ document.getElementById("tieCard").style.display = "none";
     const voteCount = votesResult.data.filter(
       vote => vote.option_id === round.winning_option_id
     ).length;
+const requesterResult = await db
+  .from("requests")
+  .select("requester_name")
+  .eq("id",optionResult.data.request_id)
+  .maybeSingle();
 
-    document.getElementById("winnerTrack").textContent =
+if(requesterResult.error){
+  throw requesterResult.error;
+}
+
+document.getElementById("winnerRequester").textContent =
+  "BEAT THE DJ: " +
+  (requesterResult.data?.requester_name || "Unknown");
+
+document.getElementById("winnerTrack").textContent =
       optionResult.data.track;
 
     document.getElementById("winnerArtist").textContent =
