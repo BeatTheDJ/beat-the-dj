@@ -692,14 +692,40 @@ if(!round.winning_option_id){
 
   const optionsResult = await db
     .from("options")
-    .select("id,artist,track")
+  .select("id,artist,track,request_id")
     .eq("round_id",round.id)
     .order("position",{ascending:true});
 
   if(optionsResult.error){
     throw optionsResult.error;
   }
+const requestIds =
+  (optionsResult.data || [])
+    .map(option => option.request_id)
+    .filter(Boolean);
 
+let requesterNames = {};
+
+if(requestIds.length){
+
+  const requestsResult = await db
+    .from("requests")
+    .select("id,requester_name")
+    .in("id",requestIds);
+
+  if(requestsResult.error){
+    throw requestsResult.error;
+  }
+
+  requesterNames =
+    Object.fromEntries(
+      (requestsResult.data || [])
+        .map(request => [
+          request.id,
+          request.requester_name
+        ])
+    );
+}
   const votesResult = await db
     .from("votes")
     .select("option_id")
@@ -738,7 +764,9 @@ if(!round.winning_option_id){
     document.getElementById("tieOptions").innerHTML =
       winners.map(option => `
         <div class="request">
-
+<div class="time">
+  REQUESTED BY ${esc(requesterNames[option.request_id] || "Unknown")}
+</div>
           <div class="artist">
             ${esc(option.artist)}
           </div>
