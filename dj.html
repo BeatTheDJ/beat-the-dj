@@ -311,12 +311,16 @@ footer{
     </div>
 
     <div class="artist" id="winnerArtist">
-      —
-    </div>
+  —
+</div>
 
-    <div id="winnerVotes">
-      —
-    </div>
+<div class="requester" id="winnerRequester">
+  BEAT THE DJ: —
+</div>
+
+<div id="winnerVotes">
+  —
+</div>
 
     <div class="actions">
 
@@ -799,7 +803,7 @@ if(requestIds.length){
 
     return;
   }
-
+document.getElementById("tieCard").style.display = "none";
   document.getElementById("winnerCard").style.display = "none";
   document.getElementById("tieCard").style.display = "none";
 
@@ -808,7 +812,7 @@ if(requestIds.length){
 
     const optionResult = await db
       .from("options")
-      .select("artist,track")
+.select("artist,track,request_id")
       .eq("id",round.winning_option_id)
       .maybeSingle();
 
