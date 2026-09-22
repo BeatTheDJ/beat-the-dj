@@ -680,10 +680,103 @@ await loadRequests();
 
     const round = roundResult.data;
 
-    if(!round || !round.winning_option_id){
-      document.getElementById("winnerCard").style.display = "none";
-      return;
-    }
+    if(!round){
+
+  document.getElementById("winnerCard").style.display = "none";
+  document.getElementById("tieCard").style.display = "none";
+
+  return;
+}
+
+if(!round.winning_option_id){
+
+  const optionsResult = await db
+    .from("options")
+    .select("id,artist,track")
+    .eq("round_id",round.id)
+    .order("position",{ascending:true});
+
+  if(optionsResult.error){
+    throw optionsResult.error;
+  }
+
+  const votesResult = await db
+    .from("votes")
+    .select("option_id")
+    .eq("round_id",round.id);
+
+  if(votesResult.error){
+    throw votesResult.error;
+  }
+
+  const counts = {};
+
+  votesResult.data.forEach(vote => {
+
+    counts[vote.option_id] =
+      (counts[vote.option_id] || 0) + 1;
+
+  });
+
+  const options = optionsResult.data || [];
+
+  const highest =
+    Math.max(
+      0,
+      ...options.map(option =>
+        counts[option.id] || 0
+      )
+    );
+
+  const winners =
+    options.filter(option =>
+      (counts[option.id] || 0) === highest
+    );
+
+  if(highest > 0 && winners.length > 1){
+
+    document.getElementById("tieOptions").innerHTML =
+      winners.map(option => `
+        <div class="request">
+
+          <div class="artist">
+            ${esc(option.artist)}
+          </div>
+
+          <div class="song">
+            ${esc(option.track)}
+          </div>
+
+          <div class="time">
+            ${counts[option.id]}
+            ${counts[option.id] === 1 ? "vote" : "votes"}
+          </div>
+
+          <div class="actions">
+
+            <button
+              onclick="chooseTieWinner('${option.id}')"
+            >
+              SELECT THIS TRACK
+            </button>
+
+          </div>
+
+        </div>
+      `).join("");
+
+    document.getElementById("winnerCard").style.display = "none";
+
+    document.getElementById("tieCard").style.display = "block";
+
+    return;
+  }
+
+  document.getElementById("winnerCard").style.display = "none";
+  document.getElementById("tieCard").style.display = "none";
+
+  return;
+}
 
     const optionResult = await db
       .from("options")
@@ -754,6 +847,42 @@ alert(error.message || "Load round result failed");
   }
   } 
 
+async function chooseTieWinner(optionId){
+
+  try{
+
+    const updateResult = await db
+      .from("rounds")
+      .update({
+        winning_option_id: optionId
+      })
+      .eq("event_id",EVENT_ID)
+      .eq("status","closed")
+      .is("winning_option_id",null);
+
+    if(updateResult.error){
+      throw updateResult.error;
+    }
+
+    await loadRoundResult();
+    await loadRequests();
+
+  }catch(error){
+
+    console.error(
+      "Choose tie winner error:",
+      error
+    );
+
+    alert(
+      error.message ||
+      "Unable to choose the tie winner."
+    );
+
+  }
+
+}
+  
   function showCloseVoteConfirm(){
 
   return new Promise(resolve => {
