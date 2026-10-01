@@ -1285,9 +1285,28 @@ const name = $("requestName").value.trim();
   }
 
   button.disabled = true;
-  message.textContent = "Sending request…";
+  message.textContent = "Checking request…";
 
   try{
+    const duplicateResult = await db
+      .from("requests")
+      .select("id")
+      .eq("event_id", EVENT_ID)
+      .ilike("requester_name", name)
+      .ilike("artist", artist)
+      .ilike("song", song)
+      .in("status", ["pending","submitted"])
+      .limit(1);
+
+    if(duplicateResult.error) throw duplicateResult.error;
+
+    if(duplicateResult.data && duplicateResult.data.length){
+      message.textContent = "You already have an active request for this song. Please wait for the DJ to deal with it."; 
+      return;
+    }
+
+    message.textContent = "Sending request…";
+
     const result = await db
   .from("requests")
   .insert({
