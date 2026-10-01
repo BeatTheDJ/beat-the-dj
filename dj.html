@@ -574,7 +574,7 @@ async function startNewRound(){
 
     const openRoundResult = await db
       .from("rounds")
-      .select("id")
+      .select("id,status")
       .eq("event_id",EVENT_ID)
       .in("status",["building","voting"])
       .limit(1)
