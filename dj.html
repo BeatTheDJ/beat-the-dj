@@ -114,6 +114,30 @@ h1{
   margin-bottom:0;
 }
 
+.group-title{
+  margin:4px 0 10px;
+  padding:9px 11px;
+  border-radius:9px;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+.actionable-title{
+  background:#272611;
+  color:#f2c94c;
+  border:1px solid #5f551b;
+}
+
+.history-title{
+  margin-top:22px;
+  background:#1b1b1b;
+  color:#999;
+  border:1px solid #383838;
+}
+
+
 .request.status-pending{
   border-left:4px solid #f2c94c;
 }
@@ -1464,6 +1488,16 @@ if(openRoundResult.data){
     
     const requests = result.data || [];
 
+    const actionableRequests = requests.filter(request =>
+      request.status === "pending" || !request.status || request.status === "submitted"
+    );
+
+    const historyRequests = requests.filter(request =>
+      request.status === "played" || request.status === "rejected"
+    );
+
+    const displayRequests = [...actionableRequests, ...historyRequests];
+
     const playedResult = await db
       .from("requests")
       .select("artist,song")
@@ -1487,9 +1521,10 @@ if(openRoundResult.data){
     const box = document.getElementById("requests");
 
     document.getElementById("requestCount").textContent =
-      requests.length +
-      " request" +
-      (requests.length === 1 ? "" : "s");
+      actionableRequests.length +
+      " actionable • " +
+      historyRequests.length +
+      " history";
 
     if(!requests.length){
       box.innerHTML =
@@ -1499,7 +1534,7 @@ if(openRoundResult.data){
       return;
     }
 
-    box.innerHTML = requests.map(request => {
+    box.innerHTML = displayRequests.map((request,index) => {
 
       const time = request.created_at
         ? new Date(request.created_at).toLocaleTimeString(
@@ -1508,7 +1543,13 @@ if(openRoundResult.data){
           )
         : "";
 
-      return `
+      const groupTitle = index === 0
+        ? '<div class="group-title actionable-title">ACTIONABLE REQUESTS — ' + actionableRequests.length + '</div>'
+        : index === actionableRequests.length
+          ? '<div class="group-title history-title">REQUEST HISTORY — ' + historyRequests.length + '</div>'
+          : "";
+
+      return groupTitle + `
         <div class="request ${request.status === "pending" || !request.status ? "status-pending" : request.status === "submitted" && roundRequestIds.has(request.id) ? "status-in-round" : request.status === "submitted" ? "status-submitted" : request.status === "played" ? "status-played" : request.status === "rejected" ? "status-rejected" : ""}">
 
           <div class="song">
