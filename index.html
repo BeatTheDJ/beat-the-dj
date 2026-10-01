@@ -142,26 +142,48 @@ h1{
   border-color:var(--accent);
   box-shadow:0 0 0 1px var(--accent) inset;
   text-align:center;
+  padding:24px 20px 22px;
+}
+
+.winner-card h2{
+  color:var(--accent);
+  font-size:11px;
+  letter-spacing:.2em;
+  margin-bottom:14px;
 }
 
 .winner-message{
-  font-size:clamp(30px,8vw,52px);
-  line-height:.95;
-  font-weight:900;
-  letter-spacing:-.04em;
-  margin:8px 0 12px;
+  line-height:1;
+  margin:0 0 16px;
   text-transform:uppercase;
 }
 
-.winner-track{
-  font-size:18px;
+.winner-name{
+  display:block;
+  font-size:clamp(28px,6vw,42px);
   font-weight:800;
+  letter-spacing:-.035em;
+  margin-bottom:3px;
+}
+
+.winner-beat{
+  display:block;
+  font-size:clamp(34px,8vw,56px);
+  font-weight:950;
+  letter-spacing:-.045em;
+}
+
+.winner-track{
+  font-size:19px;
+  font-weight:900;
+  line-height:1.2;
+  margin-top:4px;
 }
 
 .winner-artist{
   font-size:14px;
   color:#aaa;
-  margin-top:4px;
+  margin-top:5px;
 }
 
 .round-title{
@@ -772,8 +794,11 @@ async function loadBeatResult(){
       requestResult.data?.requester_name ||
       "YOU";
 
-    $("winnerMessage").textContent =
-      requesterName + "... YOU BEAT THE DJ!";
+    $("winnerMessage").innerHTML =
+      '<span class="winner-name">' +
+      esc(requesterName) +
+      '...</span>' +
+      '<span class="winner-beat">YOU BEAT THE DJ!</span>';
 
     $("winnerTrack").textContent =
       winningOption.track || "";
