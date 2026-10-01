@@ -1555,6 +1555,12 @@ async function addToCurrentRound(requestId){
       return;
     }
 
+    if(request.status !== "submitted"){
+      alert("This request is no longer available to add to a round.");
+      await loadRequests();
+      return;
+    }
+
     const optionsResult = await db
       .from("options")
       .select("position")
