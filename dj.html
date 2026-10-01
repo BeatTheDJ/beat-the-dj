@@ -1292,7 +1292,7 @@ if(!confirmed){
       .from("rounds")
       .select("id")
       .eq("event_id",EVENT_ID)
-      .eq("status","open")
+       .eq("status","voting")
       .order("round_number",{ascending:false})
       .limit(1)
       .maybeSingle();
@@ -1436,7 +1436,7 @@ async function loadRound(){
       .from("rounds")
       .select("id,title,status,round_number")
       .eq("event_id",EVENT_ID)
-      .eq("status","open")
+       .in("status",["building","voting"])
       .order("round_number",{ascending:false})
       .limit(1)
       .maybeSingle();
@@ -1520,7 +1520,7 @@ async function loadRound(){
       .from("rounds")
       .select("id")
       .eq("event_id",EVENT_ID)
-      .eq("status","open")
+       .in("status",["building","voting"])
       .order("round_number",{ascending:false})
       .limit(1)
       .maybeSingle();
@@ -1652,7 +1652,7 @@ const openRoundResult = await db
   .from("rounds")
   .select("id")
   .eq("event_id",EVENT_ID)
-  .eq("status","open")
+   .in("status",["building","voting"])
   .limit(1)
   .maybeSingle();
 
@@ -1917,7 +1917,7 @@ async function addToCurrentRound(requestId){
       .from("rounds")
       .select("id")
       .eq("event_id",EVENT_ID)
-      .eq("status","open")
+       .eq("status","building")
       .order("round_number",{ascending:false})
       .limit(1)
       .maybeSingle();
