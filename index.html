@@ -218,6 +218,19 @@ h1{
   margin-bottom:14px;
 }
 
+.winner-card.dj-win{
+  border-color:#888;
+  box-shadow:0 0 0 1px #555 inset;
+}
+
+.winner-card.dj-win h2{
+  color:#aaa;
+}
+
+.winner-card.dj-win .winner-beat{
+  font-size:clamp(28px,6vw,46px);
+}
+
 .winner-message{
   line-height:1;
   margin:0 0 16px;
@@ -793,7 +806,6 @@ async function loadBeatResult(){
 
     if(
       !latestClosed ||
-      latestClosed.dj_decision !== "play" ||
       !latestClosed.winning_option_id
     ){
 
@@ -860,11 +872,40 @@ async function loadBeatResult(){
       requestResult.data?.requester_name ||
       "YOU";
 
-    $("winnerMessage").innerHTML =
-      '<span class="winner-name">' +
-      esc(requesterName) +
-      '...</span>' +
-      '<span class="winner-beat">BEAT THE DJ!</span>';
+    const djWon =
+      latestClosed.dj_decision === "reject";
+
+    if(
+      latestClosed.dj_decision !== "play" &&
+      !djWon
+    ){
+
+      $("winnerCard")
+        .classList.add("hidden");
+
+      return;
+    }
+
+    $("winnerCard")
+      .classList.toggle("dj-win",djWon);
+
+    if(djWon){
+
+      $("winnerMessage").innerHTML =
+        '<span class="winner-name">THE DJ WINS!</span>' +
+        '<span class="winner-beat">' +
+        esc(requesterName) +
+        ' DIDN\'T BEAT THE DJ.</span>';
+
+    }else{
+
+      $("winnerMessage").innerHTML =
+        '<span class="winner-name">' +
+        esc(requesterName) +
+        '...</span>' +
+        '<span class="winner-beat">BEAT THE DJ!</span>';
+
+    }
 
     $("winnerTrack").textContent =
       winningOption.track || "";
@@ -883,7 +924,7 @@ async function loadBeatResult(){
     $("winnerCard")
       .classList.remove("hidden");
 
-    if(winnerKey !== previousWinnerKey){
+    if(winnerKey !== previousWinnerKey && !djWon){
 
       sessionStorage.setItem(
         "btd_last_winner_key",
