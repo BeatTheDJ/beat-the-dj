@@ -410,6 +410,17 @@ h1{
   font-size:14px;
 }
 
+.duplicate-warning{
+  margin-top:12px;
+  padding:12px 14px;
+  border:1px solid #555;
+  border-radius:10px;
+  font-size:15px;
+  font-weight:800;
+  line-height:1.35;
+  text-align:center;
+}
+
 .error{
   color:var(--danger);
 }
@@ -1301,7 +1312,7 @@ const name = $("requestName").value.trim();
     if(duplicateResult.error) throw duplicateResult.error;
 
     if(duplicateResult.data && duplicateResult.data.length){
-      message.textContent = "You already have an active request for this song. Please wait for the DJ to deal with it."; 
+      message.innerHTML = '<div class="duplicate-warning">⚠️ YOU ALREADY HAVE AN ACTIVE REQUEST FOR THIS SONG<br><span style="font-weight:600;">Please wait for the DJ to deal with it.</span></div>';
       return;
     }
 
