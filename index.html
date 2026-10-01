@@ -974,7 +974,9 @@ async function loadBeatResult(){
         '<span class="winner-beat">' +
         esc(requesterName) +
         ' DID NOT BEAT THE DJ.</span>' +
-        '<span class="winner-artist">BETTER LUCK NEXT TIME ${requesterName}!</span>';
+        '<span class="winner-artist">BETTER LUCK NEXT TIME ' +
+        esc(requesterName) +
+        '!</span>';
 
     }else{
 
