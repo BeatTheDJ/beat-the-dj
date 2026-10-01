@@ -1375,15 +1375,29 @@ async function loadRound(){
       return;
     }
 
-  closeButton.disabled = false;
-    title.textContent =
+  title.textContent =
       round.title ||
       "Round " + round.round_number;
+
+    const optionsResult = await db
+      .from("options")
+      .select("id")
+      .eq("round_id",round.id);
+
+    if(optionsResult.error){
+      throw optionsResult.error;
+    }
+
+    const hasTracks = (optionsResult.data || []).length > 0;
+
+    closeButton.disabled = !hasTracks;
 
     status.textContent =
       "Round " +
       round.round_number +
-      " • VOTING OPEN";
+      (hasTracks
+        ? " • VOTING OPEN"
+        : " • WAITING FOR TRACKS");
 
   }catch(error){
 
@@ -1428,6 +1442,23 @@ async function loadRound(){
 
       container.textContent =
         "No active vote";
+
+      return;
+    }
+
+    const optionsResult = await db
+      .from("options")
+      .select("id")
+      .eq("round_id",round.id);
+
+    if(optionsResult.error){
+      throw optionsResult.error;
+    }
+
+    if(!(optionsResult.data || []).length){
+
+      container.textContent =
+        "Add tracks from the requests below to begin voting.";
 
       return;
     }
