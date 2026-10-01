@@ -133,6 +133,14 @@ h1{
   font-size:12px;
 }
 
+.tie-instruction{
+  margin:-4px 0 14px;
+  color:#ddd;
+  font-size:14px;
+  font-weight:700;
+  line-height:1.4;
+}
+
 .round-result-title{
   margin:-4px 0 14px;
   color:var(--accent);
@@ -404,6 +412,10 @@ footer{
   <section class="card" id="tieCard" style="display:none;">
 
   <h2>TIE — DJ DECIDES</h2>
+
+  <div class="tie-instruction" id="tieInstruction">
+    Choose the track you want to win.
+  </div>
 
   <div id="tieOptions"></div>
 
@@ -920,7 +932,7 @@ if(requestIds.length){
             <button
               onclick="chooseTieWinner('${option.id}')"
             >
-              SELECT THIS TRACK
+              ✓ SELECT AS WINNER
             </button>
 
           </div>
