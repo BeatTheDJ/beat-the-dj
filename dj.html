@@ -842,9 +842,23 @@ if(requesterResult.error){
   throw requesterResult.error;
 }
 
-document.getElementById("winnerRequester").textContent =
-  "BEAT THE DJ: " +
-  (requesterResult.data?.requester_name || "Unknown");
+const requesterName =
+  requesterResult.data?.requester_name || "Unknown";
+
+if(round.dj_decision === "reject"){
+
+  document.getElementById("winnerRequester").textContent =
+    "THE DJ WINS! — " +
+    requesterName +
+    " DIDN'T BEAT THE DJ";
+
+}else{
+
+  document.getElementById("winnerRequester").textContent =
+    requesterName +
+    " — BEAT THE DJ!";
+
+}
 
 document.getElementById("winnerTrack").textContent =
       optionResult.data.track;
