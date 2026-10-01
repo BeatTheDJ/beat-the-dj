@@ -149,6 +149,19 @@ h1{
   letter-spacing:.04em;
 }
 
+.round-track{
+  background:#202020;
+  border:1px solid #383838;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:10px;
+}
+.round-track:last-child{margin-bottom:14px;}
+.round-track-number{color:var(--accent);font-size:12px;font-weight:900;margin-bottom:5px;}
+.round-track-title{font-size:17px;font-weight:900;}
+.round-track-artist{color:#ccc;margin-top:3px;}
+.round-track-requester{color:#999;font-size:12px;margin-top:7px;}
+
 .history-toggle{
   display:flex;
   align-items:center;
@@ -423,6 +436,8 @@ footer{
     <div class="time" id="roundNumberDisplay">
       —
     </div>
+
+    <div id="roundTracks"></div>
 
     <div id="roundVotes">
       Loading votes...
@@ -1462,6 +1477,7 @@ async function loadRound(){
       openVotingButton.disabled = true;
       openVotingButton.textContent = "OPEN VOTING";
       roundNumberDisplay.textContent = "—";
+      document.getElementById("roundTracks").innerHTML = "";
       setStartRoundControls(false);
 
       title.textContent =
@@ -1493,6 +1509,46 @@ async function loadRound(){
     }
 
     const hasTracks = (optionsResult.data || []).length > 0;
+
+
+     const roundTracksResult = await db
+       .from("options")
+       .select("id,artist,track,position,request_id")
+       .eq("round_id",round.id)
+       .order("position");
+
+     if(roundTracksResult.error){
+       throw roundTracksResult.error;
+     }
+
+     const roundTracks = roundTracksResult.data || [];
+     const requestIds = roundTracks.map(option => option.request_id).filter(Boolean);
+     let requesterNames = {};
+
+     if(requestIds.length){
+       const requestsResult = await db
+         .from("requests")
+         .select("id,requester_name")
+         .in("id",requestIds);
+
+       if(requestsResult.error){
+         throw requestsResult.error;
+       }
+
+       requesterNames = Object.fromEntries(
+         (requestsResult.data || []).map(request => [request.id,request.requester_name])
+       );
+     }
+
+     document.getElementById("roundTracks").innerHTML =
+       roundTracks.map(option => `
+         <div class="round-track">
+           <div class="round-track-number">TRACK ${option.position}</div>
+           <div class="round-track-title">${esc(option.track || "")}</div>
+           <div class="round-track-artist">${esc(option.artist || "")}</div>
+           <div class="round-track-requester">Requested by ${esc(requesterNames[option.request_id] || "Unknown")}</div>
+         </div>
+       `).join("");
 
     closeButton.disabled =
       round.status !== "voting" || !hasTracks;
