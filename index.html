@@ -147,12 +147,20 @@ h1{
 
 @keyframes victoryCard{
   0%{
-    transform:scale(.96);
+    transform:scale(.88);
     box-shadow:0 0 0 1px var(--accent) inset;
   }
-  45%{
-    transform:scale(1.02);
-    box-shadow:0 0 28px rgba(232,255,56,.45),0 0 0 1px var(--accent) inset;
+  25%{
+    transform:scale(1.04);
+    box-shadow:0 0 55px rgba(232,255,56,.9),0 0 0 3px var(--accent) inset;
+  }
+  50%{
+    transform:scale(.98);
+    box-shadow:0 0 25px rgba(232,255,56,.55),0 0 0 2px var(--accent) inset;
+  }
+  75%{
+    transform:scale(1.025);
+    box-shadow:0 0 45px rgba(232,255,56,.8),0 0 0 3px var(--accent) inset;
   }
   100%{
     transform:scale(1);
@@ -162,12 +170,24 @@ h1{
 
 @keyframes victoryText{
   0%{
-    transform:scale(.9);
-    opacity:.4;
+    transform:scale(.55);
+    opacity:0;
   }
-  55%{
-    transform:scale(1.05);
+  22%{
+    transform:scale(1.18);
     opacity:1;
+  }
+  38%{
+    transform:scale(.94);
+  }
+  54%{
+    transform:scale(1.12);
+  }
+  70%{
+    transform:scale(.97);
+  }
+  84%{
+    transform:scale(1.06);
   }
   100%{
     transform:scale(1);
@@ -175,12 +195,20 @@ h1{
   }
 }
 
+@keyframes victoryFlash{
+  0%,100%{opacity:1}
+  20%,40%,60%{opacity:.35}
+  30%,50%,70%{opacity:1}
+}
+
 .winner-card.victory-animate{
-  animation:victoryCard .8s ease-out;
+  animation:victoryCard 1.25s cubic-bezier(.2,.8,.2,1);
 }
 
 .winner-card.victory-animate .winner-beat{
-  animation:victoryText .7s ease-out;
+  animation:
+    victoryText 1s cubic-bezier(.2,.8,.2,1),
+    victoryFlash .9s ease-in-out .05s;
 }
 
 .winner-card h2{
@@ -863,7 +891,7 @@ async function loadBeatResult(){
       setTimeout(
         () => $("winnerCard")
           .classList.remove("victory-animate"),
-        900
+        1400
       );
 
     }
