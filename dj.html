@@ -1529,6 +1529,9 @@ if(openRoundResult.data){
       )
     );
 
+    const historyWasOpen =
+      document.getElementById("requestHistory")?.style.display === "block";
+
     const box = document.getElementById("requests");
 
     document.getElementById("requestCount").textContent =
@@ -1648,6 +1651,15 @@ if(openRoundResult.data){
       : "";
 
     box.innerHTML = actionableHtml + historyHtml;
+
+    if(historyWasOpen && historyRequests.length){
+      const history = document.getElementById("requestHistory");
+      const label = document.getElementById("historyToggleLabel");
+      if(history && label){
+        history.style.display = "block";
+        label.textContent = "HIDE HISTORY ▲";
+      }
+    }
 
     setStatus("Live • requests updating",true);
 
