@@ -133,6 +133,14 @@ h1{
   font-size:12px;
 }
 
+.round-result-title{
+  margin:-4px 0 14px;
+  color:var(--accent);
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:.04em;
+}
+
 .history-toggle{
   display:flex;
   align-items:center;
@@ -403,6 +411,10 @@ footer{
 <section class="card" id="winnerCard" style="display:none;">
 
   <h2>ROUND RESULT</h2>
+
+  <div class="round-result-title" id="resultRoundTitle">
+    —
+  </div>
 
   <div class="request">
 
@@ -785,7 +797,7 @@ await loadRequests();
 
     const roundResult = await db
       .from("rounds")
-      .select("id,winning_option_id,dj_decision")
+      .select("id,round_number,title,winning_option_id,dj_decision")
       .eq("event_id",EVENT_ID)
       .eq("status","closed")
       .order("round_number",{ascending:false})
@@ -805,6 +817,11 @@ await loadRequests();
 
   return;
 }
+
+document.getElementById("resultRoundTitle").textContent =
+  (round.title || "Untitled round") +
+  " • ROUND " +
+  round.round_number;
 
 if(!round.winning_option_id){
 
