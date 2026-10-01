@@ -145,6 +145,44 @@ h1{
   padding:24px 20px 22px;
 }
 
+@keyframes victoryCard{
+  0%{
+    transform:scale(.96);
+    box-shadow:0 0 0 1px var(--accent) inset;
+  }
+  45%{
+    transform:scale(1.02);
+    box-shadow:0 0 28px rgba(232,255,56,.45),0 0 0 1px var(--accent) inset;
+  }
+  100%{
+    transform:scale(1);
+    box-shadow:0 0 0 1px var(--accent) inset;
+  }
+}
+
+@keyframes victoryText{
+  0%{
+    transform:scale(.9);
+    opacity:.4;
+  }
+  55%{
+    transform:scale(1.05);
+    opacity:1;
+  }
+  100%{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+.winner-card.victory-animate{
+  animation:victoryCard .8s ease-out;
+}
+
+.winner-card.victory-animate .winner-beat{
+  animation:victoryText .7s ease-out;
+}
+
 .winner-card h2{
   color:var(--accent);
   font-size:11px;
@@ -806,8 +844,29 @@ async function loadBeatResult(){
     $("winnerArtist").textContent =
       winningOption.artist || "";
 
+    const wasHidden =
+      $("winnerCard").classList.contains("hidden");
+
     $("winnerCard")
       .classList.remove("hidden");
+
+    if(wasHidden){
+
+      $("winnerCard")
+        .classList.remove("victory-animate");
+
+      void $("winnerCard").offsetWidth;
+
+      $("winnerCard")
+        .classList.add("victory-animate");
+
+      setTimeout(
+        () => $("winnerCard")
+          .classList.remove("victory-animate"),
+        900
+      );
+
+    }
 
   }catch(error){
 
