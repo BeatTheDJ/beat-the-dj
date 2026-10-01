@@ -864,7 +864,7 @@ async function loadBeatResult(){
       '<span class="winner-name">' +
       esc(requesterName) +
       '...</span>' +
-      '<span class="winner-beat">YOU BEAT THE DJ!</span>';
+      '<span class="winner-beat">BEAT THE DJ!</span>';
 
     $("winnerTrack").textContent =
       winningOption.track || "";
@@ -872,13 +872,23 @@ async function loadBeatResult(){
     $("winnerArtist").textContent =
       winningOption.artist || "";
 
-    const wasHidden =
-      $("winnerCard").classList.contains("hidden");
+    const winnerKey =
+      String(latestClosed.id) +
+      ":" +
+      String(latestClosed.winning_option_id);
+
+    const previousWinnerKey =
+      sessionStorage.getItem("btd_last_winner_key");
 
     $("winnerCard")
       .classList.remove("hidden");
 
-    if(wasHidden){
+    if(winnerKey !== previousWinnerKey){
+
+      sessionStorage.setItem(
+        "btd_last_winner_key",
+        winnerKey
+      );
 
       $("winnerCard")
         .classList.remove("victory-animate");
