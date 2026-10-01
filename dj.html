@@ -215,6 +215,19 @@ h1{
   color:#666;
 }
 
+.request-status{
+  margin-top:10px;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+.request-status.status-submitted-text{color:#4caf50;}
+.request-status.status-in-round-text{color:#4da3ff;}
+.request-status.status-played-text{color:#d0d0d0;}
+.request-status.status-rejected-text{color:#ff7777;}
+
 .played-warning{
   margin-top:12px;
   padding:10px 12px;
@@ -1656,13 +1669,17 @@ if(openRoundResult.data){
 
 ` : request.status === "submitted" ? `
 
-<div class="time" style="color:var(--accent);font-weight:800;">
+<div class="request-status status-submitted-text">
   ✓ ACCEPTED — READY FOR A ROUND
 </div>
 
 ` : `
 
-<div class="time">
+<div class="request-status ${
+  request.status === "played"
+    ? "status-played-text"
+    : "status-rejected-text"
+}">
   ${
     request.status === "played"
       ? "✓ PLAYED"
