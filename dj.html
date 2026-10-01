@@ -1459,7 +1459,7 @@ if(openRoundResult.data){
           ${playedSongs.has(
             normaliseTrack(request.artist) + "::" +
             normaliseTrack(request.song)
-          ) ? `
+          ) && (request.status === "pending" || !request.status || request.status === "submitted") ? `
             <div class="played-warning">
               ⚠ ALREADY PLAYED TONIGHT — DJ DECIDES
             </div>
