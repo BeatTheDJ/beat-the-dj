@@ -560,8 +560,8 @@ input:focus{
   </section>
 
 <section id="waitingCard" class="card">
-  <div class="round-title">Stand by.</div>
-  <div class="round-sub">The next vote will appear here.</div>
+  <div id="waitingTitle" class="round-title">Stand by.</div>
+  <div id="waitingSub" class="round-sub">The next vote will appear here.</div>
 </section>
 
 <div class="small">
@@ -655,7 +655,7 @@ async function getOpenRound(){
     await db
       .from("rounds")
       .select("*")
-      .eq("status","open")
+      .in("status",["building","voting"])
       .order(
         "round_number",
         {ascending:false}
@@ -1207,8 +1207,45 @@ async function refresh(){
       $("waitingCard")
         .classList.remove("hidden");
 
+      $("waitingTitle")
+        .textContent = "Stand by.";
+
+      $("waitingSub")
+        .textContent = "The next vote will appear here.";
+
       setStatus(
         "Waiting for the next public vote"
+      );
+
+      $("timer").textContent = "";
+
+      return;
+    }
+
+    if(currentRound.status === "building"){
+
+      currentOptions = [];
+
+      $("roundCard")
+        .classList.add("hidden");
+
+      $("choicesCard")
+        .classList.add("hidden");
+
+      $("waitingCard")
+        .classList.remove("hidden");
+
+      $("waitingTitle")
+        .textContent = "GET READY...";
+
+      $("waitingSub")
+        .textContent =
+          "Requests are being prepared for your votes.";
+
+      setStatus(
+        "Round " +
+        currentRound.round_number +
+        " • GET READY"
       );
 
       $("timer").textContent = "";
