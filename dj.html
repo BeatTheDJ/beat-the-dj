@@ -612,9 +612,7 @@ async function startNewRound(){
         title:title,
         status:"building",
         opened_at:new Date().toISOString()
-      })
-      .select("id,title,round_number")
-      .single();
+      });
 
     if(insertResult.error){
       throw insertResult.error;
