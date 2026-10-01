@@ -220,18 +220,27 @@ h1{
 
 @keyframes djWinCard{
   0%{
-    transform:translateY(-12px);
+    transform:translateY(-38px) rotate(0deg);
     opacity:0;
   }
-  35%{
-    transform:translateY(3px);
+  20%{
+    transform:translateY(6px) rotate(0deg);
     opacity:1;
   }
-  55%{
-    transform:translateY(-2px);
+  35%{
+    transform:translateY(-5px) rotate(-1.2deg);
+  }
+  50%{
+    transform:translateY(2px) rotate(1.2deg);
+  }
+  65%{
+    transform:translateY(-2px) rotate(-.8deg);
+  }
+  80%{
+    transform:translateY(1px) rotate(.5deg);
   }
   100%{
-    transform:translateY(0);
+    transform:translateY(0) rotate(0deg);
     opacity:1;
   }
 }
@@ -272,7 +281,7 @@ h1{
 }
 
 .winner-card.dj-win.dj-win-animate{
-  animation:djWinCard .65s ease-out;
+  animation:djWinCard .95s cubic-bezier(.2,.8,.2,1);
 }
 
 .winner-message{
