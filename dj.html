@@ -1383,6 +1383,27 @@ if(openRoundResult.data){
 }
     
     const requests = result.data || [];
+
+    const playedResult = await db
+      .from("requests")
+      .select("artist,song")
+      .eq("event_id",EVENT_ID)
+      .eq("status","played");
+
+    if(playedResult.error){
+      throw playedResult.error;
+    }
+
+    const normaliseTrack = value =>
+      String(value || "").trim().toLowerCase();
+
+    const playedSongs = new Set(
+      (playedResult.data || []).map(request =>
+        normaliseTrack(request.artist) + "::" +
+        normaliseTrack(request.song)
+      )
+    );
+
     const box = document.getElementById("requests");
 
     document.getElementById("requestCount").textContent =
@@ -1421,6 +1442,14 @@ if(openRoundResult.data){
           <div class="requester">
             Requested by ${esc(request.requester_name)}
             </div>
+          ${playedSongs.has(
+            normaliseTrack(request.artist) + "::" +
+            normaliseTrack(request.song)
+          ) ? `
+            <div class="time" style="color:var(--danger);font-weight:800;margin-top:10px;">
+              ⚠ ALREADY PLAYED TONIGHT — DJ DECIDES
+            </div>
+          ` : ""}
           ${request.status === "pending" || !request.status ? `
 <div class="actions">
 
