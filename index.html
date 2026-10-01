@@ -218,17 +218,61 @@ h1{
   margin-bottom:14px;
 }
 
+@keyframes djWinCard{
+  0%{
+    transform:translateY(-12px);
+    opacity:0;
+  }
+  35%{
+    transform:translateY(3px);
+    opacity:1;
+  }
+  55%{
+    transform:translateY(-2px);
+  }
+  100%{
+    transform:translateY(0);
+    opacity:1;
+  }
+}
+
 .winner-card.dj-win{
-  border-color:#888;
-  box-shadow:0 0 0 1px #555 inset;
+  border-color:#666;
+  box-shadow:0 0 0 1px #444 inset;
+  background:#111;
 }
 
 .winner-card.dj-win h2{
   color:#aaa;
 }
 
+.winner-card.dj-win .winner-message{
+  margin-bottom:18px;
+}
+
+.winner-card.dj-win .winner-name{
+  font-size:clamp(32px,7vw,48px);
+  letter-spacing:-.04em;
+}
+
 .winner-card.dj-win .winner-beat{
-  font-size:clamp(28px,6vw,46px);
+  display:block;
+  font-size:clamp(22px,5vw,38px);
+  color:#ddd;
+  margin-top:6px;
+  letter-spacing:-.025em;
+}
+
+.winner-card.dj-win .winner-artist{
+  color:var(--accent);
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.16em;
+  margin-top:14px;
+}
+
+.winner-card.dj-win.dj-win-animate{
+  animation:djWinCard .65s ease-out;
 }
 
 .winner-message{
@@ -925,26 +969,46 @@ async function loadBeatResult(){
     $("winnerCard")
       .classList.remove("hidden");
 
-    if(winnerKey !== previousWinnerKey && !djWon){
+    if(winnerKey !== previousWinnerKey){
 
       sessionStorage.setItem(
         "btd_last_winner_key",
         winnerKey
       );
 
-      $("winnerCard")
-        .classList.remove("victory-animate");
+      if(djWon){
 
-      void $("winnerCard").offsetWidth;
+        $("winnerCard")
+          .classList.remove("dj-win-animate");
 
-      $("winnerCard")
-        .classList.add("victory-animate");
+        void $("winnerCard").offsetWidth;
 
-      setTimeout(
-        () => $("winnerCard")
-          .classList.remove("victory-animate"),
-        1400
-      );
+        $("winnerCard")
+          .classList.add("dj-win-animate");
+
+        setTimeout(
+          () => $("winnerCard")
+            .classList.remove("dj-win-animate"),
+          700
+        );
+
+      }else{
+
+        $("winnerCard")
+          .classList.remove("victory-animate");
+
+        void $("winnerCard").offsetWidth;
+
+        $("winnerCard")
+          .classList.add("victory-animate");
+
+        setTimeout(
+          () => $("winnerCard")
+            .classList.remove("victory-animate"),
+          1400
+        );
+
+      }
 
     }
 
