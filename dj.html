@@ -111,6 +111,27 @@ h1{
   margin-bottom:0;
 }
 
+.request.status-pending{
+  border-left:4px solid #f2c94c;
+}
+
+.request.status-submitted{
+  border-left:4px solid #4caf50;
+}
+
+.request.status-in-round{
+  border-left:4px solid #4da3ff;
+}
+
+.request.status-played{
+  border-left:4px solid #777;
+}
+
+.request.status-rejected{
+  border-left:4px solid #d9534f;
+}
+
+
 .song{
   font-size:21px;
   font-weight:800;
@@ -1443,7 +1464,7 @@ if(openRoundResult.data){
         : "";
 
       return `
-        <div class="request">
+        <div class="request ${request.status === "pending" || !request.status ? "status-pending" : request.status === "submitted" && roundRequestIds.has(request.id) ? "status-in-round" : request.status === "submitted" ? "status-submitted" : request.status === "played" ? "status-played" : request.status === "rejected" ? "status-rejected" : ""}">
 
           <div class="song">
             ${esc(request.song)}
