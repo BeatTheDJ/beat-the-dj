@@ -206,6 +206,20 @@ button{
   margin-top:14px;
 }
 
+.close-vote{
+  margin-top:18px;
+  background:#c88a24;
+  color:#090909;
+  border:2px solid #e0a33a;
+}
+
+.close-vote:disabled{
+  background:#6f5a37;
+  color:#ddd;
+  border-color:#6f5a37;
+}
+
+
 .actions button{
   width:100%;
   padding:11px 8px;
@@ -333,7 +347,7 @@ footer{
       Loading votes...
     </div>
 
-    <button id="closeRoundBtn" disabled>
+    <button id="closeRoundBtn" class="close-vote" disabled>
       CLOSE VOTE
     </button>
 
