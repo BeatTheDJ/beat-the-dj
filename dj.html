@@ -378,6 +378,10 @@ footer{
       Waiting for a round
     </div>
 
+    <div class="time" id="roundNumberDisplay">
+      —
+    </div>
+
     <div id="roundVotes">
       Loading votes...
     </div>
@@ -490,7 +494,16 @@ function setStatus(text,live=false){
   document.getElementById("status").classList.toggle("live",live);
 }
 
-  async function startNewRound(){
+  function setStartRoundControls(isOpen){
+
+  const titleInput = document.getElementById("newRoundTitle");
+  const startButton = document.getElementById("startRoundBtn");
+
+  if(titleInput) titleInput.disabled = isOpen;
+  if(startButton) startButton.disabled = isOpen;
+}
+
+async function startNewRound(){
 
   const titleInput =
     document.getElementById("newRoundTitle");
@@ -554,6 +567,7 @@ function setStatus(text,live=false){
     }
 
     titleInput.value = "";
+    setStartRoundControls(true);
 
     await loadRound();
     await loadVoteTotals();
@@ -1705,6 +1719,8 @@ async function updateRequest(id,status){
     if(result.error){
       throw result.error;
     }
+
+    setStartRoundControls(false);
 
     await loadRequests();
 
