@@ -138,6 +138,32 @@ h1{
   margin:0 0 11px;
 }
 
+.winner-card{
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px var(--accent) inset;
+  text-align:center;
+}
+
+.winner-message{
+  font-size:clamp(30px,8vw,52px);
+  line-height:.95;
+  font-weight:900;
+  letter-spacing:-.04em;
+  margin:8px 0 12px;
+  text-transform:uppercase;
+}
+
+.winner-track{
+  font-size:18px;
+  font-weight:800;
+}
+
+.winner-artist{
+  font-size:14px;
+  color:#aaa;
+  margin-top:4px;
+}
+
 .round-title{
   font-size:25px;
   font-weight:800;
@@ -329,6 +355,14 @@ input:focus{
   <div id="choices" class="choices"></div>
   <div id="message" class="message"></div>
 </section>
+
+<section id="winnerCard" class="card winner-card hidden">
+  <h2>Winner</h2>
+  <div id="winnerMessage" class="winner-message"></div>
+  <div id="winnerTrack" class="winner-track"></div>
+  <div id="winnerArtist" class="winner-artist"></div>
+</section>
+
   <section id="requestCard" class="card">
   <h2>Request a track</h2>
   <div class="round-sub">Submit a song request.  Will YOU Beat The DJ?</div>
@@ -644,6 +678,125 @@ function renderOptions(){
   }
 }
 
+async function loadBeatResult(){
+
+  try{
+
+    const closedResult =
+      await db
+        .from("rounds")
+        .select(
+          "id,round_number,winning_option_id,dj_decision,closed_at"
+        )
+        .eq("status","closed")
+        .order(
+          "round_number",
+          {ascending:false}
+        )
+        .limit(1)
+        .maybeSingle();
+
+    if(closedResult.error){
+      throw closedResult.error;
+    }
+
+    const latestClosed =
+      closedResult.data;
+
+    if(
+      !latestClosed ||
+      latestClosed.dj_decision !== "play" ||
+      !latestClosed.winning_option_id
+    ){
+
+      $("winnerCard")
+        .classList.add("hidden");
+
+      return;
+    }
+
+    if(
+      currentRound &&
+      Number(latestClosed.round_number) <
+      Number(currentRound.round_number)
+    ){
+
+      $("winnerCard")
+        .classList.add("hidden");
+
+      return;
+    }
+
+    const optionResult =
+      await db
+        .from("options")
+        .select(
+          "artist,track,request_id"
+        )
+        .eq(
+          "id",
+          latestClosed.winning_option_id
+        )
+        .maybeSingle();
+
+    if(optionResult.error){
+      throw optionResult.error;
+    }
+
+    const winningOption =
+      optionResult.data;
+
+    if(!winningOption){
+
+      $("winnerCard")
+        .classList.add("hidden");
+
+      return;
+    }
+
+    const requestResult =
+      await db
+        .from("requests")
+        .select("requester_name")
+        .eq(
+          "id",
+          winningOption.request_id
+        )
+        .maybeSingle();
+
+    if(requestResult.error){
+      throw requestResult.error;
+    }
+
+    const requesterName =
+      requestResult.data?.requester_name ||
+      "YOU";
+
+    $("winnerMessage").textContent =
+      requesterName + "... YOU BEAT THE DJ!";
+
+    $("winnerTrack").textContent =
+      winningOption.track || "";
+
+    $("winnerArtist").textContent =
+      winningOption.artist || "";
+
+    $("winnerCard")
+      .classList.remove("hidden");
+
+  }catch(error){
+
+    console.error(
+      "Beat the DJ result error:",
+      error
+    );
+
+    $("winnerCard")
+      .classList.add("hidden");
+
+  }
+}
+
 async function castVote(
   optionId,
   button
@@ -773,6 +926,8 @@ async function refresh(){
 
     currentRound =
       await getOpenRound();
+
+    await loadBeatResult();
 
     if(!currentRound){
 
