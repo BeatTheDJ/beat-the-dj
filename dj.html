@@ -241,6 +241,19 @@ button{
   min-width:0;
 }
 
+.voteRow.leading{
+  border-left:4px solid #4caf50;
+  padding-left:8px;
+  background:#172217;
+}
+
+.voteRow.tied{
+  border-left:4px solid #f2c94c;
+  padding-left:8px;
+  background:#242117;
+}
+
+
 .voteRow strong{
   font-size:18px;
   min-width:28px;
@@ -1339,14 +1352,29 @@ async function loadRound(){
 
     });
 
-    container.innerHTML =
-      optionsResult.data.map(option => {
+    const voteCounts = optionsResult.data.map(option =>
+      counts[option.id] || 0
+    );
 
-        const votes =
-          counts[option.id] || 0;
+    const maxVotes = voteCounts.length
+      ? Math.max(...voteCounts)
+      : 0;
+
+    const leaders = maxVotes > 0
+      ? voteCounts.filter(votes => votes === maxVotes).length
+      : 0;
+
+    container.innerHTML =
+      optionsResult.data.map((option,index) => {
+
+        const votes = voteCounts[index];
+        const isLeader = maxVotes > 0 && votes === maxVotes;
+        const rowClass = isLeader
+          ? (leaders > 1 ? "voteRow tied" : "voteRow leading")
+          : "voteRow";
 
         return `
-          <div class="voteRow">
+          <div class="${rowClass}">
             <span>
               ${option.artist} — ${option.track}
             </span>
