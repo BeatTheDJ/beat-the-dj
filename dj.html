@@ -1537,8 +1537,7 @@ if(openRoundResult.data){
       return;
     }
 
-    box.innerHTML = displayRequests.map((request,index) => {
-
+    const renderRequest = request => {
       const time = request.created_at
         ? new Date(request.created_at).toLocaleTimeString(
             [],
@@ -1546,13 +1545,7 @@ if(openRoundResult.data){
           )
         : "";
 
-      const groupTitle = index === 0
-        ? '<div class="group-title actionable-title">ACTIONABLE REQUESTS — ' + actionableRequests.length + '</div>'
-        : index === actionableRequests.length
-          ? '<div class="group-title history-title">REQUEST HISTORY — ' + historyRequests.length + '</div>'
-          : "";
-
-      return groupTitle + `
+      return `
         <div class="request ${request.status === "pending" || !request.status ? "status-pending" : request.status === "submitted" && roundRequestIds.has(request.id) ? "status-in-round" : request.status === "submitted" ? "status-submitted" : request.status === "played" ? "status-played" : request.status === "rejected" ? "status-rejected" : ""}">
 
           <div class="song">
@@ -1629,8 +1622,19 @@ if(openRoundResult.data){
 
         </div>
       `;
+    };
 
-    }).join("");
+    const actionableHtml = actionableRequests.length
+      ? '<div class="group-title actionable-title">ACTIONABLE REQUESTS — ' + actionableRequests.length + '</div>' +
+        actionableRequests.map(renderRequest).join("")
+      : "";
+
+    const historyHtml = historyRequests.length
+      ? '<div class="group-title history-title">REQUEST HISTORY — ' + historyRequests.length + '</div>' +
+        historyRequests.map(renderRequest).join("")
+      : "";
+
+    box.innerHTML = actionableHtml + historyHtml;
 
     setStatus("Live • requests updating",true);
 
