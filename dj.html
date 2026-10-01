@@ -133,6 +133,14 @@ h1{
   font-size:12px;
 }
 
+.history-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  cursor:pointer;
+  user-select:none;
+}
+
 .history-title{
   margin-top:22px;
   background:#1b1b1b;
@@ -1630,8 +1638,13 @@ if(openRoundResult.data){
       : "";
 
     const historyHtml = historyRequests.length
-      ? '<div class="group-title history-title">REQUEST HISTORY — ' + historyRequests.length + '</div>' +
-        historyRequests.map(renderRequest).join("")
+      ? '<div class="group-title history-title history-toggle" onclick="toggleRequestHistory()">' +
+          '<span>REQUEST HISTORY — ' + historyRequests.length + '</span>' +
+          '<span id="historyToggleLabel">SHOW HISTORY ▼</span>' +
+        '</div>' +
+        '<div id="requestHistory" style="display:none;">' +
+          historyRequests.map(renderRequest).join("") +
+        '</div>'
       : "";
 
     box.innerHTML = actionableHtml + historyHtml;
@@ -1650,6 +1663,23 @@ if(openRoundResult.data){
     setStatus("Connection problem",false);
   }
 }
+function toggleRequestHistory(){
+
+  const history = document.getElementById("requestHistory");
+  const label = document.getElementById("historyToggleLabel");
+
+  if(!history || !label){
+    return;
+  }
+
+  const isHidden = history.style.display === "none";
+
+  history.style.display = isHidden ? "block" : "none";
+  label.textContent = isHidden
+    ? "HIDE HISTORY ▲"
+    : "SHOW HISTORY ▼";
+}
+
 async function updateRequest(id,status){
 
   try{
