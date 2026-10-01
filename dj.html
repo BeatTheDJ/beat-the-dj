@@ -1453,7 +1453,11 @@ async function loadRound(){
     const status =
       document.getElementById("roundStatus");
     const closeButton =
-  document.getElementById("closeRoundBtn");
+      document.getElementById("closeRoundBtn");
+    const openVotingButton =
+      document.getElementById("openVotingBtn");
+    const roundNumberDisplay =
+      document.getElementById("roundNumberDisplay");
 
     if(!round){
       closeButton.disabled = true;
@@ -1475,6 +1479,12 @@ async function loadRound(){
       round.title ||
       "Round " + round.round_number;
 
+    roundNumberDisplay.textContent =
+      "ROUND " + round.round_number + " • " +
+      (round.status === "building" ? "BUILDING" : "VOTING");
+
+    setStartRoundControls(true);
+
     const optionsResult = await db
       .from("options")
       .select("id")
@@ -1486,14 +1496,25 @@ async function loadRound(){
 
     const hasTracks = (optionsResult.data || []).length > 0;
 
-    closeButton.disabled = !hasTracks;
+    closeButton.disabled =
+      round.status !== "voting" || !hasTracks;
+
+    openVotingButton.disabled =
+      round.status !== "building" || !hasTracks;
+
+    openVotingButton.textContent =
+      round.status === "voting"
+        ? "✓ VOTING OPEN"
+        : "OPEN VOTING";
 
     status.textContent =
       "Round " +
       round.round_number +
-      (hasTracks
-        ? " • VOTING OPEN"
-        : " • WAITING FOR TRACKS");
+      (round.status === "building"
+        ? (hasTracks
+          ? " • BUILDING — TRACKS READY"
+          : " • BUILDING — WAITING FOR TRACKS")
+        : " • VOTING OPEN");
 
   }catch(error){
 
@@ -1518,9 +1539,9 @@ async function loadRound(){
 
     const roundResult = await db
       .from("rounds")
-      .select("id")
+      .select("id,status")
       .eq("event_id",EVENT_ID)
-       .in("status",["building","voting"])
+      .in("status",["building","voting"])
       .order("round_number",{ascending:false})
       .limit(1)
       .maybeSingle();
@@ -1538,6 +1559,14 @@ async function loadRound(){
 
       container.textContent =
         "No active vote";
+
+      return;
+    }
+
+    if(round.status === "building"){
+
+      container.textContent =
+        "Voting is not open yet. Add tracks, then OPEN VOTING.";
 
       return;
     }
