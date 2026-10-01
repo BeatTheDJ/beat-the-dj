@@ -1446,16 +1446,16 @@ async function loadRound(){
       return;
     }
 
-    const optionsResult = await db
+    const roundOptionsResult = await db
       .from("options")
       .select("id")
       .eq("round_id",round.id);
 
-    if(optionsResult.error){
-      throw optionsResult.error;
+    if(roundOptionsResult.error){
+      throw roundOptionsResult.error;
     }
 
-    if(!(optionsResult.data || []).length){
+    if(!(roundOptionsResult.data || []).length){
 
       container.textContent =
         "Add tracks from the requests below to begin voting.";
