@@ -575,7 +575,7 @@ input:focus{
 
   <section id="requestCard" class="card">
   <h2>Request a track</h2>
-  <div class="round-sub">Submit a song request.  Will YOU Beat The DJ?</div>
+  <div id="requestRoundSub" class="round-sub">Submit a song request.  Will YOU Beat The DJ?</div>
 
 <label for="requestName">Your name / nickname</label>
 <input id="requestName" type="text" maxlength="50" placeholder="e.g. Jason / Disco Dave" required>
@@ -1295,6 +1295,10 @@ async function refresh(){
       $("waitingSub")
         .textContent = "The next vote will appear here.";
 
+      $("requestRoundSub")
+        .textContent =
+          "Submit a song request.  Will YOU Beat The DJ?";
+
       setStatus(
         "Waiting for the next public vote"
       );
@@ -1317,17 +1321,43 @@ async function refresh(){
       $("waitingCard")
         .classList.remove("hidden");
 
-      $("waitingTitle")
-        .textContent = "GET READY...";
+      if(currentRound.show_upcoming){
 
-      $("waitingSub")
-        .textContent =
-          "Requests are being prepared for your votes.";
+        $("waitingTitle")
+          .textContent =
+            currentRound.title || "NEXT ROUND";
+
+        $("waitingSub")
+          .textContent =
+            "SEND US YOUR REQUEST FOR THIS ROUND.";
+
+        $("requestRoundSub")
+          .textContent =
+            "Request a track for " +
+            (currentRound.title || "the next round") +
+            ". Will YOU Beat The DJ?";
+
+      }else{
+
+        $("waitingTitle")
+          .textContent = "GET READY...";
+
+        $("waitingSub")
+          .textContent =
+            "Requests are being prepared for your votes.";
+
+        $("requestRoundSub")
+          .textContent =
+            "Submit a song request.  Will YOU Beat The DJ?";
+
+      }
 
       setStatus(
         "Round " +
         currentRound.round_number +
-        " • GET READY"
+        (currentRound.show_upcoming
+          ? " • UPCOMING ROUND"
+          : " • GET READY")
       );
 
       $("timer").textContent = "";
