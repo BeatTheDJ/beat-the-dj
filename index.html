@@ -1334,9 +1334,10 @@ async function refresh(){
         $("requestRoundSub")
           .innerHTML =
             "Submit a song request.  Will YOU Beat The DJ?" +
-            '<br><span style="display:block;margin-top:6px;color:#aaa;font-size:12px;">Got a song for the upcoming ' +
+            '<br><span style="display:block;margin-top:6px;color:#aaa;font-size:12px;font-style:italic;">Got a song for the upcoming ' +
             esc(currentRound.title || "next round") +
-            '? Let us know!</span>';
+            '? Let us know!</span>' +
+            '<br><span style="display:block;margin-top:6px;color:#e8ff38;font-size:12px;font-weight:900;text-transform:uppercase;">ALL song requests are STILL welcome — your request does not have to fit the upcoming round.</span>';
 
       }else{
 
