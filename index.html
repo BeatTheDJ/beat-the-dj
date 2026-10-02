@@ -808,7 +808,7 @@ function renderOptions(){
 
       button.innerHTML = `
 
-        ${option.request_id ? "" : '<div class="dj-choice-label">🎧 DJ'S CHOICE</div>'}
+        ${option.request_id ? "" : `<div class="dj-choice-label">🎧 DJ'S CHOICE</div>`}
 
         <div class="track">
           ${index + 1}. ${esc(option.track || option.label)}
