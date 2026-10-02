@@ -165,6 +165,23 @@ h1{
   font-weight:900;
   letter-spacing:.12em;
 }
+.dj-choice-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 0;
+  color:var(--text);
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.08em;
+  cursor:pointer;
+  user-select:none;
+}
+.dj-choice-toggle span:last-child{
+  color:var(--accent);
+  font-size:20px;
+  line-height:1;
+}
 #djChoiceForm input{
   display:block;
   width:100%;
@@ -464,12 +481,18 @@ footer{
     <div id="roundTracks"></div>
 
     <div id="djChoiceForm" style="display:none;">
-      <div class="tie-instruction">Add one DJ's Choice to this round.</div>
-      <label class="dj-choice-label" for="djChoiceArtist">ARTIST</label>
-      <input id="djChoiceArtist" type="text" placeholder="Enter artist">
-      <label class="dj-choice-label" for="djChoiceSong">SONG</label>
-      <input id="djChoiceSong" type="text" placeholder="Enter song">
-      <button id="addDjChoiceBtn" onclick="addDjChoice()">🎧 ADD DJ'S CHOICE</button>
+      <div class="dj-choice-toggle" onclick="toggleDjChoiceForm()">
+        <span>🎧 DJ'S CHOICE</span>
+        <span id="djChoiceToggleIcon">＋</span>
+      </div>
+      <div id="djChoiceFields" style="display:none;">
+        <div class="tie-instruction">Add one DJ's Choice to this round.</div>
+        <label class="dj-choice-label" for="djChoiceArtist">ARTIST</label>
+        <input id="djChoiceArtist" type="text" placeholder="Enter artist">
+        <label class="dj-choice-label" for="djChoiceSong">SONG</label>
+        <input id="djChoiceSong" type="text" placeholder="Enter song">
+        <button id="addDjChoiceBtn" onclick="addDjChoice()">🎧 ADD DJ'S CHOICE</button>
+      </div>
     </div>
 
     <div id="roundVotes">
@@ -1494,6 +1517,16 @@ if(updateResult.error){
   }
 
   }
+function toggleDjChoiceForm(){
+  const fields = document.getElementById("djChoiceFields");
+  const icon = document.getElementById("djChoiceToggleIcon");
+  if(!fields || !icon) return;
+
+  const isOpen = fields.style.display === "block";
+  fields.style.display = isOpen ? "none" : "block";
+  icon.textContent = isOpen ? "＋" : "−";
+}
+
 async function addDjChoice(){
   const artistInput = document.getElementById("djChoiceArtist");
   const songInput = document.getElementById("djChoiceSong");
@@ -1571,6 +1604,11 @@ async function addDjChoice(){
 
     artistInput.value = "";
     songInput.value = "";
+
+    const djChoiceFields = document.getElementById("djChoiceFields");
+    const djChoiceToggleIcon = document.getElementById("djChoiceToggleIcon");
+    if(djChoiceFields) djChoiceFields.style.display = "none";
+    if(djChoiceToggleIcon) djChoiceToggleIcon.textContent = "＋";
 
     await loadRound();
     await loadVoteTotals();
