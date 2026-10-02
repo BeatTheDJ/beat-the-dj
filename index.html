@@ -1346,7 +1346,7 @@ async function refresh(){
         $("waitingSub")
           .textContent =
             "Got a song for the upcoming " +
-            (currentRound.title || "next round") +
+            (currentRound.title || "next round").toUpperCase() +
             "? Let us know!";
 
         $("requestRoundSub")
