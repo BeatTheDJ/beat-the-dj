@@ -1409,6 +1409,10 @@ async function refresh(){
     $("waitingCard")
       .classList.add("hidden");
 
+    $("requestRoundSub")
+      .textContent =
+        "Submit a song request.  Will YOU Beat The DJ?";
+
     $("roundTitle")
       .textContent =
         currentRound.title ||
