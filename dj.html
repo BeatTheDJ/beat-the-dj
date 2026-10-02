@@ -812,8 +812,8 @@ async function openVoting(){
 
     const winningOption = optionResult.data;
 
-    if(!winningOption || !winningOption.request_id){
-      alert("The winning track is not linked to a request.");
+    if(!winningOption){
+      alert("The winning track could not be found.");
       return;
     }
 
@@ -831,15 +831,17 @@ async function openVoting(){
       throw updateResult.error;
     }
 
-    const requestUpdate = await db
-      .from("requests")
-      .update({
-        status:"played"
-      })
-      .eq("id",winningOption.request_id);
+    if(winningOption.request_id){
+      const requestUpdate = await db
+        .from("requests")
+        .update({
+          status:"played"
+        })
+        .eq("id",winningOption.request_id);
 
-    if(requestUpdate.error){
-      throw requestUpdate.error;
+      if(requestUpdate.error){
+        throw requestUpdate.error;
+      }
     }
 
     document.getElementById("playWinnerBtn").textContent = "✓ PLAYED";
@@ -919,15 +921,17 @@ await loadRequests();
       throw updateResult.error;
     }
 
-    const requestUpdate = await db
-      .from("requests")
-      .update({
-        status:"rejected"
-      })
-      .eq("id",winningOption.request_id);
+    if(winningOption.request_id){
+      const requestUpdate = await db
+        .from("requests")
+        .update({
+          status:"rejected"
+        })
+        .eq("id",winningOption.request_id);
 
-    if(requestUpdate.error){
-      throw requestUpdate.error;
+      if(requestUpdate.error){
+        throw requestUpdate.error;
+      }
     }
 
     document.getElementById("rejectWinnerBtn").textContent =
@@ -1062,7 +1066,9 @@ if(requestIds.length){
       winners.map(option => `
         <div class="request">
 <div class="time">
-  REQUESTED BY ${esc(requesterNames[option.request_id] || "Unknown")}
+  ${option.request_id
+    ? "REQUESTED BY " + esc(requesterNames[option.request_id] || "Unknown")
+    : "🎧 DJ'S CHOICE"}
 </div>
           <div class="artist">
             ${esc(option.artist)}
@@ -1125,20 +1131,33 @@ document.getElementById("tieCard").style.display = "none";
     const voteCount = votesResult.data.filter(
       vote => vote.option_id === round.winning_option_id
     ).length;
-const requesterResult = await db
-  .from("requests")
-  .select("requester_name")
-  .eq("id",optionResult.data.request_id)
-  .maybeSingle();
+const isDjChoice = !optionResult.data.request_id;
 
-if(requesterResult.error){
-  throw requesterResult.error;
+let requesterName = "";
+
+if(!isDjChoice){
+  const requesterResult = await db
+    .from("requests")
+    .select("requester_name")
+    .eq("id",optionResult.data.request_id)
+    .maybeSingle();
+
+  if(requesterResult.error){
+    throw requesterResult.error;
+  }
+
+  requesterName =
+    requesterResult.data?.requester_name || "Unknown";
 }
 
-const requesterName =
-  requesterResult.data?.requester_name || "Unknown";
-
-if(round.dj_decision === "reject"){
+if(isDjChoice){
+  document.getElementById("winnerRequester").textContent =
+    round.dj_decision === "reject"
+      ? "THE DJ CHOICE WAS NOT PLAYED"
+      : round.dj_decision === "play"
+        ? "THE DJ'S CHOICE WON!"
+        : "🎧 DJ'S CHOICE";
+}else if(round.dj_decision === "reject"){
 
   document.getElementById("winnerRequester").textContent =
     "THE DJ WINS! — " +
