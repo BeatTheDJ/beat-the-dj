@@ -676,7 +676,7 @@ async function getOptions(roundId){
     await db
       .from("options")
       .select(
-        "id,round_id,position,label,artist,track"
+        "id,round_id,position,label,artist,track,request_id"
       )
       .eq("round_id",roundId)
       .order(
@@ -787,7 +787,7 @@ function renderOptions(){
       button.innerHTML = `
 
         <div class="track">
-          ${index + 1}. ${esc(option.track || option.label)}
+          ${index + 1}. ${option.request_id ? "" : "🎧 DJ'S CHOICE — "}${esc(option.track || option.label)}
         </div>
 
         ${
