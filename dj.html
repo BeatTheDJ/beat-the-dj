@@ -2273,6 +2273,30 @@ async function removeFromCurrentRound(optionId){
       throw deleteResult.error;
     }
 
+    const remainingOptionsResult = await db
+      .from("options")
+      .select("id")
+      .eq("round_id",round.id)
+      .order("position",{ascending:true});
+
+    if(remainingOptionsResult.error){
+      throw remainingOptionsResult.error;
+    }
+
+    for(let index = 0; index < (remainingOptionsResult.data || []).length; index++){
+
+      const updatePositionResult = await db
+        .from("options")
+        .update({
+          position:index + 1
+        })
+        .eq("id",remainingOptionsResult.data[index].id);
+
+      if(updatePositionResult.error){
+        throw updatePositionResult.error;
+      }
+    }
+
     await loadRequests();
     await loadRound();
     await loadVoteTotals();
