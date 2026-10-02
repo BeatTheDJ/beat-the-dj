@@ -457,6 +457,11 @@ footer{
     style="width:100%;padding:13px;border-radius:12px;border:1px solid #444;background:#202020;color:#f5f5f2;font:inherit;margin-bottom:10px;"
   >
 
+  <label style="display:flex;align-items:center;gap:9px;margin:0 0 12px;color:#ddd;font-size:13px;font-weight:800;cursor:pointer;">
+    <input id="showUpcoming" type="checkbox" style="width:18px;height:18px;accent-color:#e8ff38;">
+    SHOW AS UPCOMING ROUND TO AUDIENCE
+  </label>
+
   <button id="startRoundBtn">
     START ROUND
   </button>
@@ -685,7 +690,8 @@ async function startNewRound(){
         round_number:nextRoundNumber,
         title:title,
         status:"building",
-        opened_at:new Date().toISOString()
+        opened_at:new Date().toISOString(),
+        show_upcoming:document.getElementById("showUpcoming").checked
       });
 
     if(insertResult.error){
@@ -693,6 +699,7 @@ async function startNewRound(){
     }
 
     titleInput.value = "";
+    document.getElementById("showUpcoming").checked = false;
     setStartRoundControls(true);
 
     await loadRound();
