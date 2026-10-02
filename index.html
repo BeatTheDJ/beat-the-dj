@@ -932,23 +932,31 @@ async function loadBeatResult(){
       return;
     }
 
-    const requestResult =
-      await db
-        .from("requests")
-        .select("requester_name")
-        .eq(
-          "id",
-          winningOption.request_id
-        )
-        .maybeSingle();
+    const isDjChoice =
+      !winningOption.request_id;
 
-    if(requestResult.error){
-      throw requestResult.error;
+    let requesterName = "YOU";
+
+    if(!isDjChoice){
+
+      const requestResult =
+        await db
+          .from("requests")
+          .select("requester_name")
+          .eq(
+            "id",
+            winningOption.request_id
+          )
+          .maybeSingle();
+
+      if(requestResult.error){
+        throw requestResult.error;
+      }
+
+      requesterName =
+        requestResult.data?.requester_name ||
+        "YOU";
     }
-
-    const requesterName =
-      requestResult.data?.requester_name ||
-      "YOU";
 
     const djWon =
       latestClosed.dj_decision === "reject";
@@ -977,6 +985,11 @@ async function loadBeatResult(){
         '<span class="winner-artist">BETTER LUCK NEXT TIME ' +
         esc(requesterName) +
         '!</span>';
+
+    }else if(isDjChoice){
+
+      $("winnerMessage").innerHTML =
+        '<span class="winner-beat">THE DJ\'S CHOICE WON THE VOTE!</span>';
 
     }else{
 
