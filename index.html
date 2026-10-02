@@ -356,6 +356,25 @@ h1{
   border-color:#666;
 }
 
+.choice.dj-choice{
+  border-color:var(--accent);
+  background:#242814;
+  box-shadow:0 0 0 1px var(--accent) inset;
+}
+
+.choice.dj-choice:hover{
+  border-color:var(--accent);
+}
+
+.dj-choice-label{
+  color:var(--accent);
+  font-size:11px;
+  font-weight:950;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  margin-bottom:7px;
+}
+
 .choice:disabled{
   opacity:.65;
   cursor:not-allowed;
@@ -770,7 +789,10 @@ function renderOptions(){
       const button =
         document.createElement("button");
 
-      button.className = "choice";
+      button.className =
+        option.request_id
+          ? "choice"
+          : "choice dj-choice";
 
       button.dataset.id =
         option.id;
@@ -786,8 +808,10 @@ function renderOptions(){
 
       button.innerHTML = `
 
+        ${option.request_id ? "" : '<div class="dj-choice-label">🎧 DJ'S CHOICE</div>'}
+
         <div class="track">
-          ${index + 1}. ${option.request_id ? "" : "🎧 DJ'S CHOICE — "}${esc(option.track || option.label)}
+          ${index + 1}. ${esc(option.track || option.label)}
         </div>
 
         ${
