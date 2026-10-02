@@ -390,6 +390,14 @@ h1{
   margin-top:4px;
 }
 
+.option-requester{
+  margin-top:6px;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.08em;
+  color:#777;
+}
+
 .votes{
   height:7px;
   background:#2b2b2b;
@@ -737,6 +745,36 @@ async function getVoteCounts(roundId){
   return counts;
 }
 
+async function getRequesterNames(options){
+
+  const requestIds = options
+    .map(option => option.request_id)
+    .filter(Boolean);
+
+  if(!requestIds.length){
+    return options;
+  }
+
+  const result = await db
+    .from("requests")
+    .select("id,requester_name")
+    .in("id",requestIds);
+
+  if(result.error){
+    throw result.error;
+  }
+
+  const names = {};
+  for(const request of result.data || []){
+    names[request.id] = request.requester_name;
+  }
+
+  return options.map(option => ({
+    ...option,
+    requesterName: names[option.request_id] || ""
+  }));
+}
+
 function renderOptions(){
 
   const box = $("choices");
@@ -807,6 +845,14 @@ function renderOptions(){
             ? `<div class="artist">${esc(option.artist)}</div>`
             : ""
         }
+
+        <div class="option-requester">
+          ${
+            option.request_id
+              ? "REQUESTED BY " + esc(option.requesterName || "Unknown")
+              : ""
+          }
+        </div>
 
         <div class="votes">
           <div
@@ -1281,6 +1327,11 @@ async function refresh(){
     currentOptions =
       await getOptions(
         currentRound.id
+      );
+
+    currentOptions =
+      await getRequesterNames(
+        currentOptions
       );
 
     voteCounts =
