@@ -150,6 +150,15 @@ h1{
   font-weight:900;
 }
 
+.upcoming-label{
+  color:#aaa;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  margin-bottom:5px;
+}
+
 .winner-card{
   border-color:var(--accent);
   box-shadow:0 0 0 1px var(--accent) inset;
@@ -591,6 +600,7 @@ input:focus{
   </section>
 
 <section id="waitingCard" class="card">
+  <div id="waitingLabel" class="upcoming-label hidden">Upcoming Round...</div>
   <div id="waitingTitle" class="round-title">Stand by.</div>
   <div id="waitingSub" class="round-sub">The next vote will appear here.</div>
 </section>
@@ -1289,6 +1299,9 @@ async function refresh(){
       $("waitingCard")
         .classList.remove("hidden");
 
+      $("waitingLabel")
+        .classList.add("hidden");
+
       $("waitingTitle")
         .textContent = "Stand by.";
 
@@ -1323,23 +1336,28 @@ async function refresh(){
 
       if(currentRound.show_upcoming){
 
+        $("waitingLabel")
+          .classList.remove("hidden");
+
         $("waitingTitle")
           .textContent =
             currentRound.title || "NEXT ROUND";
 
         $("waitingSub")
           .textContent =
-            "SEND US YOUR REQUEST FOR THIS ROUND.";
+            "Got a song for the upcoming " +
+            (currentRound.title || "next round") +
+            "? Let us know!";
 
         $("requestRoundSub")
           .innerHTML =
             "Submit a song request.  Will YOU Beat The DJ?" +
-            '<br><span style="display:block;margin-top:6px;color:#aaa;font-size:12px;font-style:italic;">Got a song for the upcoming ' +
-            esc(currentRound.title || "next round") +
-            '? Let us know!</span>' +
             '<br><span style="display:block;margin-top:6px;color:#e8ff38;font-size:12px;font-weight:900;text-transform:uppercase;">ALL song requests are STILL welcome. Your request does not have to fit the upcoming round.</span>';
 
       }else{
+
+        $("waitingLabel")
+          .classList.add("hidden");
 
         $("waitingTitle")
           .textContent = "GET READY...";
