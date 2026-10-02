@@ -469,6 +469,11 @@ h1{
   padding:0;
 }
 
+.refresh:disabled{
+  opacity:.55;
+  cursor:default;
+}
+
 .hidden{
   display:none;
 }
@@ -592,7 +597,7 @@ input:focus{
 </div>
 
 <footer>
-  BEAT THE DJ • STAGE 1
+  BEAT THE DJ ©
 </footer>
 
 </div>
@@ -1389,8 +1394,33 @@ async function refresh(){
   }
 }
 
+async function manualRefresh(){
+
+  const button =
+    $("refreshBtn");
+
+  button.textContent =
+    "Refreshing…";
+
+  button.disabled = true;
+
+  try{
+
+    await refresh();
+
+  }finally{
+
+    button.textContent =
+      "Refresh";
+
+    button.disabled = false;
+
+  }
+
+}
+
 $("refreshBtn").onclick =
-  refresh;
+  manualRefresh;
 
 refresh();
 
