@@ -1782,7 +1782,7 @@ async function loadRound(){
            <div class="round-track-title">${esc(option.track || "")}</div>
            <div class="round-track-artist">${esc(option.artist || "")}</div>
            <div class="round-track-requester">${option.request_id ? "Requested by " + esc(requesterNames[option.request_id] || "Unknown") : "🎧 DJ'S CHOICE"}</div>
-           ${round.status === "building" && option.request_id ? `
+           ${round.status === "building" ? `
              <button
                type="button"
                style="margin-top:10px;background:#333;color:#f5f5f2;border:1px solid #555;font-size:12px;padding:9px;"
@@ -2299,17 +2299,19 @@ async function removeFromCurrentRound(optionId){
       return;
     }
 
-    if(!optionResult.data.request_id){
-      alert("DJ's Choice cannot be removed this way.");
-      return;
-    }
-
-    const deleteResult = await db
-      .from("options")
-      .delete()
-      .eq("id",optionId)
-      .eq("round_id",round.id)
-      .eq("request_id",optionResult.data.request_id);
+    const deleteResult = optionResult.data.request_id
+      ? await db
+          .from("options")
+          .delete()
+          .eq("id",optionId)
+          .eq("round_id",round.id)
+          .eq("request_id",optionResult.data.request_id)
+      : await db
+          .from("options")
+          .delete()
+          .eq("id",optionId)
+          .eq("round_id",round.id)
+          .is("request_id",null);
 
     if(deleteResult.error){
       throw deleteResult.error;
