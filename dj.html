@@ -499,7 +499,7 @@ footer{
         <input id="djChoiceArtist" type="text" placeholder="Enter artist">
         <label class="dj-choice-label" for="djChoiceSong">SONG</label>
         <input id="djChoiceSong" type="text" placeholder="Enter song">
-        <button id="addDjChoiceBtn" onclick="addDjChoice()">🎧 ADD DJ'S CHOICE</button>
+        <button id="addDjChoiceBtn" onclick="addDjChoice(this)">🎧 ADD DJ'S CHOICE</button>
       </div>
     </div>
 
@@ -744,6 +744,11 @@ document
   
 async function openVoting(){
 
+  const button=document.getElementById("openVotingBtn");
+  if(button.disabled){ return; }
+  button.disabled=true;
+  button.textContent="OPENING...";
+
   try{
 
     const roundResult = await db
@@ -811,6 +816,11 @@ async function openVoting(){
 
   async function playWinner(){
 
+  const button=document.getElementById("playWinnerBtn");
+  if(button.disabled){ return; }
+  button.disabled=true;
+  button.textContent="PLAYING...";
+
   try{
 
     const roundResult = await db
@@ -877,8 +887,7 @@ async function openVoting(){
       }
     }
 
-    document.getElementById("playWinnerBtn").textContent = "✓ PLAYED";
-document.getElementById("playWinnerBtn").disabled = true;
+    button.textContent="✓ PLAYED";
 document.getElementById("rejectWinnerBtn").disabled = true;
 
 document.getElementById("rejectWinnerBtn").style.background = "#555";
@@ -903,6 +912,11 @@ await loadRequests();
 
 }
  async function rejectWinner(){
+
+  const button=document.getElementById("rejectWinnerBtn");
+  if(button.disabled){ return; }
+  button.disabled=true;
+  button.textContent="PROCESSING...";
 
   try{
 
@@ -968,10 +982,7 @@ await loadRequests();
       }
     }
 
-    document.getElementById("rejectWinnerBtn").textContent =
-      "✕ NOT TONIGHT";
-
-    document.getElementById("rejectWinnerBtn").disabled = true;
+    button.textContent="✕ NOT TONIGHT";
 
     document.getElementById("playWinnerBtn").disabled = true;
 
@@ -1381,11 +1392,16 @@ async function chooseTieWinner(optionId){
 
   }
 async function closeRound(){
-const confirmed = await showCloseVoteConfirm();
+const button=document.getElementById("closeRoundBtn");
+if(button.disabled){ return; }
 
-if(!confirmed){
-  return;
-}
+const confirmed=await showCloseVoteConfirm();
+
+if(!confirmed){ return; }
+
+button.disabled=true;
+button.textContent="CLOSING...";
+
   try{
 
     const roundResult = await db
@@ -1538,7 +1554,10 @@ function toggleDjChoiceForm(){
   icon.textContent = isOpen ? "＋" : "−";
 }
 
-async function addDjChoice(){
+async function addDjChoice(button){
+
+  if(button && button.disabled){ return; }
+  if(button){ button.disabled=true; button.dataset.originalText=button.textContent; button.textContent="ADDING..."; }
   const artistInput = document.getElementById("djChoiceArtist");
   const songInput = document.getElementById("djChoiceSong");
 
@@ -1631,6 +1650,7 @@ async function addDjChoice(){
       error.message ||
       "Unable to add the DJ's Choice."
     );
+    if(button){ button.disabled=false; button.textContent=button.dataset.originalText || "🎧 ADD DJ'S CHOICE"; }
   }
 }
 
@@ -2086,7 +2106,7 @@ openRoundResult.data.status === "building" ? `
         </button>
       `
       : `
-        <button onclick="addToCurrentRound('${request.id}')">
+        <button onclick="addToCurrentRound('${request.id}',this)">
           + ADD TO CURRENT ROUND
         </button>
       `
@@ -2315,7 +2335,10 @@ async function removeFromCurrentRound(optionId){
   }
 }
 
-async function addToCurrentRound(requestId){
+async function addToCurrentRound(requestId,button){
+
+  if(button && button.disabled){ return; }
+  if(button){ button.disabled=true; button.dataset.originalText=button.textContent; button.textContent="ADDING..."; }
 
   try{
 
@@ -2417,6 +2440,7 @@ async function addToCurrentRound(requestId){
       error.message ||
       "Unable to add this request to the current round."
     );
+    if(button){ button.disabled=false; button.textContent=button.dataset.originalText || "+ ADD TO CURRENT ROUND"; }
   }
 }
 document.getElementById("refreshBtn").onclick =
