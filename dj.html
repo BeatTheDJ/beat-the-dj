@@ -1709,6 +1709,7 @@ async function loadRound(){
 
     if(!round){
       closeButton.disabled = true;
+      closeButton.textContent = "CLOSE VOTE";
       openVotingButton.disabled = true;
       openVotingButton.textContent = "OPEN VOTING";
       roundNumberDisplay.textContent = "—";
