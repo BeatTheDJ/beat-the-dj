@@ -768,6 +768,8 @@ async function openVoting(){
 
     if(!round){
       alert("There is no round currently being built.");
+      button.disabled=false;
+      button.textContent="OPEN VOTING";
       return;
     }
 
@@ -782,6 +784,8 @@ async function openVoting(){
 
     if(!(optionsResult.data || []).length){
       alert("Add at least one track before opening voting.");
+      button.disabled=false;
+      button.textContent="OPEN VOTING";
       return;
     }
 
@@ -809,6 +813,8 @@ async function openVoting(){
       error.message ||
       "Unable to open voting."
     );
+    button.disabled=false;
+    button.textContent="OPEN VOTING";
 
   }
 
@@ -840,6 +846,8 @@ async function openVoting(){
 
     if(!round || !round.winning_option_id){
       alert("There is no winning track to play.");
+      button.disabled=false;
+      button.textContent="✓ PLAY IT";
       return;
     }
 
@@ -857,6 +865,8 @@ async function openVoting(){
 
     if(!winningOption){
       alert("The winning track could not be found.");
+      button.disabled=false;
+      button.textContent="✓ PLAY IT";
       return;
     }
 
@@ -907,6 +917,8 @@ await loadRequests();
       error.message ||
       "Unable to mark the winner to play."
     );
+    button.disabled=false;
+    button.textContent="✓ PLAY IT";
 
   }
 
@@ -937,6 +949,8 @@ await loadRequests();
 
     if(!round || !round.winning_option_id){
       alert("There is no winning track to reject.");
+      button.disabled=false;
+      button.textContent="✕ NOT TONIGHT";
       return;
     }
 
@@ -954,6 +968,8 @@ await loadRequests();
 
     if(!winningOption || !winningOption.request_id){
       alert("The winning track is not linked to a request.");
+      button.disabled=false;
+      button.textContent="✕ NOT TONIGHT";
       return;
     }
 
@@ -999,6 +1015,8 @@ await loadRequests();
       error.message ||
       "Unable to reject the winner."
     );
+    button.disabled=false;
+    button.textContent="✕ NOT TONIGHT";
 
   }
  }
@@ -1421,6 +1439,8 @@ button.textContent="CLOSING...";
 
     if(!round){
       alert("There is no round currently being built.");
+      button.disabled=false;
+      button.textContent="CLOSE VOTE";
       return;
     }
 
@@ -1541,6 +1561,8 @@ if(updateResult.error){
       error.message ||
       "Unable to close the vote."
     );
+    button.disabled=false;
+    button.textContent="CLOSE VOTE";
   }
 
   }
