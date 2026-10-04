@@ -679,6 +679,26 @@ function setStatus(text, live=false, error=false){
   );
 }
 
+function showConnectionLost(){
+
+  setStatus(
+    "CONNECTION LOST — RECONNECTING...",
+    false,
+    true
+  );
+}
+
+window.addEventListener("offline",showConnectionLost);
+
+window.addEventListener("online",() => {
+  setStatus(
+    "CONNECTION RESTORED — RECONNECTING...",
+    false,
+    false
+  );
+  refresh();
+});
+
 function esc(value){
 
   return String(value ?? "")
@@ -1475,11 +1495,7 @@ async function refresh(){
       error
     );
 
-    setStatus(
-      "Connection problem",
-      false,
-      true
-    );
+    showConnectionLost();
 
     $("message").innerHTML =
       '<span class="error">' +
