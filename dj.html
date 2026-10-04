@@ -669,14 +669,15 @@ function esc(value){
     }[character]));
 }
 
-function setStatus(text,live=false){
+function setStatus(text,live=false,error=false){
   document.getElementById("statusText").textContent = text;
   document.getElementById("status").classList.toggle("live",live);
+  document.getElementById("statusText").classList.toggle("error",error);
 }
 
 function showConnectionLost(){
 
-  setStatus("CONNECTION LOST — RECONNECTING...",false);
+  setStatus("CONNECTION LOST — RECONNECTING...",false,true);
 }
 
 window.addEventListener("offline",showConnectionLost);
@@ -2284,9 +2285,7 @@ openRoundResult.data.status === "building" ? `
     console.error("Request loading error:",error);
 
     document.getElementById("requests").innerHTML =
-      '<div class="error">' +
-      esc(error.message || "Unable to load requests.") +
-      '</div>';
+      '<div class="error">Unable to update requests — connection lost. Reconnecting...</div>';
 
     showConnectionLost();
   }
