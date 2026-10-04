@@ -223,6 +223,28 @@ h1{
   user-select:none;
 }
 
+.requests-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.requests-toggle h2{
+  flex:1;
+  margin:0;
+}
+
+.requests-toggle-label{
+  color:var(--accent);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.1em;
+  white-space:nowrap;
+}
+
 .history-title{
   margin-top:22px;
   background:#1b1b1b;
@@ -459,6 +481,25 @@ footer{
   <span id="requestCount">0 requests</span>
 </div>
 
+
+
+  
+
+
+
+
+
+<section class="card">
+  <div class="requests-toggle" onclick="toggleRequests()">
+    <h2>Requests</h2>
+    <span id="requestsToggleLabel" class="requests-toggle-label">HIDE REQUESTS ▲</span>
+  </div>
+  <div id="requests">
+    <div class="empty">Loading requests…</div>
+  </div>
+  <button id="refreshBtn" style="margin-top:12px;">Refresh requests</button>
+</section>
+
 <section class="card">
 
   <h2>Current Round</h2>
@@ -509,28 +550,8 @@ footer{
   </div>
 
 </section>
-<section class="card">
 
-  <h2>START NEW ROUND</h2>
-
-  <input
-    id="newRoundTitle"
-    type="text"
-    placeholder="Round name e.g. 90s Indie Bangers"
-    style="width:100%;padding:13px;border-radius:12px;border:1px solid #444;background:#202020;color:#f5f5f2;font:inherit;margin-bottom:10px;"
-  >
-
-  <label style="display:flex;align-items:center;gap:9px;margin:0 0 12px;color:#ddd;font-size:13px;font-weight:800;cursor:pointer;">
-    <input id="showUpcoming" type="checkbox" style="width:18px;height:18px;accent-color:#e8ff38;">
-    SHOW AS UPCOMING ROUND TO AUDIENCE
-  </label>
-
-  <button id="startRoundBtn">
-    START ROUND
-  </button>
-
-</section>
-  <section class="card" id="tieCard" style="display:none;">
+<section class="card" id="tieCard" style="display:none;">
 
   <h2>TIE — DJ DECIDES</h2>
 
@@ -541,6 +562,7 @@ footer{
   <div id="tieOptions"></div>
 
   </section>
+
 <section class="card" id="winnerCard" style="display:none;">
 
   <h2>ROUND RESULT</h2>
@@ -589,15 +611,27 @@ footer{
   </div>
 
 </section>
-<section class="card">
-  <h2>Requests</h2>
-  <div id="requests">
-    <div class="empty">Loading requests…</div>
-  </div>
-</section>
 
 <section class="card">
-  <button id="refreshBtn">Refresh requests</button>
+
+  <h2>START NEW ROUND</h2>
+
+  <input
+    id="newRoundTitle"
+    type="text"
+    placeholder="Round name e.g. 90s Indie Bangers"
+    style="width:100%;padding:13px;border-radius:12px;border:1px solid #444;background:#202020;color:#f5f5f2;font:inherit;margin-bottom:10px;"
+  >
+
+  <label style="display:flex;align-items:center;gap:9px;margin:0 0 12px;color:#ddd;font-size:13px;font-weight:800;cursor:pointer;">
+    <input id="showUpcoming" type="checkbox" style="width:18px;height:18px;accent-color:#e8ff38;">
+    SHOW AS UPCOMING ROUND TO AUDIENCE
+  </label>
+
+  <button id="startRoundBtn">
+    START ROUND
+  </button>
+
 </section>
 
 <footer>
@@ -2068,6 +2102,14 @@ if(openRoundResult.data){
     const historyWasOpen =
       document.getElementById("requestHistory")?.style.display === "block";
 
+    const requestList =
+      document.getElementById("requestList");
+
+    const requestsWasOpen =
+      requestList
+        ? requestList.style.display !== "none"
+        : true;
+
     const box = document.getElementById("requests");
 
     document.getElementById("requestCount").textContent =
@@ -2192,7 +2234,23 @@ openRoundResult.data.status === "building" ? `
         '</div>'
       : "";
 
-    box.innerHTML = actionableHtml + historyHtml;
+    box.innerHTML =
+      '<div id="requestList" style="display:' +
+      (requestsWasOpen ? "block" : "none") +
+      ';">' +
+      actionableHtml +
+      historyHtml +
+      '</div>';
+
+    const requestToggleLabel =
+      document.getElementById("requestsToggleLabel");
+
+    if(requestToggleLabel){
+      requestToggleLabel.textContent =
+        requestsWasOpen
+          ? "HIDE REQUESTS ▲"
+          : "SHOW REQUESTS ▼";
+    }
 
     if(historyWasOpen && historyRequests.length){
       const history = document.getElementById("requestHistory");
@@ -2217,6 +2275,30 @@ openRoundResult.data.status === "building" ? `
     setStatus("Connection problem",false);
   }
 }
+function toggleRequests(){
+
+  const list =
+    document.getElementById("requestList");
+
+  const label =
+    document.getElementById("requestsToggleLabel");
+
+  if(!list || !label){
+    return;
+  }
+
+  const isHidden =
+    list.style.display === "none";
+
+  list.style.display =
+    isHidden ? "block" : "none";
+
+  label.textContent =
+    isHidden
+      ? "HIDE REQUESTS ▲"
+      : "SHOW REQUESTS ▼";
+}
+
 function toggleRequestHistory(){
 
   const history = document.getElementById("requestHistory");
