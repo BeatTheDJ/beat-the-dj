@@ -36,6 +36,24 @@ header{
   padding:8px 0 24px;
 }
 
+.dj-brand-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:8px;
+}
+
+.dj-brand-row img{
+  width:76px;
+  height:76px;
+  object-fit:contain;
+  flex:0 0 auto;
+}
+
+.dj-brand-text{
+  min-width:0;
+}
+
 .eyebrow{
   font-size:12px;
   letter-spacing:.2em;
@@ -474,8 +492,13 @@ footer{
 <div class="wrap">
 
 <header>
-  <div class="eyebrow">Beat The DJ</div>
-  <h1>DJ Control</h1>
+  <div class="dj-brand-row">
+    <img src="beat-the-dj-logo.png" alt="Beat The DJ">
+    <div class="dj-brand-text">
+      <div class="eyebrow">Beat The DJ</div>
+      <h1>DJ Control</h1>
+    </div>
+  </div>
   <p class="strap">Incoming requests</p>
 </header>
 
