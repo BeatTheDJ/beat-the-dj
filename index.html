@@ -1306,19 +1306,55 @@ async function refresh(){
       $("waitingLabel")
         .classList.add("hidden");
 
-      $("waitingTitle")
-        .textContent = "Stand by.";
+      const pendingResult =
+        await db
+          .from("rounds")
+          .select("id,round_number,title,dj_decision,closed_at")
+          .eq("status","closed")
+          .is("dj_decision",null)
+          .order("round_number",{ascending:false})
+          .limit(1)
+          .maybeSingle();
 
-      $("waitingSub")
-        .textContent = "The next vote will appear here.";
+      if(pendingResult.error){
+        throw pendingResult.error;
+      }
+
+      const pendingRound = pendingResult.data;
+
+      if(pendingRound){
+
+        $("waitingTitle")
+          .textContent =
+            (pendingRound.title || "ROUND RESULTS").toUpperCase();
+
+        $("waitingSub")
+          .textContent =
+            "VOTE CLOSED — RESULTS ARE BEING CONFIRMED.";
+
+        setStatus(
+          "Round " +
+          pendingRound.round_number +
+          " • RESULTS BEING CONFIRMED"
+        );
+
+      }else{
+
+        $("waitingTitle")
+          .textContent = "Stand by.";
+
+        $("waitingSub")
+          .textContent = "The next vote will appear here.";
+
+        setStatus(
+          "Waiting for the next public vote"
+        );
+
+      }
 
       $("requestRoundSub")
         .textContent =
           "Submit a song request.  Will YOU Beat The DJ?";
-
-      setStatus(
-        "Waiting for the next public vote"
-      );
 
       $("timer").textContent = "";
 
