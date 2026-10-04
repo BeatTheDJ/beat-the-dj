@@ -1311,7 +1311,6 @@ async function refresh(){
           .from("rounds")
           .select("id,round_number,title,dj_decision,closed_at")
           .eq("status","closed")
-          .is("dj_decision",null)
           .order("round_number",{ascending:false})
           .limit(1)
           .maybeSingle();
@@ -1322,7 +1321,7 @@ async function refresh(){
 
       const pendingRound = pendingResult.data;
 
-      if(pendingRound){
+      if(pendingRound && pendingRound.dj_decision === null){
 
         $("waitingTitle")
           .textContent =
