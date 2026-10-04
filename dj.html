@@ -674,6 +674,21 @@ function setStatus(text,live=false){
   document.getElementById("status").classList.toggle("live",live);
 }
 
+function showConnectionLost(){
+
+  setStatus("CONNECTION LOST — RECONNECTING...",false);
+}
+
+window.addEventListener("offline",showConnectionLost);
+
+window.addEventListener("online",() => {
+  setStatus("CONNECTION RESTORED — RECONNECTING...",false);
+  loadRequests();
+  loadRound();
+  loadVoteTotals();
+  loadRoundResult();
+});
+
   function setStartRoundControls(isOpen){
 
   const titleInput = document.getElementById("newRoundTitle");
@@ -2273,7 +2288,7 @@ openRoundResult.data.status === "building" ? `
       esc(error.message || "Unable to load requests.") +
       '</div>';
 
-    setStatus("Connection problem",false);
+    showConnectionLost();
   }
 }
 function toggleRequests(){
