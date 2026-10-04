@@ -836,7 +836,14 @@ function clearLoginError(){
 }
 
 async function handleAuthSession(session){
+  const logoutButton = document.getElementById("logoutBtn");
+
   if(session){
+    if(logoutButton){
+      logoutButton.disabled = false;
+      logoutButton.textContent = "LOG OUT";
+    }
+
     loginScreen.style.display = "none";
     document.querySelector(".wrap").style.display = "block";
 
