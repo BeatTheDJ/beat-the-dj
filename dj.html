@@ -808,7 +808,13 @@ const EVENT_ID =
 
 const db = supabase.createClient(
   SUPABASE_URL,
-  SUPABASE_ANON_KEY
+  SUPABASE_ANON_KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true
+    }
+  }
 );
 
 
@@ -2845,7 +2851,7 @@ document.getElementById("logoutBtn").onclick =
     button.disabled = true;
     button.textContent = "LOGGING OUT...";
 
-    const result = await db.auth.signOut();
+    const result = await db.auth.signOut({ scope: "local" });
 
     if(result.error){
       console.error("Logout error:",result.error);
