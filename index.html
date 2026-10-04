@@ -160,10 +160,14 @@ h1{
 }
 
 .winner-card{
-  border-color:var(--accent);
-  box-shadow:0 0 0 1px var(--accent) inset;
+  border:2px solid var(--accent);
+  background:#151515;
+  box-shadow:
+    0 0 0 1px var(--accent) inset,
+    0 0 22px rgba(232,255,56,.18);
   text-align:center;
-  padding:24px 20px 22px;
+  padding:28px 20px 26px;
+  margin-bottom:24px;
 }
 
 @keyframes victoryCard{
@@ -234,9 +238,9 @@ h1{
 
 .winner-card h2{
   color:var(--accent);
-  font-size:11px;
-  letter-spacing:.2em;
-  margin-bottom:14px;
+  font-size:13px;
+  letter-spacing:.24em;
+  margin-bottom:16px;
 }
 
 @keyframes djWinCard{
