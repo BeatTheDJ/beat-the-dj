@@ -571,6 +571,22 @@ footer{
   font-size:11px;
   padding-top:10px;
 }
+
+.logout-button{
+  width:auto;
+  min-width:140px;
+  margin:0 auto 12px;
+  padding:9px 16px;
+  background:#2a2a2a;
+  color:#f5f5f2;
+  border:1px solid #555;
+  font-size:12px;
+  letter-spacing:.08em;
+}
+
+.logout-button:hover{
+  background:#3a3a3a;
+}
 </style>
 </head>
 
@@ -772,6 +788,7 @@ footer{
 </section>
 
 <footer>
+  <button id="logoutBtn" class="logout-button" type="button">LOG OUT</button>
   © 2026 Beat The DJ. All rights reserved.
 </footer>
 
@@ -2820,6 +2837,26 @@ document.getElementById("closeRoundBtn").onclick =
 playWinner;
 document.getElementById("rejectWinnerBtn").onclick =
   rejectWinner;
+
+document.getElementById("logoutBtn").onclick =
+  async function(){
+    const button = document.getElementById("logoutBtn");
+
+    button.disabled = true;
+    button.textContent = "LOGGING OUT...";
+
+    const result = await db.auth.signOut();
+
+    if(result.error){
+      console.error("Logout error:",result.error);
+      button.disabled = false;
+      button.textContent = "LOG OUT";
+      alert("Unable to log out. Please try again.");
+      return;
+    }
+
+    button.textContent = "LOGGED OUT";
+  };
 
 
 </script>
