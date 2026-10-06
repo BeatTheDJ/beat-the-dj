@@ -1553,7 +1553,7 @@ setInterval(
 const EVENT_ID = "4f56de4d-be9c-4312-b56d-2950286bacc2";
 
 async function submitRequest(){
-const name = $("requestName").value.trim();
+  const name = $("requestName").value.trim();
   const artist = $("requestArtist").value.trim();
   const song = $("requestSong").value.trim();
   const button = $("requestBtn");
@@ -1568,33 +1568,13 @@ const name = $("requestName").value.trim();
   message.textContent = "Checking request…";
 
   try{
-    const duplicateResult = await db
-      .from("requests")
-      .select("id")
-      .eq("event_id", EVENT_ID)
-      .ilike("requester_name", name)
-      .ilike("artist", artist)
-      .ilike("song", song)
-      .in("status", ["pending","submitted"])
-      .limit(1);
-
-    if(duplicateResult.error) throw duplicateResult.error;
-
-    if(duplicateResult.data && duplicateResult.data.length){
-      message.innerHTML = '<div class="duplicate-warning">⚠️ YOU ALREADY HAVE AN ACTIVE REQUEST FOR THIS SONG<br><span style="font-weight:600;">Please wait for the DJ to deal with it.</span></div>';
-      return;
-    }
-
-    message.textContent = "Sending request…";
-
-    const result = await db
-  .from("requests")
-  .insert({
-    event_id: EVENT_ID,requester_name: name,
-    artist: artist,
-    song: song,
-    status: "pending"
-  });
+    const result = await db.rpc("submit_request", {
+      p_event_id: EVENT_ID,
+      p_requester_name: name,
+      p_artist: artist,
+      p_song: song,
+      p_request_token: voterToken
+    });
 
     if(result.error) throw result.error;
 
@@ -1604,8 +1584,20 @@ const name = $("requestName").value.trim();
     message.innerHTML = '<div class="request-success">REQUEST SENT.</div>';
   }catch(error){
     console.error("Request error:", error);
-    message.textContent =
-      error.message || "Request failed.";
+
+    const code = error?.message || "";
+
+    if(code.includes("DUPLICATE_REQUEST")){
+      message.innerHTML = '<div class="duplicate-warning">⚠️ YOU ALREADY HAVE AN ACTIVE REQUEST FOR THIS SONG<br><span style="font-weight:600;">Please wait for the DJ to deal with it.</span></div>';
+    }else if(code.includes("REQUEST_RATE_LIMIT")){
+      message.innerHTML = '<div class="duplicate-warning">⚠️ REQUEST LIMIT REACHED<br><span style="font-weight:600;">Please wait a few minutes before sending another request.</span></div>';
+    }else if(code.includes("EVENT_NOT_ACTIVE")){
+      message.textContent = "Requests are not currently open.";
+    }else if(code.includes("INVALID_REQUEST")){
+      message.textContent = "Please check your request details and try again.";
+    }else{
+      message.textContent = "Request failed. Please try again.";
+    }
   }finally{
     button.disabled = false;
   }
