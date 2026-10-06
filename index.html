@@ -1281,17 +1281,16 @@ function updateCountdown(){
 }
 
 async function getEventState(){
-  const result = await db
-    .from("events")
-    .select("active,name")
-    .eq("id","4f56de4d-be9c-4312-b56d-2950286bacc2")
-    .maybeSingle();
+
+  const result = await db.rpc(
+    "get_public_event_state"
+  );
 
   if(result.error){
     throw result.error;
   }
 
-  return result.data;
+  return result.data?.[0] || null;
 }
 
 async function refresh(){
