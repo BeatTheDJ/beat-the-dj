@@ -1532,7 +1532,8 @@ async function refresh(){
       setStatus(
         "UPDATE ISSUE — " +
         refreshStage.toUpperCase() +
-        " — RETRYING...",
+        " — " +
+        String(error?.message || "UNKNOWN ERROR").slice(0, 90).toUpperCase(),
         false,
         true
       );
