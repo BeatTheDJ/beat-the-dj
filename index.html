@@ -1301,9 +1301,46 @@ function updateCountdown(){
       .padStart(2,"0");
 }
 
+async function getEventState(){
+  const result = await db
+    .from("events")
+    .select("active,name")
+    .eq("id","4f56de4d-be9c-4312-b56d-2950286bacc2")
+    .maybeSingle();
+
+  if(result.error){
+    throw result.error;
+  }
+
+  return result.data;
+}
+
 async function refresh(){
 
   try{
+
+    const eventState = await getEventState();
+
+    if(!eventState || !eventState.active){
+      currentRound = null;
+      currentOptions = [];
+      voteCounts = {};
+
+      $("roundCard").classList.add("hidden");
+      $("choicesCard").classList.add("hidden");
+      $("winnerCard").classList.add("hidden");
+      $("waitingCard").classList.remove("hidden");
+      $("waitingLabel").classList.add("hidden");
+      $("waitingTitle").textContent = "EVENT ENDED";
+      $("waitingSub").textContent = "The DJ has ended this event. Please check back when the next event is live.";
+      $("requestCard").classList.add("hidden");
+      $("requestRoundSub").textContent = "Requests are currently closed.";
+      $("timer").textContent = "";
+      setStatus("EVENT ENDED");
+      return;
+    }
+
+    $("requestCard").classList.remove("hidden");
 
     currentRound =
       await getOpenRound();
