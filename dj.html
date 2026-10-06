@@ -1381,6 +1381,7 @@ document.getElementById("rejectWinnerBtn").style.opacity = ".35";
 alert("Winner marked to PLAY.");
 
 await loadRequests();
+    await loadRoundResult();
 
   }catch(error){
 
@@ -1644,6 +1645,8 @@ document.getElementById("tieCard").style.display = "none";
 
   return;
 }
+
+    document.getElementById("tieCard").style.display = "none";
 
     const optionResult = await db
       .from("options")
