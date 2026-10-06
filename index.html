@@ -970,7 +970,7 @@ async function loadBeatResult(){
     }
 
     const latestClosed =
-      closedResult.data;
+      closedResult.data?.[0] || null;
 
     if(
       !latestClosed ||
@@ -1007,7 +1007,7 @@ async function loadBeatResult(){
     }
 
     const winningOption =
-      optionResult.data;
+      optionResult.data?.[0] || null;
 
     if(!winningOption){
 
@@ -1293,7 +1293,15 @@ async function getEventState(){
   return result.data?.[0] || null;
 }
 
+let refreshInFlight = false;
+
 async function refresh(){
+
+  if(refreshInFlight){
+    return;
+  }
+
+  refreshInFlight = true;
 
   try{
 
@@ -1353,7 +1361,7 @@ async function refresh(){
         throw pendingResult.error;
       }
 
-      const pendingRound = pendingResult.data;
+      const pendingRound = pendingResult.data?.[0] || null;
 
       if(pendingRound && pendingRound.dj_decision === null){
 
@@ -1509,15 +1517,22 @@ async function refresh(){
       error
     );
 
-    showConnectionLost();
+    if(navigator.onLine === false){
+      showConnectionLost();
+    }else{
+      setStatus(
+        "TEMPORARY CONNECTION ISSUE — RETRYING...",
+        false,
+        true
+      );
 
-    $("message").innerHTML =
-      '<span class="error">' +
-      esc(
-        error.message ||
-        "Unable to connect to the database."
-      ) +
-      "</span>";
+      $("message").innerHTML =
+        '<span class="error">Live updates are temporarily unavailable. Retrying...</span>';
+    }
+
+  }finally{
+
+    refreshInFlight = false;
 
   }
 }
