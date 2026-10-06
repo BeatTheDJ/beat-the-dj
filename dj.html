@@ -497,7 +497,8 @@ button{
 .actions button{
   width:100%;
   padding:11px 8px;
-  font-size:13px;}
+  font-size:13px;
+}
 
 .actions .reject{
   background:#333;
@@ -996,7 +997,8 @@ async function startNewRound(){
     const insertResult = await db
       .from("rounds")
       .insert({
-        event_id:EVENT_ID,        round_number:nextRoundNumber,
+        event_id:EVENT_ID,
+        round_number:nextRoundNumber,
         title:title,
         status:"building",
         opened_at:new Date().toISOString(),
@@ -1495,6 +1497,7 @@ document.getElementById("tieCard").style.display = "none";
       .from("votes")
       .select("option_id")
       .eq("round_id",round.id);
+
     if(votesResult.error){
       throw votesResult.error;
     }
@@ -2195,3 +2198,682 @@ async function loadRound(){
       .from("options")
       .select("id")
       .eq("round_id",round.id);
+
+    if(roundOptionsResult.error){
+      throw roundOptionsResult.error;
+    }
+
+    if(!(roundOptionsResult.data || []).length){
+
+      container.textContent =
+        "Add tracks from the requests below to begin voting.";
+
+      return;
+    }
+
+    const optionsResult = await db
+      .from("options")
+      .select("id,artist,track,position")
+      .eq("round_id",round.id)
+      .order("position");
+
+    if(optionsResult.error){
+      throw optionsResult.error;
+    }
+
+    const votesResult = await db
+      .from("votes")
+      .select("option_id")
+      .eq("round_id",round.id);
+
+    if(votesResult.error){
+      throw votesResult.error;
+    }
+
+    const counts = {};
+
+    votesResult.data.forEach(vote => {
+
+      counts[vote.option_id] =
+        (counts[vote.option_id] || 0) + 1;
+
+    });
+
+    const voteCounts = optionsResult.data.map(option =>
+      counts[option.id] || 0
+    );
+
+    const maxVotes = voteCounts.length
+      ? Math.max(...voteCounts)
+      : 0;
+
+    const leaders = maxVotes > 0
+      ? voteCounts.filter(votes => votes === maxVotes).length
+      : 0;
+
+    container.innerHTML =
+      optionsResult.data.map((option,index) => {
+
+        const votes = voteCounts[index];
+        const isLeader = maxVotes > 0 && votes === maxVotes;
+        const rowClass = isLeader
+          ? (leaders > 1 ? "voteRow tied" : "voteRow leading")
+          : "voteRow";
+
+        return `
+          <div class="${rowClass}">
+            <span>
+              ${option.artist} — ${option.track}
+            </span>
+            <strong>
+              ${votes}
+            </strong>
+          </div>
+        `;
+
+      }).join("");
+
+  }catch(error){
+
+    console.error(
+      "Vote loading error:",
+      error
+    );
+
+    document.getElementById("roundVotes").textContent =
+      "Unable to load votes";
+
+  }
+
+  } async function loadRequests(){
+
+  try{
+
+    const result = await db
+      .from("requests")
+      .select(
+        "id,requester_name,artist,song,status,created_at"
+      )
+      .eq("event_id",EVENT_ID)
+      .order("created_at",{ascending:false});
+
+    if(result.error){
+      throw result.error;
+    }
+const openRoundResult = await db
+  .from("rounds")
+  .select("id,status")
+  .eq("event_id",EVENT_ID)
+   .in("status",["building","voting"])
+  .limit(1)
+  .maybeSingle();
+
+if(openRoundResult.error){
+  throw openRoundResult.error;
+}
+
+let roundRequestIds = new Set();
+
+if(openRoundResult.data){
+
+  const optionsResult = await db
+    .from("options")
+    .select("request_id")
+    .eq("round_id",openRoundResult.data.id);
+
+  if(optionsResult.error){
+    throw optionsResult.error;
+  }
+
+  roundRequestIds = new Set(
+    (optionsResult.data || [])
+      .map(option => option.request_id)
+      .filter(Boolean)
+  );
+}
+    
+    const requests = result.data || [];
+
+    const actionableRequests = requests.filter(request =>
+      request.status === "pending" || !request.status || request.status === "submitted"
+    );
+
+    const historyRequests = requests.filter(request =>
+      request.status === "played" || request.status === "rejected"
+    );
+
+    const displayRequests = [...actionableRequests, ...historyRequests];
+
+    const playedResult = await db
+      .from("requests")
+      .select("artist,song")
+      .eq("event_id",EVENT_ID)
+      .eq("status","played");
+
+    if(playedResult.error){
+      throw playedResult.error;
+    }
+
+    const normaliseTrack = value =>
+      String(value || "").trim().toLowerCase();
+
+    const playedSongs = new Set(
+      (playedResult.data || []).map(request =>
+        normaliseTrack(request.artist) + "::" +
+        normaliseTrack(request.song)
+      )
+    );
+
+    const historyWasOpen =
+      document.getElementById("requestHistory")?.style.display === "block";
+
+    const requestList =
+      document.getElementById("requestList");
+
+    const requestsWasOpen =
+      requestList
+        ? requestList.style.display !== "none"
+        : true;
+
+    const box = document.getElementById("requests");
+
+    document.getElementById("requestCount").textContent =
+      actionableRequests.length +
+      " actionable • " +
+      historyRequests.length +
+      " history";
+
+    if(!requests.length){
+      box.innerHTML =
+        '<div class="empty">No requests yet.</div>';
+
+      setStatus("Waiting for requests",true);
+      return;
+    }
+
+    const renderRequest = request => {
+      const time = request.created_at
+        ? new Date(request.created_at).toLocaleTimeString(
+            [],
+            {hour:"2-digit",minute:"2-digit"}
+          )
+        : "";
+
+      return `
+        <div class="request ${request.status === "pending" || !request.status ? "status-pending" : request.status === "submitted" && roundRequestIds.has(request.id) ? "status-in-round" : request.status === "submitted" ? "status-submitted" : request.status === "played" ? "status-played" : request.status === "rejected" ? "status-rejected" : ""}">
+
+          <div class="song">
+            ${esc(request.song)}
+          </div>
+
+          <div class="artist">
+            ${esc(request.artist)}
+          </div>
+
+          <div class="requester">
+            Requested by ${esc(request.requester_name)}
+            </div>
+          ${playedSongs.has(
+            normaliseTrack(request.artist) + "::" +
+            normaliseTrack(request.song)
+          ) && (request.status === "pending" || !request.status || request.status === "submitted") ? `
+            <div class="played-warning">
+              ⚠ THIS SONG WAS ALREADY PLAYED TONIGHT — DJ DECIDES
+            </div>
+          ` : ""}
+          ${request.status === "pending" || !request.status ? `
+<div class="actions">
+
+  <button onclick="updateRequest('${request.id}','submitted')">
+    ✓ ACCEPT
+  </button>
+
+  <button class="reject" onclick="updateRequest('${request.id}','rejected')">
+    ✕ NOT TONIGHT
+  </button>
+
+</div>`
+
+: request.status === "submitted" &&
+openRoundResult.data &&
+openRoundResult.data.status === "building" ? `
+
+<div class="actions">
+
+  ${
+    roundRequestIds.has(request.id)
+      ? `
+        <button disabled>
+          ✓ ADDED TO ROUND
+        </button>
+      `
+      : `
+        <button onclick="addToCurrentRound('${request.id}',this)">
+          + ADD TO CURRENT ROUND
+        </button>
+      `
+  }
+
+</div>
+
+` : request.status === "submitted" ? `
+
+<div class="request-status status-submitted-text">
+  ✓ ACCEPTED — READY FOR A ROUND
+</div>
+
+` : `
+
+<div class="request-status ${
+  request.status === "played"
+    ? "status-played-text"
+    : "status-rejected-text"
+}">
+  ${
+    request.status === "played"
+      ? "✓ PLAYED"
+      : "✕ REJECTED"
+  }
+</div>
+
+`}
+
+          
+
+        </div>
+      `;
+    };
+
+    const actionableHtml = actionableRequests.length
+      ? '<div class="group-title actionable-title">ACTIONABLE REQUESTS — ' + actionableRequests.length + '</div>' +
+        actionableRequests.map(renderRequest).join("")
+      : "";
+
+    const historyHtml = historyRequests.length
+      ? '<div class="group-title history-title history-toggle" onclick="toggleRequestHistory()">' +
+          '<span>REQUEST HISTORY — ' + historyRequests.length + '</span>' +
+          '<span id="historyToggleLabel">SHOW HISTORY ▼</span>' +
+        '</div>' +
+        '<div id="requestHistory" style="display:none;">' +
+          historyRequests.map(renderRequest).join("") +
+        '</div>'
+      : "";
+
+    box.innerHTML =
+      '<div id="requestList" style="display:' +
+      (requestsWasOpen ? "block" : "none") +
+      ';">' +
+      actionableHtml +
+      historyHtml +
+      '</div>';
+
+    const requestToggleLabel =
+      document.getElementById("requestsToggleLabel");
+
+    if(requestToggleLabel){
+      requestToggleLabel.textContent =
+        requestsWasOpen
+          ? "HIDE REQUESTS ▲"
+          : "SHOW REQUESTS ▼";
+    }
+
+    if(historyWasOpen && historyRequests.length){
+      const history = document.getElementById("requestHistory");
+      const label = document.getElementById("historyToggleLabel");
+      if(history && label){
+        history.style.display = "block";
+        label.textContent = "HIDE HISTORY ▲";
+      }
+    }
+
+    setStatus("Live • requests updating",true);
+
+  }catch(error){
+
+    console.error("Request loading error:",error);
+
+    document.getElementById("requests").innerHTML =
+      '<div class="error">Unable to update requests — connection lost. Reconnecting...</div>';
+
+    showConnectionLost();
+  }
+}
+function toggleRequests(){
+
+  const list =
+    document.getElementById("requestList");
+
+  const label =
+    document.getElementById("requestsToggleLabel");
+
+  if(!list || !label){
+    return;
+  }
+
+  const isHidden =
+    list.style.display === "none";
+
+  list.style.display =
+    isHidden ? "block" : "none";
+
+  label.textContent =
+    isHidden
+      ? "HIDE REQUESTS ▲"
+      : "SHOW REQUESTS ▼";
+}
+
+function toggleRequestHistory(){
+
+  const history = document.getElementById("requestHistory");
+  const label = document.getElementById("historyToggleLabel");
+
+  if(!history || !label){
+    return;
+  }
+
+  const isHidden = history.style.display === "none";
+
+  history.style.display = isHidden ? "block" : "none";
+  label.textContent = isHidden
+    ? "HIDE HISTORY ▲"
+    : "SHOW HISTORY ▼";
+}
+
+async function updateRequest(id,status){
+
+  try{
+
+    const result = await db
+  .from("requests")
+  .update({status:status})
+  .eq("id",id)
+  .eq("event_id",EVENT_ID)
+
+    if(result.error){
+      throw result.error;
+    }
+
+    setStartRoundControls(false);
+
+    await loadRequests();
+
+  }catch(error){
+
+    console.error("Request update error:",error);
+
+    alert(
+      error.message ||
+      "Unable to update this request."
+    );
+  }
+  }
+async function removeFromCurrentRound(optionId){
+
+  const confirmed = confirm(
+    "Remove this track from the current round? It will return to the actionable requests list."
+  );
+
+  if(!confirmed){
+    return;
+  }
+
+  try{
+
+    const roundResult = await db
+      .from("rounds")
+      .select("id")
+      .eq("event_id",EVENT_ID)
+      .eq("status","building")
+      .order("round_number",{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(roundResult.error){
+      throw roundResult.error;
+    }
+
+    const round = roundResult.data;
+
+    if(!round){
+      alert("Voting has already opened. This track can no longer be removed.");
+      return;
+    }
+
+    const optionResult = await db
+      .from("options")
+      .select("id,request_id")
+      .eq("id",optionId)
+      .eq("round_id",round.id)
+      .maybeSingle();
+
+    if(optionResult.error){
+      throw optionResult.error;
+    }
+
+    if(!optionResult.data){
+      alert("This track is no longer in the current round.");
+      await loadRound();
+      await loadRequests();
+      return;
+    }
+
+    const deleteResult = optionResult.data.request_id
+      ? await db
+          .from("options")
+          .delete()
+          .eq("id",optionId)
+          .eq("round_id",round.id)
+          .eq("request_id",optionResult.data.request_id)
+      : await db
+          .from("options")
+          .delete()
+          .eq("id",optionId)
+          .eq("round_id",round.id)
+          .is("request_id",null);
+
+    if(deleteResult.error){
+      throw deleteResult.error;
+    }
+
+    const remainingOptionsResult = await db
+      .from("options")
+      .select("id")
+      .eq("round_id",round.id)
+      .order("position",{ascending:true});
+
+    if(remainingOptionsResult.error){
+      throw remainingOptionsResult.error;
+    }
+
+    for(let index = 0; index < (remainingOptionsResult.data || []).length; index++){
+
+      const updatePositionResult = await db
+        .from("options")
+        .update({
+          position:index + 1
+        })
+        .eq("id",remainingOptionsResult.data[index].id);
+
+      if(updatePositionResult.error){
+        throw updatePositionResult.error;
+      }
+    }
+
+    await loadRequests();
+    await loadRound();
+    await loadVoteTotals();
+
+  }catch(error){
+
+    console.error(
+      "Remove from current round error:",
+      error
+    );
+
+    alert(
+      error.message ||
+      "Unable to remove this track from the current round."
+    );
+  }
+}
+
+async function addToCurrentRound(requestId,button){
+
+  if(button && button.disabled){ return; }
+  if(button){ button.disabled=true; button.dataset.originalText=button.textContent; button.textContent="ADDING..."; }
+
+  try{
+
+    const roundResult = await db
+      .from("rounds")
+      .select("id")
+      .eq("event_id",EVENT_ID)
+       .eq("status","building")
+      .order("round_number",{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(roundResult.error){
+      throw roundResult.error;
+    }
+
+    const round = roundResult.data;
+
+    if(!round){
+      alert("There is no open round.");
+      return;
+    }
+
+    const requestResult = await db
+      .from("requests")
+      .select("id,artist,song,status")
+      .eq("id",requestId)
+      .eq("event_id",EVENT_ID)
+      .maybeSingle();
+
+    if(requestResult.error){
+      throw requestResult.error;
+    }
+
+    const request = requestResult.data;
+
+    if(!request){
+      alert("Request not found.");
+      return;
+    }
+
+    if(request.status !== "submitted"){
+      alert("This request is no longer available to add to a round.");
+      await loadRequests();
+      return;
+    }
+
+    const optionsResult = await db
+      .from("options")
+      .select("position")
+      .eq("round_id",round.id)
+      .order("position",{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(optionsResult.error){
+      throw optionsResult.error;
+    }
+
+    const nextPosition =
+      optionsResult.data
+        ? optionsResult.data.position + 1
+        : 1;
+
+    const insertResult = await db
+      .from("options")
+      .insert({
+        round_id:round.id,
+        position:nextPosition,
+        label:request.artist + " — " + request.song,
+        artist:request.artist,
+        track:request.song,
+        request_id:request.id
+      });
+
+    if(insertResult.error){
+      throw insertResult.error;
+    }
+
+    alert(
+      request.artist +
+      " — " +
+      request.song +
+      " added to the current round."
+    );
+
+    await loadRequests();
+    await loadRound();
+    await loadVoteTotals();
+
+  }catch(error){
+
+    console.error(
+      "Add to current round error:",
+      error
+    );
+
+    alert(
+      error.message ||
+      "Unable to add this request to the current round."
+    );
+    if(button){ button.disabled=false; button.textContent=button.dataset.originalText || "+ ADD TO CURRENT ROUND"; }
+  }
+}
+document.getElementById("refreshBtn").onclick =
+  async function(){
+
+    const button =
+      document.getElementById("refreshBtn");
+
+    button.textContent = "REFRESHING...";
+    button.disabled = true;
+
+    await loadRequests();
+
+    button.textContent = "✓ REFRESHED";
+
+    setTimeout(() => {
+      button.textContent = "REFRESH REQUESTS";
+      button.disabled = false;
+    }, 800);
+
+  };
+  
+document.getElementById("closeRoundBtn").onclick =
+  closeRound;
+  document.getElementById("playWinnerBtn").onclick =
+playWinner;
+document.getElementById("rejectWinnerBtn").onclick =
+  rejectWinner;
+
+document.getElementById("logoutBtn").onclick =
+  async function(){
+    const button = document.getElementById("logoutBtn");
+
+    button.disabled = true;
+    button.textContent = "LOGGING OUT...";
+
+    const result = await db.auth.signOut({ scope: "local" });
+
+    if(result.error){
+      console.error("Logout error:",result.error);
+      button.disabled = false;
+      button.textContent = "LOG OUT";
+      alert("Unable to log out. Please try again.");
+      return;
+    }
+
+    button.textContent = "LOGGED OUT";
+  };
+
+
+</script>
+
+</body>
+</html>
