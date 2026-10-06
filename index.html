@@ -1530,7 +1530,9 @@ async function refresh(){
       showConnectionLost();
     }else{
       setStatus(
-        "TEMPORARY CONNECTION ISSUE — RETRYING...",
+        "UPDATE ISSUE — " +
+        refreshStage.toUpperCase() +
+        " — RETRYING...",
         false,
         true
       );
