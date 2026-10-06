@@ -759,11 +759,12 @@ async function getOptions(roundId){
 
 async function getVoteCounts(roundId){
 
-  const result =
-    await db
-      .from("votes")
-      .select("option_id")
-      .eq("round_id",roundId);
+  const result = await db.rpc(
+    "get_public_vote_counts",
+    {
+      p_round_id: roundId
+    }
+  );
 
   if(result.error){
 
@@ -781,10 +782,10 @@ async function getVoteCounts(roundId){
 
   const counts = {};
 
-  for(const vote of result.data || []){
+  for(const row of result.data || []){
 
-    counts[vote.option_id] =
-      (counts[vote.option_id] || 0) + 1;
+    counts[row.option_id] =
+      Number(row.vote_count || 0);
 
   }
 
