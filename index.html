@@ -1303,8 +1303,11 @@ async function refresh(){
 
   refreshInFlight = true;
 
+  let refreshStage = "starting";
+
   try{
 
+    refreshStage = "event";
     const eventState = await getEventState();
 
     if(!eventState || !eventState.active){
@@ -1328,9 +1331,11 @@ async function refresh(){
 
     $("requestCard").classList.remove("hidden");
 
+    refreshStage = "round";
     currentRound =
       await getOpenRound();
 
+    refreshStage = "result";
     await loadBeatResult();
 
     if(!currentRound){
@@ -1350,6 +1355,7 @@ async function refresh(){
       $("waitingLabel")
         .classList.add("hidden");
 
+      refreshStage = "pending result";
       const pendingResult = await db.rpc(
         "get_public_round",
         {
@@ -1466,16 +1472,19 @@ async function refresh(){
       return;
     }
 
+    refreshStage = "options";
     currentOptions =
       await getOptions(
         currentRound.id
       );
 
+    refreshStage = "requester names";
     currentOptions =
       await getRequesterNames(
         currentOptions
       );
 
+    refreshStage = "vote totals";
     voteCounts =
       await getVoteCounts(
         currentRound.id
@@ -1527,7 +1536,9 @@ async function refresh(){
       );
 
       $("message").innerHTML =
-        '<span class="error">Live updates are temporarily unavailable. Retrying...</span>';
+        '<span class="error">Live update problem at: ' +
+        esc(refreshStage) +
+        '. Retrying...</span>';
     }
 
   }finally{
