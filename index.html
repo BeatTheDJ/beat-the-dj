@@ -717,23 +717,18 @@ function esc(value){
 
 async function getOpenRound(){
 
-  const result =
-    await db
-      .from("rounds")
-      .select("*")
-      .in("status",["building","voting"])
-      .order(
-        "round_number",
-        {ascending:false}
-      )
-      .limit(1)
-      .maybeSingle();
+  const result = await db.rpc(
+    "get_public_round",
+    {
+      p_mode: "open"
+    }
+  );
 
   if(result.error){
     throw result.error;
   }
 
-  return result.data;
+  return result.data?.[0] || null;
 }
 
 async function getOptions(roundId){
@@ -968,19 +963,12 @@ async function loadBeatResult(){
 
   try{
 
-    const closedResult =
-      await db
-        .from("rounds")
-        .select(
-          "id,round_number,winning_option_id,dj_decision,closed_at"
-        )
-        .eq("status","closed")
-        .order(
-          "round_number",
-          {ascending:false}
-        )
-        .limit(1)
-        .maybeSingle();
+    const closedResult = await db.rpc(
+      "get_public_round",
+      {
+        p_mode: "closed"
+      }
+    );
 
     if(closedResult.error){
       throw closedResult.error;
@@ -1365,14 +1353,12 @@ async function refresh(){
       $("waitingLabel")
         .classList.add("hidden");
 
-      const pendingResult =
-        await db
-          .from("rounds")
-          .select("id,round_number,title,dj_decision,closed_at")
-          .eq("status","closed")
-          .order("round_number",{ascending:false})
-          .limit(1)
-          .maybeSingle();
+      const pendingResult = await db.rpc(
+        "get_public_round",
+        {
+          p_mode: "closed"
+        }
+      );
 
       if(pendingResult.error){
         throw pendingResult.error;
