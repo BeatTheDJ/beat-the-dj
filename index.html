@@ -801,10 +801,12 @@ async function getRequesterNames(options){
     return options;
   }
 
-  const result = await db
-    .from("requests")
-    .select("id,requester_name")
-    .in("id",requestIds);
+  const result = await db.rpc(
+    "get_public_requester_names",
+    {
+      p_request_ids: requestIds
+    }
+  );
 
   if(result.error){
     throw result.error;
@@ -1044,21 +1046,19 @@ async function loadBeatResult(){
     if(!isDjChoice){
 
       const requestResult =
-        await db
-          .from("requests")
-          .select("requester_name")
-          .eq(
-            "id",
-            winningOption.request_id
-          )
-          .maybeSingle();
+        await db.rpc(
+          "get_public_requester_names",
+          {
+            p_request_ids: [winningOption.request_id]
+          }
+        );
 
       if(requestResult.error){
         throw requestResult.error;
       }
 
       requesterName =
-        requestResult.data?.requester_name ||
+        requestResult.data?.[0]?.requester_name ||
         "YOU";
     }
 
