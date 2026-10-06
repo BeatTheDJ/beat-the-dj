@@ -572,6 +572,41 @@ footer{
   padding-top:10px;
 }
 
+.event-control-card{
+  border:1px solid #444;
+}
+.event-control-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+.event-status-text{
+  margin-top:5px;
+  font-size:15px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.event-status-active{color:#4caf50;}
+.event-status-ended{color:#ff7777;}
+.event-toggle{
+  width:auto;
+  min-width:150px;
+  padding:11px 14px;
+  font-size:12px;
+  letter-spacing:.06em;
+}
+.event-toggle.end{
+  background:#333;
+  color:#f5f5f2;
+  border:1px solid #666;
+}
+.event-toggle.start{
+  background:#4caf50;
+  color:#090909;
+  border:1px solid #65c96b;
+}
+
 .logout-button{
   display:block;
   width:auto;
@@ -634,6 +669,16 @@ footer{
   </span>
   <span id="requestCount">0 requests</span>
 </div>
+
+<section class="card event-control-card">
+  <div class="event-control-row">
+    <div>
+      <h2>EVENT</h2>
+      <div id="eventStatusText" class="event-status-text">Checking event status…</div>
+    </div>
+    <button id="eventToggleBtn" type="button" class="event-toggle" disabled>CHECKING...</button>
+  </div>
+</section>
 
 
 
@@ -850,14 +895,17 @@ async function handleAuthSession(session){
     if(!djControlStarted){
       djControlStarted = true;
 
+      loadEventState();
       loadRequests();
       loadRound();
       loadVoteTotals();
       loadRoundResult();
 
       setInterval(loadRequests,5000);
+      setInterval(loadEventState,5000);
       setInterval(loadVoteTotals,5000);
     }else{
+      loadEventState();
       loadRequests();
       loadRound();
       loadVoteTotals();
@@ -932,11 +980,118 @@ window.addEventListener("offline",showConnectionLost);
 
 window.addEventListener("online",() => {
   setStatus("CONNECTION RESTORED — RECONNECTING...",false);
+  loadEventState();
   loadRequests();
   loadRound();
   loadVoteTotals();
   loadRoundResult();
 });
+
+let eventIsActive = false;
+
+async function loadEventState(){
+  try{
+    const result = await db
+      .from("events")
+      .select("active,name")
+      .eq("id",EVENT_ID)
+      .maybeSingle();
+
+    if(result.error){
+      throw result.error;
+    }
+
+    eventIsActive = !!result.data?.active;
+
+    const statusText = document.getElementById("eventStatusText");
+    const button = document.getElementById("eventToggleBtn");
+
+    if(statusText){
+      statusText.textContent = eventIsActive
+        ? "🟢 EVENT ACTIVE"
+        : "🔴 EVENT ENDED";
+      statusText.className =
+        "event-status-text " +
+        (eventIsActive ? "event-status-active" : "event-status-ended");
+    }
+
+    if(button){
+      button.disabled = false;
+      button.className =
+        "event-toggle " +
+        (eventIsActive ? "end" : "start");
+      button.textContent =
+        eventIsActive ? "END EVENT" : "START EVENT";
+    }
+
+    const startButton = document.getElementById("startRoundBtn");
+    if(startButton){
+      startButton.disabled = !eventIsActive;
+      startButton.title = eventIsActive
+        ? ""
+        : "Start the event before starting a round.";
+    }
+
+    setStatus(
+      eventIsActive
+        ? "Event active • requests updating"
+        : "Event ended • audience access paused",
+      eventIsActive
+    );
+
+  }catch(error){
+    console.error("Event status error:",error);
+    const button = document.getElementById("eventToggleBtn");
+    if(button){
+      button.disabled = true;
+      button.textContent = "STATUS ERROR";
+    }
+  }
+}
+
+async function toggleEvent(){
+  const button = document.getElementById("eventToggleBtn");
+  if(button.disabled){ return; }
+
+  const nextActive = !eventIsActive;
+
+  if(!nextActive){
+    const confirmed = confirm(
+      "End this event? New song requests and the public live view will be paused. Existing rounds and requests will not be deleted."
+    );
+    if(!confirmed){ return; }
+  }
+
+  button.disabled = true;
+  button.textContent = nextActive ? "STARTING..." : "ENDING...";
+
+  try{
+    const result = await db
+      .from("events")
+      .update({active:nextActive})
+      .eq("id",EVENT_ID);
+
+    if(result.error){
+      throw result.error;
+    }
+
+    eventIsActive = nextActive;
+    await loadEventState();
+    await loadRequests();
+    await loadRound();
+    await loadVoteTotals();
+    await loadRoundResult();
+
+  }catch(error){
+    console.error("Event update error:",error);
+    alert(error.message || "Unable to update the event.");
+    await loadEventState();
+  }
+}
+
+document
+  .getElementById("eventToggleBtn")
+  .addEventListener("click",toggleEvent);
 
   function setStartRoundControls(isOpen){
 
@@ -948,6 +1103,11 @@ window.addEventListener("online",() => {
 }
 
 async function startNewRound(){
+
+  if(!eventIsActive){
+    alert("Start the event before starting a round.");
+    return;
+  }
 
   const titleInput =
     document.getElementById("newRoundTitle");
