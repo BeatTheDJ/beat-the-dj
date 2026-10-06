@@ -733,17 +733,12 @@ async function getOpenRound(){
 
 async function getOptions(roundId){
 
-  const result =
-    await db
-      .from("options")
-      .select(
-        "id,round_id,position,label,artist,track,request_id"
-      )
-      .eq("round_id",roundId)
-      .order(
-        "position",
-        {ascending:true}
-      );
+  const result = await db.rpc(
+    "get_public_options",
+    {
+      p_round_id: roundId
+    }
+  );
 
   if(result.error){
     throw result.error;
@@ -1000,17 +995,12 @@ async function loadBeatResult(){
       return;
     }
 
-    const optionResult =
-      await db
-        .from("options")
-        .select(
-          "artist,track,request_id"
-        )
-        .eq(
-          "id",
-          latestClosed.winning_option_id
-        )
-        .maybeSingle();
+    const optionResult = await db.rpc(
+      "get_public_winning_option",
+      {
+        p_option_id: latestClosed.winning_option_id
+      }
+    );
 
     if(optionResult.error){
       throw optionResult.error;
