@@ -2389,7 +2389,7 @@ async function enrichRoundArtwork(roundId){
   }catch(error){
 
     console.error("Artwork enrichment error:",error);
-    // Artwork is enhancement only. A failed lookup must never stop voting.
+    // Artwork is an enhancement only. Voting must still open if lookup fails.
   }
 
 }
