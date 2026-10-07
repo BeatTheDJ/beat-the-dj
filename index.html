@@ -504,6 +504,18 @@ footer{
   padding-top:10px;
 }
 
+.ended-landing{
+  margin:8px 0 18px;
+}
+
+.ended-landing img{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:16px;
+  border:1px solid var(--line);
+}
+
 label{
   display:block;
   margin-top:12px;
@@ -568,6 +580,10 @@ input:focus{
   <span id="timer" class="timer"></span>
 </div>
 
+<section id="endedLanding" class="ended-landing hidden">
+  <img src="ended-event.svg" alt="Beat The DJ event ended — upcoming events at Maida Vale">
+</section>
+
 <section id="roundCard" class="card hidden">
   <h2>Voting now</h2>
   <div id="roundTitle" class="round-title">Stage 1</div>
@@ -610,7 +626,7 @@ input:focus{
   <div id="waitingSub" class="round-sub">The next vote will appear here.</div>
 </section>
 
-<div class="small">
+<div id="liveNote" class="small">
   One vote per device/browser for the current round.
   Results update automatically.
   <button id="refreshBtn" class="refresh">Refresh</button>
@@ -1324,6 +1340,9 @@ async function refresh(){
       $("winnerCard").classList.add("hidden");
       $("waitingCard").classList.remove("hidden");
       $("waitingLabel").classList.add("hidden");
+      $("endedLanding").classList.remove("hidden");
+      $("status").classList.add("hidden");
+      $("liveNote").classList.add("hidden");
       $("waitingTitle").textContent = "EVENT ENDED";
       $("waitingSub").textContent = "The DJ has ended this event. Please check back when the next event is live.";
       $("requestCard").classList.add("hidden");
@@ -1334,6 +1353,9 @@ async function refresh(){
     }
 
     $("requestCard").classList.remove("hidden");
+    $("endedLanding").classList.add("hidden");
+    $("status").classList.remove("hidden");
+    $("liveNote").classList.remove("hidden");
 
     currentRound =
       await getOpenRound();
