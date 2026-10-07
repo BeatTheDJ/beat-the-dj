@@ -2236,6 +2236,11 @@ async function loadRound(){
      }
 
      const roundTracks = roundTracksResult.data || [];
+
+     if(round.status === "voting"){
+       await enrichRoundArtwork(round.id);
+     }
+
      const requestIds = roundTracks.map(option => option.request_id).filter(Boolean);
      let requesterNames = {};
 
