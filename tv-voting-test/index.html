@@ -170,6 +170,19 @@ function hideUpcomingEvents(){
 
 async function load(){
   try{
+    const eventState=(await rpc("get_public_event_state"))?.[0] || null;
+
+    if(!eventState || !eventState.active){
+      showUpcomingEvents();
+      let board=document.getElementById("votingBoard");
+      board.className="board";
+      board.dataset.optionKey="upcoming-events";
+      board.innerHTML="";
+      return;
+    }
+
+    hideUpcomingEvents();
+
     let rr=await rpc("get_public_round",{p_mode:"open"}),r=rr?.[0];
     if(r){
       document.querySelector(".header").classList.remove("tieHeader","winnerHeader");
