@@ -48,7 +48,60 @@
 <section class="board" id="votingBoard" aria-label="Live voting options"></section>
 <aside class="qrbox"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAACiklEQVR4nO2aQY7bMAxFH2sDWSpADpCjKDfokQY9Um9gH6UHCGAtA8j4XVhK7Jl2ikE9boySCyGO3uIDBCmKlImPWP/lQzg477zzzjvvvPO/461Yi10YzS6pxewIkOreZUM9zq/MR0nSAOrSQeoA4o8WoJEkacl/th7nV+ZTiVCz883ozzfTt/Ot/mft1nqcX4dvX32r/woGB0FqEWlbPc5/Np9apvwMzdvL8fPrd35uNX6DgARGGCAOJyAM097cy8+m3/k/2Lx4ohFxeLXUvShJ3bPpd/59m+L3EaHqzxkIGUGmBPZ2epxfly/xG4em3I+mZfoPJGWkoZHH7y75yZfqAHUhQ1Quvwj5jmTPz/vki3811M+OeurGKXSB6WB2/+6Qv/u3kboglYQsFYdqCudCuX/3xt/r51Iwqwt5eQjX/qTH7975/nwz4tDI7JwxO44GPJat9Tj/9/yivoJ66ipTa64Suh6/u+Rrfg65ejpo3tqIWpj7d6d8OojezOxlGI3+COV+lGxKzXbZVI/z6/D3/tVoEK4tvTUywtXUH6+VSset9Di/Lj/51wiDLH4v0wbBiMVhBGiyEYRto8f5dflF/zkIi111N+k41dSaIc+m3/n37RG/qLcmqz8OAGMrUpON1GKEa+v+3SXPsj4uXoyaRkflauT9yZ3zj/eT0/33m7W19Zza6u4N9Ti/Fl8qqtgBpBPqDSwOpwzplGdDpG30OL8uP5v11v7zMkkD8+7Hs+l3/sP8aPP3dUGCdJBd/pUe51fk7WWgDvmTWe1J33y+sE9+MeudZoG5DvmnxnRZPD/vkv/F+0nK0RsfG8HnRzvl37yfLB/laftiYws9zjvvvPPOO/8/8D8BjObuTfHv5OcAAAAASUVORK5CYII=" alt="Scan to join QR code"><strong>SCAN TO JOIN</strong><span>REQUEST • VOTE • BEAT THE DJ</span></aside>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://lxojmyujlljkhtnudzmr.supabase.co";
+const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc4OTM1NTYxOCwiZXhwIjoyMTA0OTMxNjE4fQ.AicCDkKSifzeK9pE1aHhTbyY4exRMvUD771_vld9wKk";
+async function rpc(name, body){
+  const r=await fetch(SUPABASE_URL+"/rest/v1/rpc/"+name,{
+    method:"POST",
+    headers:{apikey:SUPABASE_ANON_KEY,Authorization:"Bearer "+SUPABASE_ANON_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify(body||{})
+  });
+  if(!r.ok) throw new Error(name+" HTTP "+r.status);
+  return await r.json();
+}
+function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));}
+function titleMarkup(title){return esc(String(title||"").trim().toUpperCase());}
+function placeholderArtwork(){return '<div class="art" aria-label="Track artwork placeholder"></div>';}
+function renderBoard(options,counts){
+  const board=document.getElementById("votingBoard");
+  const list=(options||[]).slice(0,4);
+  const total=list.reduce((s,o)=>s+(counts[o.id]||0),0);
+  const maxVotes=Math.max(0,...list.map(o=>counts[o.id]||0));
+  board.className="board count-"+Math.min(Math.max(list.length,1),4);
+  board.innerHTML=list.map((o,i)=>{
+    const votes=counts[o.id]||0;
+    const pct=total?Math.round(votes/total*100):0;
+    const isLeader=maxVotes>0&&votes===maxVotes;
+    const artworkUrl=o.artwork_url||null;
+    const art=artworkUrl?'<div class="art has-image"><img src="'+esc(artworkUrl)+'" alt="'+esc((o.artist||"")+" — "+(o.track||""))+' artwork" onerror="this.parentElement.outerHTML=\'<div class="art" aria-label="Track artwork placeholder"></div>\'" /></div>':placeholderArtwork();
+    return '<div class="card '+(isLeader?'lead':'')+'" style="--accent:#f01d2d;--w:'+pct+'%">'+art+'<div class="num">'+String(i+1).padStart(2,"0")+'</div><div class="track">'+esc(o.track||o.label||"")+'</div><div class="artist">'+esc(o.artist||"")+'</div><div class="votes">'+votes+'<small>VOTES</small></div><div class="bar"><div class="fill"></div></div><div class="status">'+(isLeader?'CURRENT LEADER':'LIVE VOTE')+'</div></div>';
+  }).join("");
+}
+async function loadVotingVisual(){
+  try{
+    const rounds=await rpc("get_public_round",{p_mode:"open"});
+    const round=rounds?.[0]||null;
+    if(!round){
+      document.getElementById("roundNumber").textContent="—";
+      document.getElementById("roundTitle").textContent="STAND BY";
+      document.getElementById("votingBoard").innerHTML="";
+      return;
+    }
+    document.getElementById("roundNumber").textContent=String(round.round_number||"");
+    document.getElementById("roundTitle").innerHTML=titleMarkup(round.title||"");
+    const [options,votes]=await Promise.all([
+      rpc("get_public_options_with_artwork",{p_round_id:round.id}),
+      rpc("get_public_vote_counts",{p_round_id:round.id})
+    ]);
+    const counts=Object.fromEntries((votes||[]).map(x=>[x.option_id,Number(x.vote_count||0)]));
+    renderBoard(options||[],counts);
+  }catch(e){console.error("TV voting visual load error:",e);}
+}
+loadVotingVisual();
+setInterval(loadVotingVisual,2000);
+window.addEventListener("online",loadVotingVisual);
+</script>
 <script>
 const SUPABASE_URL="https://lxojmyujlljkhtnudzmr.supabase.co";
 const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4b2pteXVqbGxqa2h0bnVkem1yIiwiaWF0IjoxNzg5MzU1NjE4LCJleHAiOjIxMDQ5MzE2MTh9.AicCDkKSifzeK9pE1aHhTbyY4exRMvUD771_vld9wKk";
