@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beat The DJ — Voting Now</title>
+<style>
+:root{
+  --bg:#050505;
+  --panel:#111;
+  --panel2:#181818;
+  --text:#f5f2e9;
+  --muted:#9d9d9d;
+  --red:#e51d2a;
+  --yellow:#e8ff38;
+  --line:#303030;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:Arial,Helvetica,sans-serif;color:var(--text)}
+.stage{
+  position:relative;width:100vw;height:100vh;overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(229,29,42,.13),transparent 38%),
+    linear-gradient(135deg,#070707 0%,#020202 55%,#0b0b0b 100%);
+}
+.stage:before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;
+  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:42px 42px;
+}
+.wrap{
+  position:relative;z-index:1;width:100%;height:100%;
+  padding:3vh 4vw 2.5vh;display:flex;flex-direction:column;
+}
+.top{
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  gap:2vw;min-height:12vh;margin-bottom:1.5vh;
+}
+.logo{max-width:20vw;max-height:8vh;object-fit:contain}
+.logo.left{justify-self:start}
+.logo.right{justify-self:end}
+.divider{width:2px;height:7vh;background:#444;justify-self:center}
+.header{text-align:center}
+.kicker{
+  font-size:clamp(16px,1.8vw,28px);font-weight:900;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--yellow)
+}
+.live{color:var(--red)}
+.title{
+  margin-top:.7vh;font-size:clamp(32px,4.2vw,72px);line-height:.95;
+  font-weight:950;letter-spacing:-.045em;text-transform:uppercase
+}
+.instruction{
+  margin-top:.8vh;color:#bdbdbd;font-size:clamp(12px,1.15vw,20px);
+  font-weight:800;letter-spacing:.16em;text-transform:uppercase
+}
+.board{
+  flex:1;min-height:0;display:grid;gap:1.3vw;align-items:stretch;
+}
+.board.count-1{grid-template-columns:1fr}
+.board.count-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.board.count-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.board.count-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{
+  min-width:0;position:relative;overflow:hidden;border:1px solid var(--line);
+  border-radius:22px;background:linear-gradient(180deg,#151515,#0c0c0c);
+  padding:1.1vw;display:flex;flex-direction:column;
+  box-shadow:0 12px 35px rgba(0,0,0,.35);
+}
+.card.lead{border-color:var(--yellow);box-shadow:0 0 0 2px rgba(232,255,56,.16) inset,0 0 28px rgba(232,255,56,.12)}
+.art{
+  width:100%;aspect-ratio:1/1;border-radius:15px;overflow:hidden;
+  background:
+    radial-gradient(circle at 35% 30%,rgba(229,29,42,.65),transparent 25%),
+    linear-gradient(145deg,#242424,#080808);
+  border:1px solid #353535;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.art:after{
+  content:"♪";font-size:clamp(48px,7vw,110px);font-weight:900;color:#444
+}
+.art.has-image:after{display:none}
+.art img{width:100%;height:100%;object-fit:cover;display:block}
+.num{
+  margin-top:1.2vh;color:var(--red);font-size:clamp(18px,1.7vw,32px);
+  line-height:1;font-weight:950;letter-spacing:.04em
+}
+.track{
+  margin-top:.7vh;font-size:clamp(18px,2vw,36px);line-height:1.02;
+  font-weight:950;text-transform:uppercase;letter-spacing:-.025em
+}
+.artist{
+  margin-top:.45vh;color:#aaa;font-size:clamp(13px,1.25vw,22px);
+  line-height:1.1;font-weight:700;text-transform:uppercase
+}
+.votes{
+  margin-top:auto;padding-top:1.3vh;font-size:clamp(24px,2.8vw,50px);
+  font-weight:950;line-height:1
+}
+.votes small{
+  margin-left:.35em;color:#888;font-size:.34em;letter-spacing:.16em;
+  vertical-align:middle
+}
+.bar{
+  height:8px;margin-top:1vh;background:#292929;border-radius:99px;overflow:hidden
+}
+.fill{
+  width:var(--w);height:100%;background:var(--red);border-radius:99px;
+  transition:width .35s ease
+}
+.lead .fill{background:var(--yellow)}
+.status{
+  margin-top:.75vh;font-size:clamp(9px,.75vw,14px);font-weight:900;
+  letter-spacing:.15em;text-transform:uppercase;color:#777
+}
+.lead .status{color:var(--yellow)}
+.standby{
+  flex:1;display:flex;align-items:center;justify-content:center;text-align:center
+}
+.standby-box{border:1px solid #333;border-radius:24px;padding:5vh 7vw;background:#101010}
+.standby-title{font-size:clamp(36px,6vw,92px);font-weight:950;letter-spacing:-.05em;text-transform:uppercase}
+.standby-sub{margin-top:1.2vh;color:#aaa;font-size:clamp(14px,1.5vw,25px);letter-spacing:.08em;text-transform:uppercase}
+.footer{
+  min-height:5vh;display:flex;align-items:end;justify-content:center;
+  color:#666;font-size:clamp(10px,.85vw,16px);font-weight:800;
+  letter-spacing:.12em;text-transform:uppercase;padding-top:1vh
+}
+@media(max-width:900px){
+  .wrap{padding:2vh 2.5vw}
+  .top{grid-template-columns:1fr auto 1fr}
+  .logo{max-width:24vw}
+  .board{gap:1.5vw}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="wrap">
+    <div class="top">
+      <img class="logo left" src="../maida-vale-logo.png" alt="Maida Vale">
+      <div class="header">
+        <div class="kicker">ROUND <span id="roundNumber">—</span> <span aria-hidden="true">•</span> <span class="live">VOTING NOW</span></div>
+        <div id="roundTitle" class="title">—</div>
+        <div class="instruction">VOTE FOR THE TRACK YOU WANT TO HEAR</div>
+      </div>
+      <img class="logo right" src="../beat-the-dj-logo.png" alt="Beat The DJ">
+    </div>
+
+    <section id="board" class="board count-1" aria-label="Live voting options"></section>
+
+    <section id="standby" class="standby" hidden>
+      <div class="standby-box">
+        <div id="standbyTitle" class="standby-title">GET READY...</div>
+        <div id="standbySub" class="standby-sub">The next vote will appear here.</div>
+      </div>
+    </section>
+
+    <div class="footer">RESULTS UPDATE LIVE • BEAT THE DJ™</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://lxojmyujlljkhtnudzmr.supabase.co";
+const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6MTc4OTM1NTYxOCwiZXhwIjoyMTA0OTMxNjE4fQ.AicCDkKSifzeK9pE1aHhTbyY4exRMvUD771_vld9wKk";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{
+  auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
+});
+
+const $=id=>document.getElementById(id);
+const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
+
+function placeholderArtwork(){
+  return '<div class="art" aria-label="Artwork unavailable"></div>';
+}
+
+function artworkMarkup(option){
+  const url=String(option.artwork_url||"").trim();
+  if(!url) return placeholderArtwork();
+  const alt=esc((option.artist||"")+" — "+(option.track||option.label||""));
+  return '<div class="art has-image"><img src="'+esc(url)+'" alt="'+alt+' artwork" onerror="this.parentElement.outerHTML=\'<div class="art" aria-label="Artwork unavailable"></div>\'"></div>';
+}
+
+function render(options,counts){
+  const list=(options||[])
+    .slice()
+    .sort((a,b)=>Number(a.position||0)-Number(b.position||0))
+    .slice(0,4);
+
+  const board=$("board");
+  const standby=$("standby");
+
+  if(!list.length){
+    board.hidden=true;
+    standby.hidden=false;
+    $("standbyTitle").textContent="GET READY...";
+    $("standbySub").textContent="Requests are being prepared for your votes.";
+    return;
+  }
+
+  board.hidden=false;
+  standby.hidden=true;
+  board.className="board count-"+list.length;
+
+  const total=list.reduce((sum,o)=>sum+Number(counts[o.id]||0),0);
+  const maxVotes=Math.max(0,...list.map(o=>Number(counts[o.id]||0)));
+
+  board.innerHTML=list.map((o,i)=>{
+    const votes=Number(counts[o.id]||0);
+    const pct=total?Math.round(votes/total*100):0;
+    const leader=maxVotes>0 && votes===maxVotes;
+    return '<article class="card '+(leader?"lead":"")+'" style="--w:'+pct+'%">'+
+      artworkMarkup(o)+
+      '<div class="num">'+String(i+1).padStart(2,"0")+'</div>'+
+      '<div class="track">'+esc(o.track||o.label||"")+'</div>'+
+      '<div class="artist">'+esc(o.artist||"")+'</div>'+
+      '<div class="votes">'+votes+'<small>VOTES</small></div>'+
+      '<div class="bar"><div class="fill"></div></div>'+
+      '<div class="status">'+(leader?"CURRENT LEADER":"LIVE VOTE")+'</div>'+
+      '</article>';
+  }).join("");
+}
+
+async function loadVotingVisual(){
+  try{
+    const roundResult=await db.rpc("get_public_round",{p_mode:"open"});
+    if(roundResult.error) throw roundResult.error;
+    const round=roundResult.data?.[0]||null;
+
+    if(!round){
+      $("roundNumber").textContent="—";
+      $("roundTitle").textContent="STAND BY";
+      $("board").hidden=true;
+      $("standby").hidden=false;
+      $("standbyTitle").textContent="STAND BY";
+      $("standbySub").textContent="The next vote will appear here.";
+      return;
+    }
+
+    $("roundNumber").textContent=String(round.round_number||"");
+    $("roundTitle").textContent=String(round.title||"").trim().toUpperCase()||"VOTING NOW";
+
+    const [optionsResult,votesResult]=await Promise.all([
+      db.rpc("get_public_options_with_artwork",{p_round_id:round.id}),
+      db.rpc("get_public_vote_counts",{p_round_id:round.id})
+    ]);
+
+    if(optionsResult.error) throw optionsResult.error;
+    if(votesResult.error) throw votesResult.error;
+
+    const counts=Object.fromEntries(
+      (votesResult.data||[]).map(row=>[row.option_id,Number(row.vote_count||0)])
+    );
+
+    render(optionsResult.data||[],counts);
+  }catch(error){
+    console.error("TV voting visual load error:",error);
+    $("board").hidden=true;
+    $("standby").hidden=false;
+    $("standbyTitle").textContent="CONNECTION ISSUE";
+    $("standbySub").textContent="Reconnecting to the live vote...";
+  }
+}
+
+loadVotingVisual();
+setInterval(loadVotingVisual,2000);
+window.addEventListener("online",loadVotingVisual);
+</script>
+</body>
+</html>
