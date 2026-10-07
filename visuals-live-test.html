@@ -14,6 +14,7 @@
 .title b{color:#f01d2d}
 .instruction{display:inline-block;margin-top:1.4vh;padding:.55em 1.15em;background:#f01d2d;color:#fff;font-size:clamp(16px,1.35vw,25px);font-weight:1000;letter-spacing:.12em;box-shadow:0 7px 20px rgba(0,0,0,.45);animation:pulse 2.8s ease-in-out infinite}
 .board{position:absolute;left:50%;top:27.5vh;width:min(66vw,1260px);bottom:13.5vh;transform:translateX(-50%);z-index:4;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:18px 22px;align-content:center}
+.board.count-3{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.board.count-3 .card:last-child{grid-column:1 / -1;width:50%;justify-self:center}.board.count-4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.board.count-5,.board.count-6{grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr}.board.count-5 .card:last-child{grid-column:2}
 .card{position:relative;min-height:0;overflow:hidden;padding:16px 20px 15px 20px;background:linear-gradient(100deg,rgba(5,5,5,.92),rgba(16,10,11,.78));border:1px solid rgba(244,239,226,.20);box-shadow:0 12px 34px rgba(0,0,0,.46),inset 6px 0 0 var(--accent);backdrop-filter:blur(2px);transform:translateY(0);animation:cardIn .7s cubic-bezier(.2,.8,.2,1) both}
 .card:nth-child(2){animation-delay:.08s}.card:nth-child(3){animation-delay:.16s}.card:nth-child(4){animation-delay:.24s}.card:nth-child(5){animation-delay:.32s}.card:nth-child(6){animation-delay:.40s}
 .card::after{content:"";position:absolute;right:-12%;top:-50%;width:48%;height:200%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.035),transparent);transform:rotate(18deg);animation:glint 6s ease-in-out infinite}
@@ -57,9 +58,10 @@ function titleMarkup(title){return esc(String(title||"").trim().toUpperCase());}
 function placeholderArtwork(){return '<div class="art" aria-label="Track artwork placeholder"></div>';}
 function renderBoard(options,counts){
   const board=document.getElementById("votingBoard");
-  const list=(options||[]).slice(0,4);
+  const list=(options||[]).slice(0,6);
   const total=list.reduce((s,o)=>s+(counts[o.id]||0),0);
   const maxVotes=Math.max(0,...list.map(o=>counts[o.id]||0));
+  board.className="board count-"+Math.min(Math.max(list.length,1),6);
   board.innerHTML=list.map((o,i)=>{
     const votes=counts[o.id]||0;
     const pct=total?Math.round(votes/total*100):0;
