@@ -131,13 +131,13 @@ async function load(){
       }
     }
     document.querySelector(".header").classList.remove("tieHeader","winnerHeader");
-    document.querySelector(".kicker").innerHTML='ROUND <span id="roundNumber">—</span> &nbsp;•&nbsp; <span class="liveNow">STAND BY</span>';
-    document.getElementById("roundTitle").textContent="STAND BY";
-    document.querySelector(".instruction").textContent="WAITING FOR THE NEXT VOTE";
+    document.querySelector(".kicker").innerHTML='<span class="liveNow">BEAT THE DJ™</span>';
+    document.getElementById("roundTitle").textContent="GET READY...";
+    document.querySelector(".instruction").textContent="REQUESTS ARE BEING PREPARED FOR YOUR VOTES";
     let board=document.getElementById("votingBoard");
     board.className="board";
-    board.dataset.optionKey="standby";
-    board.innerHTML='<div class="standby"><h2>STAND BY</h2><p>Waiting for the next vote.</p></div>';
+    board.dataset.optionKey="get-ready";
+    board.innerHTML='<div class="standby"><h2>GET READY...</h2><p>Requests are being prepared for your votes.</p></div>';
   }catch(e){console.error("TV load",e)}
 }
 load();setInterval(load,2000);window.addEventListener("online",load);
