@@ -4,7 +4,7 @@
 const SUPABASE_URL="https://lxojmyujlljkhtnudzmr.supabase.co",SUPABASE_KEY="sb_publishable_fWygwIdemec7H3A61hLnTQ_RERWp1Ex";
 async function rpc(n,b){const r=await fetch(SUPABASE_URL+"/rest/v1/rpc/"+n,{method:"POST",headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify(b||{})});if(!r.ok)throw Error(n+" HTTP "+r.status);return r.json()}
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-function art(o){let u=String(o.artwork_url||"").trim();if(!u)return'<div class="art"></div>';return'<div class="art has-image"><img src="'+esc(u)+'" alt="'+esc((o.artist||"")+" — "+(o.track||""))+' artwork" onerror="this.parentElement.outerHTML=\'<div class="art"></div>\'"></div>'}
+function art(o){let u=String(o.artwork_url||"").trim();if(!u)return'<div class="art"></div>';return'<div class="art has-image"><img src="'+esc(u)+'" alt="'+esc((o.artist||"")+" — "+(o.track||""))+' artwork" onerror="this.remove();this.parentElement.classList.remove(\'has-image\')"></div>'}
 function render(os,cs){
   let list=(os||[]).slice().sort((a,b)=>Number(a.position||0)-Number(b.position||0)).slice(0,4);
   let board=document.getElementById("votingBoard");
@@ -49,7 +49,7 @@ function renderResults(os,cs){
   board.innerHTML=list.map(o=>{
     let v=Number(cs[o.id]||0),leading=max>0&&v===max;
     return '<article class="resultsCard '+(leading?"leading":"")+'">'+art(o)+'<div class="track">'+esc(o.track||o.label||"")+'</div><div class="artist">'+esc(o.artist||"")+'</div><div class="votes">'+v+'<small>VOTE'+(v===1?"":"S")+'</small></div><div class="status">'+(leading?"LEADING VOTE":"VOTE TOTAL")+'</div></article>';
-  }).join("")+'<div class="resultsNote"><b>THE DJ IS MAKING THE FINAL DECISION</b></div>';
+  }).join("")+'<div class="resultsNote"><b>YOU vs THE DJ. WHO WINS?</b></div>';
 }
 function renderTie(os,cs){
   let list=(os||[]).filter(o=>Number(cs[o.id]||0)>0);
