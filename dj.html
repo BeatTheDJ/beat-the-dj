@@ -1262,6 +1262,8 @@ async function openVoting(){
       return;
     }
 
+    await enrichRoundArtwork(round.id);
+
     const updateResult = await db
       .from("rounds")
       .update({status:"voting"})
@@ -2321,7 +2323,78 @@ async function loadRound(){
   }
 
   }
- async function loadVoteTotals(){
+ 
+async function enrichRoundArtwork(roundId){
+
+  try{
+
+    const optionsResult = await db
+      .from("options")
+      .select("id,artist,track")
+      .eq("round_id",roundId)
+      .order("position");
+
+    if(optionsResult.error){
+      throw optionsResult.error;
+    }
+
+    const options = optionsResult.data || [];
+
+    if(!options.length){
+      return;
+    }
+
+    const invokeResult = await db.functions.invoke(
+      "btd-track-artwork",
+      {
+        body:{
+          tracks: options.map(option => ({
+            artist: option.artist,
+            track: option.track
+          }))
+        }
+      }
+    );
+
+    if(invokeResult.error){
+      throw invokeResult.error;
+    }
+
+    const results = invokeResult.data?.results || [];
+
+    for(let index = 0; index < options.length; index++){
+
+      const option = options[index];
+      const artwork = results[index] || {};
+
+      const updateResult = await db
+        .from("options")
+        .update({
+          artwork_url: artwork.artwork_url || null,
+          artwork_status: artwork.status || "not_found",
+          artwork_confidence: artwork.confidence ?? null,
+          artwork_source: artwork.source || null
+        })
+        .eq("id",option.id)
+        .eq("round_id",roundId);
+
+      if(updateResult.error){
+        throw updateResult.error;
+      }
+
+    }
+
+    console.log("Artwork enrichment complete.", results);
+
+  }catch(error){
+
+    console.error("Artwork enrichment error:",error);
+    // Artwork is enhancement only. A failed lookup must never stop voting.
+  }
+
+}
+
+async function loadVoteTotals(){
 
   try{
 
