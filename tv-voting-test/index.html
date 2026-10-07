@@ -58,7 +58,7 @@ function renderWinner(w){
   board.dataset.optionKey=key;
   board.className="winnerBoard";
   let requester=w.requester_name&&String(w.requester_name).trim();
-  let djChoice=!requester || String(w.dj_decision||"")!=="";
+  let djChoice=Boolean(w.is_tie);
   let art=w.artwork_url?'<div class="winnerArt"><img src="'+esc(w.artwork_url)+'" alt="Winner artwork" onerror="this.parentElement.outerHTML=\'<div class="winnerFallback"></div>\'"></div>':'<div class="winnerFallback"></div>';
   let message=djChoice?"THE DJ HAS CHOSEN!":(esc(requester)+"... YOU BEAT THE DJ!");
   let name=djChoice?"":'<div class="winnerName">'+esc(requester)+'</div>';
@@ -90,7 +90,7 @@ async function load(){
           document.querySelector(".header").classList.remove("tieHeader");
           document.querySelector(".kicker").innerHTML='ROUND <span id="roundNumber">'+esc(cr.round_number||"")+'</span> &nbsp;•&nbsp; <span class="liveNow">WINNER</span>';
           document.getElementById("roundTitle").textContent="WINNER";
-          document.querySelector(".instruction").textContent=String(w.dj_decision||"")===""?"PUBLIC VOTE WINNER":"DJ'S CHOICE";
+          document.querySelector(".instruction").textContent=Boolean(w.is_tie)?"DJ'S CHOICE":"PUBLIC VOTE WINNER";
           renderWinner(w);
           return;
         }
