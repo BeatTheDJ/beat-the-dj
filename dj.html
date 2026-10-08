@@ -2734,7 +2734,7 @@ if(openRoundResult.data){
 <div id="editRequest-${request.id}" class="request-edit" style="display:none;">
 <label>Artist</label><input id="editArtist-${request.id}" type="text" maxlength="100" value="${esc(request.artist)}">
 <label>Song</label><input id="editSong-${request.id}" type="text" maxlength="150" value="${esc(request.song)}">
-<div class="request-edit-actions"><button type="button" onclick="saveRequestEdit('${request.id}',this)">SAVE CHANGES</button><button type="button" class="cancel-edit" onclick="toggleRequestEdit('${request.id}')">CANCEL</button></div></div>
+<div class="request-edit-actions"><button type="button" onclick="saveRequestEdit('${request.id}',this)">SAVE CHANGES</button><button type="button" class="cancel-edit" onclick="toggleRequestEdit('${request.id}')">CANCEL</button></div></div>`
 : request.status === "submitted" &&
 openRoundResult.data &&
 openRoundResult.data.status === "building" ? `
