@@ -805,7 +805,12 @@ footer{
 
 <section class="card">
 
-  <h2>START NEW ROUND</h2>
+  <h2 id="startRoundHeading">START NEW ROUND</h2>
+
+  <div
+    id="startRoundNotice"
+    style="display:none;margin:0 0 12px;padding:10px 12px;border-left:3px solid #e8ff38;background:#202020;color:#ddd;font-size:13px;font-weight:800;line-height:1.4;"
+  ></div>
 
   <input
     id="newRoundTitle"
@@ -1098,9 +1103,24 @@ document
 
   const titleInput = document.getElementById("newRoundTitle");
   const startButton = document.getElementById("startRoundBtn");
+  const notice = document.getElementById("startRoundNotice");
+  const heading = document.getElementById("startRoundHeading");
 
   if(titleInput) titleInput.disabled = isOpen;
   if(startButton) startButton.disabled = isOpen;
+
+  if(notice){
+    notice.style.display = isOpen ? "block" : "none";
+    notice.textContent = isOpen
+      ? "🔒 A round is currently active. Complete the current round before starting another."
+      : "";
+  }
+
+  if(heading){
+    heading.textContent = isOpen
+      ? "START NEW ROUND — CURRENT ROUND ACTIVE"
+      : "START NEW ROUND";
+  }
 }
 
 async function startNewRound(){
