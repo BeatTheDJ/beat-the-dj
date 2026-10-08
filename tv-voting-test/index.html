@@ -259,7 +259,7 @@ async function load(){
     if(!isCurrentLoad()) return;
     const r=rr?.[0];
 
-    if(r && r.status==="building"{
+    if(r && r.status==="building"){
       document.querySelector(".header").classList.remove("tieHeader","winnerHeader");
       document.querySelector(".header").classList.add("winnerHeader");
       document.querySelector(".kicker").innerHTML='<span class="liveNow">BEAT THE DJ™</span>';
