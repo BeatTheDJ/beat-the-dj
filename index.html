@@ -1449,12 +1449,19 @@ async function refresh(){
       $("endedLanding").classList.remove("hidden");
       $("status").classList.add("hidden");
       $("liveNote").classList.add("hidden");
-      $("waitingTitle").textContent = "EVENT ENDED";
-      $("waitingSub").textContent = "The DJ has ended this event. Please check back when the next event is live.";
+      const isPaused = !!eventState?.paused;
+      $("waitingTitle").textContent = isPaused
+        ? "EVENT PAUSED"
+        : "EVENT ENDED";
+      $("waitingSub").textContent = isPaused
+        ? "The event is paused temporarily. Please check back soon."
+        : "The DJ has ended this event. Please check back when the next event is live.";
       $("requestCard").classList.add("hidden");
-      $("requestRoundSub").textContent = "Requests are currently closed.";
+      $("requestRoundSub").textContent = isPaused
+        ? "Requests are currently paused."
+        : "Requests are currently closed.";
       $("timer").textContent = "";
-      setStatus("EVENT ENDED");
+      setStatus(isPaused ? "EVENT PAUSED" : "EVENT ENDED");
       return;
     }
 
