@@ -2728,7 +2728,8 @@ if(openRoundResult.data){
     ✕ NOT TONIGHT
   </button>
 
-</div>
+</div>`
+
 : request.status === "submitted" &&
 openRoundResult.data &&
 openRoundResult.data.status === "building" ? `
@@ -2756,7 +2757,8 @@ openRoundResult.data.status === "building" ? `
 <div class="request-status status-submitted-text">
   ✓ ACCEPTED — READY FOR A ROUND
 </div>
- : request.status === "submitted" ? `
+
+` : `
 
 <div class="request-status ${
   request.status === "played"
