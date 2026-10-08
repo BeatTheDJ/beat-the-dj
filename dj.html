@@ -2729,13 +2729,12 @@ if(openRoundResult.data){
     ✕ NOT TONIGHT
   </button>
 
-</div>`
-<button type="button" onclick="toggleRequestEdit('\${request.id}')">✎ EDIT REQUEST</button>
-<div id="editRequest-\${request.id}" class="request-edit" style="display:none;">
-<label>Artist</label><input id="editArtist-\${request.id}" type="text" maxlength="100" value="\${esc(request.artist)}">
-<label>Song</label><input id="editSong-\${request.id}" type="text" maxlength="150" value="\${esc(request.song)}">
-<div class="request-edit-actions"><button type="button" onclick="saveRequestEdit('\${request.id}',this)">SAVE CHANGES</button><button type="button" class="cancel-edit" onclick="toggleRequestEdit('\${request.id}')">CANCEL</button></div></div>
-
+</div>
+<button type="button" onclick="toggleRequestEdit('${request.id}')">✎ EDIT REQUEST</button>
+<div id="editRequest-${request.id}" class="request-edit" style="display:none;">
+<label>Artist</label><input id="editArtist-${request.id}" type="text" maxlength="100" value="${esc(request.artist)}">
+<label>Song</label><input id="editSong-${request.id}" type="text" maxlength="150" value="${esc(request.song)}">
+<div class="request-edit-actions"><button type="button" onclick="saveRequestEdit('${request.id}',this)">SAVE CHANGES</button><button type="button" class="cancel-edit" onclick="toggleRequestEdit('${request.id}')">CANCEL</button></div></div>
 : request.status === "submitted" &&
 openRoundResult.data &&
 openRoundResult.data.status === "building" ? `
@@ -2763,14 +2762,13 @@ openRoundResult.data.status === "building" ? `
 <div class="request-status status-submitted-text">
   ✓ ACCEPTED — READY FOR A ROUND
 </div>
-<button type="button" onclick="toggleRequestEdit('\${request.id}')">✎ EDIT REQUEST</button>
-<div id="editRequest-\${request.id}" class="request-edit" style="display:none;">
-<label>Artist</label><input id="editArtist-\${request.id}" type="text" maxlength="100" value="\${esc(request.artist)}">
-<label>Song</label><input id="editSong-\${request.id}" type="text" maxlength="150" value="\${esc(request.song)}">
-<div class="request-edit-actions"><button type="button" onclick="saveRequestEdit('\${request.id}',this)">SAVE CHANGES</button><button type="button" class="cancel-edit" onclick="toggleRequestEdit('\${request.id}')">CANCEL</button></div></div>
+<button type="button" onclick="toggleRequestEdit('${request.id}')">✎ EDIT REQUEST</button>
+<div id="editRequest-${request.id}" class="request-edit" style="display:none;">
+<label>Artist</label><input id="editArtist-${request.id}" type="text" maxlength="100" value="${esc(request.artist)}">
+<label>Song</label><input id="editSong-${request.id}" type="text" maxlength="150" value="${esc(request.song)}">
+<div class="request-edit-actions"><button type="button" onclick="saveRequestEdit('${request.id}',this)">SAVE CHANGES</button><button type="button" class="cancel-edit" onclick="toggleRequestEdit('${request.id}')">CANCEL</button></div></div>
 
-
-` : `
+` : request.status === "submitted" ? `
 
 <div class="request-status ${
   request.status === "played"
