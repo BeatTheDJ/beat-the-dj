@@ -640,7 +640,7 @@ input:focus{
 </div>
 
 <section id="endedLanding" class="ended-landing hidden">
-  <img src="ended-event.svg" alt="Beat The DJ event ended — upcoming events at Maida Vale">
+  <img id="endedLandingImage" src="ended-event.svg" alt="Beat The DJ event ended — upcoming events at Maida Vale">
 </section>
 
 <section id="roundCard" class="card hidden">
@@ -1430,6 +1430,13 @@ async function refresh(){
     const eventState = await getEventState();
 
     if(!eventState || !eventState.active){
+      const landingImage = $("endedLandingImage");
+      if(landingImage){
+        landingImage.src = eventState?.paused ? "paused-event.svg" : "ended-event.svg";
+        landingImage.alt = eventState?.paused
+          ? "Beat The DJ event paused temporarily — upcoming events at Maida Vale"
+          : "Beat The DJ event ended — upcoming events at Maida Vale";
+      }
       currentRound = null;
       currentOptions = [];
       voteCounts = {};
