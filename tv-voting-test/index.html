@@ -258,6 +258,7 @@ async function load(){
     hideUpcomingEvents();
 
     const rr=await rpc("get_public_round",{p_mode:"open"});
+    if(!isCurrentLoad()) return;
     const r=rr?.[0];
 
     if(r && r.status==="building"){
@@ -283,6 +284,7 @@ async function load(){
       document.getElementById("roundTitle").textContent=String(r.title||"").toUpperCase()||"VOTING NOW";
       document.querySelector(".instruction").textContent="VOTE FOR THE TRACK YOU WANT TO HEAR";
       let [o,v]=await Promise.all([rpc("get_public_options_with_artwork",{p_round_id:r.id}),rpc("get_public_vote_counts",{p_round_id:r.id})]);
+      if(!isCurrentLoad()) return;
       render(o,Object.fromEntries((v||[]).map(x=>[x.option_id,Number(x.vote_count||0)])));
       return;
     }
@@ -293,6 +295,7 @@ async function load(){
     if(cr){
       if(cr.winning_option_id && cr.dj_decision==="play"){
         let w=(await rpc("get_public_winner",{p_round_id:cr.id}))?.[0];
+        if(!isCurrentLoad()) return;
         if(w){
           document.querySelector(".header").classList.remove("tieHeader");
           document.querySelector(".header").classList.add("winnerHeader");
@@ -304,6 +307,7 @@ async function load(){
         }
       }
       let [o,v]=await Promise.all([rpc("get_public_options_with_artwork",{p_round_id:cr.id}),rpc("get_public_vote_counts",{p_round_id:cr.id})]);
+      if(!isCurrentLoad()) return;
       let counts=Object.fromEntries((v||[]).map(x=>[x.option_id,Number(x.vote_count||0)]));
       let max=Math.max(0,...o.map(x=>Number(counts[x.id]||0)));
       let tied=(o||[]).filter(x=>Number(counts[x.id]||0)===max&&max>0);
