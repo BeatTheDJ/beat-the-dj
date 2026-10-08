@@ -172,7 +172,12 @@ function renderWinner(w){
   let requester=w.requester_name&&String(w.requester_name).trim();
   let djChoice=!w.request_id;
   let art=w.artwork_url?'<div class="winnerArt"><img src="'+esc(w.artwork_url)+'" alt="Winner artwork"></div>':'<div class="winnerFallback"></div>';
-  let message=djChoice?"THE DJ'S CHOICE WON THE VOTE!":(esc(requester)+"... YOU BEAT THE DJ!");
+  let tieDecision=w.dj_decision==="tie_play";
+  let message=tieDecision
+    ? (esc(requester)+"... THE DJ DECIDED TO PLAY YOUR SONG!")
+    : djChoice
+      ? "THE DJ'S CHOICE WON THE VOTE!"
+      : (esc(requester)+"... YOU BEAT THE DJ!");
   let name="";
   board.innerHTML='<article class="winnerCard">'+art+'<div class="winnerTrack">'+esc(w.track||"")+'</div><div class="winnerArtist">'+esc(w.artist||"")+'</div><div class="winnerVotes">'+Number(w.vote_count||0)+' VOTE'+(Number(w.vote_count||0)===1?"":"S")+'</div>'+name+'<div class="winnerMessage '+(djChoice?"dj":"winnerPulse")+'">'+message+'</div></article>';
 }
