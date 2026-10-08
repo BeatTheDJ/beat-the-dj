@@ -255,13 +255,11 @@ async function load(){
       return;
     }
 
-    hideUpcomingEvents();
-
     const rr=await rpc("get_public_round",{p_mode:"open"});
     if(!isCurrentLoad()) return;
     const r=rr?.[0];
 
-    if(r && r.status==="building"){
+    if(r && r.status==="building"{
       document.querySelector(".header").classList.remove("tieHeader","winnerHeader");
       document.querySelector(".header").classList.add("winnerHeader");
       document.querySelector(".kicker").innerHTML='<span class="liveNow">BEAT THE DJ™</span>';
@@ -276,8 +274,6 @@ async function load(){
       return;
     }
 
-    hideSpecialTVScreens();
-
     if(r && r.status==="voting"){
       document.querySelector(".header").classList.remove("tieHeader","winnerHeader");
       document.querySelector(".kicker").innerHTML='ROUND <span id="roundNumber">'+esc(r.round_number||"")+'</span> &nbsp;•&nbsp; <span class="liveNow">VOTING NOW</span>';
@@ -285,6 +281,9 @@ async function load(){
       document.querySelector(".instruction").textContent="VOTE FOR THE TRACK YOU WANT TO HEAR";
       let [o,v]=await Promise.all([rpc("get_public_options_with_artwork",{p_round_id:r.id}),rpc("get_public_vote_counts",{p_round_id:r.id})]);
       if(!isCurrentLoad()) return;
+      if(!isCurrentLoad()) return;
+      hideUpcomingEvents();
+      hideSpecialTVScreens();
       render(o,Object.fromEntries((v||[]).map(x=>[x.option_id,Number(x.vote_count||0)])));
       return;
     }
@@ -297,6 +296,9 @@ async function load(){
         let w=(await rpc("get_public_winner",{p_round_id:cr.id}))?.[0];
         if(!isCurrentLoad()) return;
         if(w){
+          if(!isCurrentLoad()) return;
+          hideUpcomingEvents();
+          hideSpecialTVScreens();
           document.querySelector(".header").classList.remove("tieHeader");
           document.querySelector(".header").classList.add("winnerHeader");
           document.querySelector(".kicker").innerHTML='ROUND <span id="roundNumber">'+esc(cr.round_number||"")+"</span>";
@@ -312,11 +314,17 @@ async function load(){
       let max=Math.max(0,...o.map(x=>Number(counts[x.id]||0)));
       let tied=(o||[]).filter(x=>Number(counts[x.id]||0)===max&&max>0);
       if(!cr.dj_decision && tied.length>=2){
+        if(!isCurrentLoad()) return;
+        hideUpcomingEvents();
+        hideSpecialTVScreens();
         setClosedHeader(cr,true);
         renderTie(o,counts);
         return;
       }
       if(!cr.dj_decision){
+        if(!isCurrentLoad()) return;
+        hideUpcomingEvents();
+        hideSpecialTVScreens();
         document.querySelector(".header").classList.remove("tieHeader","winnerHeader");
         document.querySelector(".header").classList.add("winnerHeader");
         document.querySelector(".kicker").innerHTML='ROUND <span id="roundNumber">'+esc(cr.round_number||"")+'</span> &nbsp;•&nbsp; <span class="liveNow">RESULTS BEING CONFIRMED</span>';
