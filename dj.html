@@ -2592,6 +2592,11 @@ async function loadVoteTotals(){
 
   try{
 
+    const openEditor=document.querySelector(".request-edit[style*='display: block']");
+    const openEditorId=openEditor ? openEditor.id.replace("editRequest-","") : "";
+    const openEditorArtist=openEditor ? document.getElementById("editArtist-"+openEditorId)?.value || "" : "";
+    const openEditorSong=openEditor ? document.getElementById("editSong-"+openEditorId)?.value || "" : "";
+
     const result = await db
       .from("requests")
       .select(
@@ -2833,6 +2838,18 @@ ${requestEditMarkup(request)}
       actionableHtml +
       historyHtml +
       '</div>';
+
+    if(openEditorId){
+      const restoredEditor=document.getElementById("editRequest-"+openEditorId);
+      const restoredArtist=document.getElementById("editArtist-"+openEditorId);
+      const restoredSong=document.getElementById("editSong-"+openEditorId);
+
+      if(restoredEditor){
+        restoredEditor.style.display="block";
+        if(restoredArtist) restoredArtist.value=openEditorArtist;
+        if(restoredSong) restoredSong.value=openEditorSong;
+      }
+    }
 
     const requestToggleLabel =
       document.getElementById("requestsToggleLabel");
