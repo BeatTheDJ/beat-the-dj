@@ -170,7 +170,7 @@ function renderWinner(w){
   board.dataset.optionKey=key;
   board.className="winnerBoard";
   let requester=w.requester_name&&String(w.requester_name).trim();
-  let djChoice=Boolean(w.is_tie);
+  let djChoice=!w.request_id;
   let art=w.artwork_url?'<div class="winnerArt"><img src="'+esc(w.artwork_url)+'" alt="Winner artwork"></div>':'<div class="winnerFallback"></div>';
   let message=djChoice?"THE DJ'S CHOICE WON THE VOTE!":(esc(requester)+"... YOU BEAT THE DJ!");
   let name="";
