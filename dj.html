@@ -2592,6 +2592,11 @@ async function loadVoteTotals(){
 
   try{
 
+    const activeEditor=document.querySelector(".request-edit[style*='display: block']");
+    if(activeEditor && document.activeElement && activeEditor.contains(document.activeElement)){
+      return;
+    }
+
     const openEditor=document.querySelector(".request-edit[style*='display: block']");
     const openEditorId=openEditor ? openEditor.id.replace("editRequest-","") : "";
     const openEditorArtist=openEditor ? document.getElementById("editArtist-"+openEditorId)?.value || "" : "";
