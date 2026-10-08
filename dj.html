@@ -1097,7 +1097,7 @@ async function toggleEvent(){
   try{
     const result = await db
       .from("events")
-      .update({active:nextActive})
+      .update({active:nextActive,paused:!nextActive})
       .eq("id",EVENT_ID);
 
     if(result.error){
