@@ -2056,7 +2056,20 @@ function toggleDjChoiceForm(){
 async function addDjChoice(button){
 
   if(button && button.disabled){ return; }
-  if(button){ button.disabled=true; button.dataset.originalText=button.textContent; button.textContent="ADDING..."; }
+
+  if(button){
+    button.disabled=true;
+    button.dataset.originalText=button.textContent;
+    button.textContent="ADDING...";
+  }
+
+  const restoreButton=()=>{
+    if(button){
+      button.disabled=false;
+      button.textContent=button.dataset.originalText || "🎧 ADD DJ'S CHOICE";
+    }
+  };
+
   const artistInput = document.getElementById("djChoiceArtist");
   const songInput = document.getElementById("djChoiceSong");
 
@@ -2065,6 +2078,7 @@ async function addDjChoice(button){
 
   if(!artist || !song){
     alert("Please enter both an artist and a song.");
+    restoreButton();
     return;
   }
 
@@ -2075,15 +2089,15 @@ async function addDjChoice(button){
       .eq("event_id",EVENT_ID)
       .eq("status","building")
       .order("round_number",{ascending:false})
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
 
     if(roundResult.error) throw roundResult.error;
 
-    const round = roundResult.data;
+    const round = roundResult.data?.[0] || null;
 
     if(!round){
       alert("There is no round currently being built.");
+      restoreButton();
       return;
     }
 
@@ -2092,14 +2106,14 @@ async function addDjChoice(button){
       .select("id")
       .eq("round_id",round.id)
       .is("request_id",null)
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
 
     if(existingResult.error) throw existingResult.error;
 
-    if(existingResult.data){
+    if((existingResult.data || []).length){
       alert("This round already has a DJ's Choice.");
       await loadRound();
+      restoreButton();
       return;
     }
 
@@ -2108,14 +2122,16 @@ async function addDjChoice(button){
       .select("position")
       .eq("round_id",round.id)
       .order("position",{ascending:false})
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
 
     if(positionResult.error) throw positionResult.error;
 
+    const highestPosition =
+      positionResult.data?.[0]?.position;
+
     const nextPosition =
-      positionResult.data
-        ? positionResult.data.position + 1
+      highestPosition != null
+        ? Number(highestPosition) + 1
         : 1;
 
     const insertResult = await db
@@ -2149,7 +2165,7 @@ async function addDjChoice(button){
       error.message ||
       "Unable to add the DJ's Choice."
     );
-    if(button){ button.disabled=false; button.textContent=button.dataset.originalText || "🎧 ADD DJ'S CHOICE"; }
+    restoreButton();
   }
 }
 
