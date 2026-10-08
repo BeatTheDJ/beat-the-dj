@@ -646,6 +646,98 @@ footer{
     opacity:.5;
     cursor:not-allowed;
   }
+
+/* Destructive end-event confirmation */
+.event-delete-modal{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.82);
+}
+.event-delete-modal.open{display:flex}
+.event-delete-dialog{
+  width:min(520px,100%);
+  background:#151515;
+  border:3px solid #ff3333;
+  border-radius:14px;
+  box-shadow:0 0 0 1px #ff7777,0 0 36px rgba(255,40,40,.35);
+  overflow:hidden;
+}
+.event-delete-warning{
+  background:#8b1111;
+  color:#fff;
+  padding:18px 20px 16px;
+  text-align:center;
+  font-size:20px;
+  font-weight:1000;
+  letter-spacing:.06em;
+  line-height:1.1;
+}
+.event-delete-body{padding:20px}
+.event-delete-title{
+  margin:0 0 12px;
+  color:#ff5555;
+  font-size:22px;
+  font-weight:1000;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.event-delete-copy{
+  margin:0;
+  color:#f5f5f2;
+  font-size:15px;
+  line-height:1.5;
+}
+.event-delete-list{
+  margin:14px 0;
+  padding:12px 16px 12px 34px;
+  background:#090909;
+  border:1px solid #444;
+  border-radius:8px;
+  color:#fff;
+  line-height:1.55;
+}
+.event-delete-note{
+  margin:14px 0 0;
+  color:#ffb0b0;
+  font-weight:800;
+  font-size:13px;
+}
+.event-delete-actions{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+.event-delete-actions button{
+  flex:1;
+  min-height:48px;
+  border-radius:7px;
+  font-weight:1000;
+  letter-spacing:.04em;
+  cursor:pointer;
+}
+.event-delete-cancel{
+  background:#333;
+  color:#fff;
+  border:1px solid #666;
+}
+.event-delete-confirm{
+  background:#d71919;
+  color:#fff;
+  border:2px solid #ff7777;
+  box-shadow:0 0 14px rgba(255,40,40,.2);
+}
+@media(max-width:520px){
+  .event-delete-dialog{border-width:2px}
+  .event-delete-warning{font-size:17px}
+  .event-delete-title{font-size:19px}
+  .event-delete-actions{flex-direction:column-reverse}
+}
+
 </style>
 </head>
 
@@ -1156,13 +1248,35 @@ document
       : "START NEW ROUND";
   }
 }
+function showEndDeleteModal(){
+  return new Promise(resolve=>{
+    const modal=document.getElementById("eventDeleteModal");
+    const cancel=document.getElementById("eventDeleteCancel");
+    const confirmButton=document.getElementById("eventDeleteConfirm");
+    if(!modal || !cancel || !confirmButton){
+      resolve(false);
+      return;
+    }
+
+    const close=(value)=>{
+      modal.classList.remove("open");
+      cancel.onclick=null;
+      confirmButton.onclick=null;
+      resolve(value);
+    };
+
+    cancel.onclick=()=>close(false);
+    confirmButton.onclick=()=>close(true);
+    modal.classList.add("open");
+    cancel.focus();
+  });
+}
+
 async function endDeleteEvent(){
   const button = document.getElementById("endDeleteEventBtn");
   if(!button || button.disabled){ return; }
 
-  const confirmed = confirm(
-    "END / DELETE THIS EVENT? This permanently deletes this event's rounds, votes, options, requests and results. This cannot be undone. The reusable artwork cache will NOT be deleted."
-  );
+  const confirmed = await showEndDeleteModal();
   if(!confirmed){ return; }
 
   button.disabled = true;
@@ -3321,6 +3435,29 @@ document.getElementById("logoutBtn").onclick =
 
 
 </script>
+
+
+<div id="eventDeleteModal" class="event-delete-modal" role="dialog" aria-modal="true" aria-labelledby="eventDeleteTitle">
+  <div class="event-delete-dialog">
+    <div class="event-delete-warning">⚠️  WARNING — PERMANENT ACTION  ⚠️</div>
+    <div class="event-delete-body">
+      <h2 id="eventDeleteTitle" class="event-delete-title">END / DELETE THIS EVENT?</h2>
+      <p class="event-delete-copy">This will permanently clear the data from this event:</p>
+      <ul class="event-delete-list">
+        <li>Song requests and requester names</li>
+        <li>Rounds and voting options</li>
+        <li>Votes and round results</li>
+        <li>Event activity/history</li>
+      </ul>
+      <p class="event-delete-copy"><strong>The Beat The DJ system, DJ login, settings and reusable artwork cache will NOT be deleted.</strong></p>
+      <p class="event-delete-note">THIS CANNOT BE UNDONE.</p>
+      <div class="event-delete-actions">
+        <button id="eventDeleteCancel" type="button" class="event-delete-cancel">CANCEL — KEEP EVENT</button>
+        <button id="eventDeleteConfirm" type="button" class="event-delete-confirm">YES — END &amp; DELETE EVENT</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
