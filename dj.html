@@ -1034,12 +1034,11 @@ async function loadEventState(){
         : "Start the event before starting a round.";
     }
 
-    setStatus(
-      eventIsActive
-        ? "Event active • requests updating"
-        : "Event ended • audience access paused",
-      eventIsActive
-    );
+    // The main live-status indicator is owned by request loading.
+    // Event ACTIVE/ENDED is shown separately in the Event Control section.
+    if(!document.getElementById("statusText").classList.contains("error")){
+      setStatus("Live • requests updating",true);
+    }
 
   }catch(error){
     console.error("Event status error:",error);
