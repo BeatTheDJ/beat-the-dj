@@ -460,6 +460,13 @@ button{
   opacity:.35;
   cursor:not-allowed;
   }
+.request-edit-toggle{margin-top:10px;width:100%;padding:10px 12px;background:#333;color:#f5f5f2;border:1px solid #555;border-radius:9px;font-weight:800;cursor:pointer}
+.request-edit{display:none;margin-top:10px;padding:12px;border:1px solid #444;border-radius:12px;background:#181818}
+.request-edit label{display:block;margin:0 0 5px;color:#aaa;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.request-edit input{width:100%;box-sizing:border-box;padding:10px 11px;margin:0 0 9px;border-radius:9px;border:1px solid #444;background:#202020;color:#f5f5f2;font:inherit}
+.request-edit-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.request-edit-actions button{width:100%;padding:10px 8px;font-size:13px}
+.request-edit-actions .cancel-edit{background:#333;color:#f5f5f2;border:1px solid #555}
 .actions{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -2687,7 +2694,27 @@ if(openRoundResult.data){
       return;
     }
 
-    const renderRequest = request => {
+    function requestEditMarkup(request){
+  const status=request.status||"pending";
+  if(roundRequestIds.has(request.id)) return "";
+  if(status!=="pending" && status!=="submitted") return "";
+
+  return `
+    <button type="button" class="request-edit-toggle" onclick="toggleRequestEdit('${request.id}')">✎ EDIT REQUEST</button>
+    <div id="editRequest-${request.id}" class="request-edit">
+      <label for="editArtist-${request.id}">Artist</label>
+      <input id="editArtist-${request.id}" type="text" maxlength="100" value="${esc(request.artist)}">
+      <label for="editSong-${request.id}">Song</label>
+      <input id="editSong-${request.id}" type="text" maxlength="150" value="${esc(request.song)}">
+      <div class="request-edit-actions">
+        <button type="button" onclick="saveRequestEdit('${request.id}',this)">SAVE CHANGES</button>
+        <button type="button" class="cancel-edit" onclick="toggleRequestEdit('${request.id}')">CANCEL</button>
+      </div>
+    </div>
+  `;
+}
+
+const renderRequest = request => {
       const time = request.created_at
         ? new Date(request.created_at).toLocaleTimeString(
             [],
@@ -2728,9 +2755,11 @@ if(openRoundResult.data){
     ✕ NOT TONIGHT
   </button>
 
-</div>`
+</div>
 
-: request.status === "submitted" &&
+${requestEditMarkup(request)}
+
+` : request.status === "submitted" &&
 openRoundResult.data &&
 openRoundResult.data.status === "building" ? `
 
@@ -2757,6 +2786,8 @@ openRoundResult.data.status === "building" ? `
 <div class="request-status status-submitted-text">
   ✓ ACCEPTED — READY FOR A ROUND
 </div>
+
+${requestEditMarkup(request)}
 
 ` : `
 
@@ -2834,6 +2865,44 @@ openRoundResult.data.status === "building" ? `
     showConnectionLost();
   }
 }
+function toggleRequestEdit(id){
+  const editor=document.getElementById("editRequest-"+id);
+  if(!editor)return;
+  editor.style.display=editor.style.display==="block" ? "none" : "block";
+}
+
+async function saveRequestEdit(id,button){
+  const artistInput=document.getElementById("editArtist-"+id);
+  const songInput=document.getElementById("editSong-"+id);
+  if(!artistInput||!songInput)return;
+
+  const artist=artistInput.value.trim();
+  const song=songInput.value.trim();
+
+  if(!artist||!song){
+    alert("Please enter both an artist and a song.");
+    return;
+  }
+
+  button.disabled=true;
+  button.textContent="SAVING...";
+
+  try{
+    const result=await db.from("requests")
+      .update({artist:artist,song:song})
+      .eq("id",id)
+      .eq("event_id",EVENT_ID);
+
+    if(result.error)throw result.error;
+    await loadRequests();
+  }catch(error){
+    console.error("Request edit error:",error);
+    button.disabled=false;
+    button.textContent="SAVE CHANGES";
+    alert(error.message||"Unable to save the request.");
+  }
+}
+
 function toggleRequests(){
 
   const list =
