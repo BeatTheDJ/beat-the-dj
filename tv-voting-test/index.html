@@ -122,7 +122,7 @@ function render(os,cs,names){
     board.dataset.optionKey=key;
     board.innerHTML=list.map((o,i)=>{
       let v=Number(cs[o.id]||0),p=total?Math.round(v/total*100):0,l=max>0&&v===max;
-      return '<article class="card '+(l?"lead":"")+'" data-option-id="'+esc(o.id)+'">'+art(o)+'<div class="num">'+String(i+1).padStart(2,"0")+'</div><div class="track">'+esc(o.track||o.label||"")+'</div><div class="artist">'+esc(o.artist||"")+'</div><div class="requester" data-request-id="'+esc(o.request_id||"")+'"></div><div class="votes">'+v+'<small>VOTES</small></div><div class="bar"><div class="fill" style="width:'+p+'%"></div></div><div class="status">'+(l?"CURRENT LEADER":"LIVE VOTE")+'</div></article>'
+      return '<article class="card '+(l?"lead":"")+'" data-option-id="'+esc(o.id)+'">'+art(o)+'<div class="num">'+String(i+1).padStart(2,"0")+'</div><div class="track">'+esc(o.track||o.label||"")+'</div><div class="artist">'+esc(o.artist||"")+'</div><div class="requester" data-request-id="'+esc(o.request_id||"")+'">'+(o.request_id?"":"🎧︎ DJ'S CHOICE")+'</div><div class="votes">'+v+'<small>VOTES</small></div><div class="bar"><div class="fill" style="width:'+p+'%"></div></div><div class="status">'+(l?"CURRENT LEADER":"LIVE VOTE")+'</div></article>'
     }).join("");
     return;
   }
