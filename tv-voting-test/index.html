@@ -235,9 +235,15 @@ function showGenericUpcomingRoundScreen(){
   document.getElementById("tvUpcomingTitle").style.display="none";
   document.getElementById("tvUpcomingGeneric").style.display="block";
 }
+let loadGeneration = 0;
+
 async function load(){
+  const thisLoad = ++loadGeneration;
   try{
+    const isCurrentLoad = () => thisLoad === loadGeneration;
     const eventState=(await rpc("get_public_event_state"))?.[0] || null;
+
+    if(!isCurrentLoad()) return;
 
     if(!eventState || !eventState.active){
       hideSpecialTVScreens();
@@ -281,6 +287,8 @@ async function load(){
       return;
     }
 
+    if(!isCurrentLoad()) return;
+
     let cr=(await rpc("get_public_round",{p_mode:"closed"}))?.[0];
     if(cr){
       if(cr.winning_option_id && cr.dj_decision==="play"){
@@ -315,8 +323,11 @@ async function load(){
       }
     }
 
+    if(!isCurrentLoad()) return;
     showAttractScreen();
-  }catch(e){console.error("TV load",e)}
+  }catch(e){
+    if(isCurrentLoad()) console.error("TV load",e);
+  }
 }
 load();setInterval(load,2000);window.addEventListener("online",load);
 </script></body></html>
