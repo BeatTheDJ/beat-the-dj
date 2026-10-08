@@ -623,6 +623,21 @@ footer{
 .logout-button:hover{
   background:#3a3a3a;
 }
+
+
+  /* Make the START NEW ROUND controls visibly unavailable while a round is active. */
+  #startRoundBtn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+  }
+  #newRoundTitle:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+  }
+  #showUpcoming:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+  }
 </style>
 </head>
 
@@ -1106,8 +1121,11 @@ document
   const notice = document.getElementById("startRoundNotice");
   const heading = document.getElementById("startRoundHeading");
 
+  const showUpcoming = document.getElementById("showUpcoming");
+
   if(titleInput) titleInput.disabled = isOpen;
   if(startButton) startButton.disabled = isOpen;
+  if(showUpcoming) showUpcoming.disabled = isOpen;
 
   if(notice){
     notice.style.display = isOpen ? "block" : "none";
