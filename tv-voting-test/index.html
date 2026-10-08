@@ -37,6 +37,35 @@
   .eventCard{min-height:220px}
 }
 
+.tvAttract,.tvUpcomingRound{position:absolute;inset:0;z-index:21;display:none;overflow:hidden;color:#f4efe2}
+.tvAttract.active,.tvUpcomingRound.active{display:block}
+.tvAttract:before,.tvUpcomingRound:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.18),rgba(0,0,0,.02) 55%,rgba(0,0,0,.28)),linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.2));pointer-events:none}
+.attractBrand{position:absolute;left:6.2vw;top:7vh;width:min(29vw,500px);z-index:2;filter:drop-shadow(0 10px 22px rgba(0,0,0,.7))}
+.attractTagline{position:absolute;left:7.3vw;top:34vh;font-family:Impact,"Arial Narrow",Arial,sans-serif;font-size:clamp(22px,2vw,38px);font-weight:900;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 5px 18px #000;z-index:2}
+.attractTagline .red{color:#f01d2d}
+.attractQR{position:absolute;right:13vw;top:18vh;width:min(25vw,390px);z-index:2;text-align:center}
+.attractQR .qrLarge{width:min(20vw,310px);height:min(20vw,310px);padding:10px;background:#fff;box-shadow:0 0 0 3px #f4efe2,0 12px 35px rgba(0,0,0,.7)}
+.attractQR .qrPrompt{display:block;margin-top:14px;font-family:Impact,"Arial Narrow",Arial,sans-serif;font-size:clamp(23px,2vw,36px);font-weight:900;letter-spacing:.06em;text-transform:uppercase;text-shadow:0 5px 18px #000}
+.attractQR .qrSub{display:block;margin-top:4px;font-size:clamp(11px,.9vw,16px);font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.attractVenue{position:absolute;right:7vw;bottom:7vh;width:min(17vw,285px);z-index:2;filter:drop-shadow(0 8px 18px rgba(0,0,0,.7))}
+.attractBottom{position:absolute;left:7.3vw;bottom:10vh;font-family:Arial,Helvetica,sans-serif;font-size:clamp(14px,1.1vw,22px);font-weight:900;letter-spacing:.08em;text-transform:uppercase;z-index:2}
+.attractBottom .red{color:#f01d2d}
+
+.upcomingBrand{position:absolute;left:5vw;top:7vh;width:min(12vw,205px);z-index:2;filter:drop-shadow(0 8px 18px rgba(0,0,0,.7))}
+.upcomingVenue{position:absolute;right:7vw;top:7vh;width:min(14vw,245px);z-index:2;filter:drop-shadow(0 8px 18px rgba(0,0,0,.7))}
+.upcomingEyebrow{position:absolute;left:10vw;top:25vh;font-family:Arial,Helvetica,sans-serif;font-size:clamp(17px,1.35vw,27px);font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#f01d2d;z-index:2}
+.upcomingRoundNo{position:absolute;left:9.5vw;top:29vh;font-family:Impact,"Arial Narrow",Arial,sans-serif;font-size:clamp(76px,7vw,128px);line-height:.8;font-weight:900;text-transform:uppercase;z-index:2;text-shadow:0 7px 25px #000}
+.upcomingRoundNo .red{color:#f01d2d}
+.upcomingTitle{position:absolute;left:10vw;top:40vh;width:40vw;font-family:Impact,"Arial Narrow",Arial,sans-serif;font-size:clamp(38px,3.8vw,70px);line-height:.9;font-weight:900;text-transform:uppercase;z-index:2;text-shadow:0 7px 25px #000}
+.upcomingTitle .red{color:#f01d2d}
+.upcomingCta{position:absolute;left:10vw;top:59vh;background:#f4efe2;color:#050505;padding:10px 18px;font-family:Arial,Helvetica,sans-serif;font-size:clamp(14px,1.1vw,21px);font-weight:900;letter-spacing:.07em;text-transform:uppercase;z-index:2;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+.upcomingCta:before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:#f01d2d;margin-right:10px}
+.upcomingQR{position:absolute;right:28vw;bottom:7vh;z-index:2;text-align:center}
+.upcomingQR img{width:min(13vw,220px);height:min(13vw,220px);padding:8px;background:#fff;box-shadow:0 0 0 2px #f4efe2,0 10px 30px rgba(0,0,0,.65)}
+.upcomingQR strong{display:block;margin-top:8px;font-family:Arial,Helvetica,sans-serif;font-size:clamp(12px,1vw,19px);letter-spacing:.1em;text-transform:uppercase}
+.upcomingGeneric{position:absolute;left:10vw;top:39vh;width:48vw;font-family:Impact,"Arial Narrow",Arial,sans-serif;font-size:clamp(42px,4.2vw,78px);line-height:.9;text-transform:uppercase;z-index:2;text-shadow:0 7px 25px #000}
+.upcomingGeneric .red{color:#f01d2d}
+
 .stage.landingMode > .brand,
 .stage.landingMode > .venue,
 .stage.landingMode > .header,
@@ -56,6 +85,23 @@
     <div class="eventMore"><div class="eventMoreInner">MORE<br>BEAT THE DJ<sup>™</sup><br>EVENTS<span class="red">COMING SOON!</span></div></div>
   </div>
   <div class="landingFooter"><span>© 2026 Beat The DJ. All rights reserved.</span><span><b>MAIDA VALE</b> • SHEFFIELD</span></div>
+</section>
+<section id="tvAttractScreen" class="tvAttract">
+  <img class="attractBrand" src="../beat-the-dj-logo.png" alt="Beat The DJ">
+  <div class="attractTagline">YOU <span class="red">VS</span> THE DJ. WHO WINS?</div>
+  <div class="attractQR"><img class="qrLarge" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAACiklEQVR4nO2aQY7bMAxFH2sDWSpADpCjKDfokQY9Um9gH6UHCGAtA8j4XVhK7Jl2ikE9boySCyGO3uIDBCmKlImPWP/lQzg477zzzjvvvPO/461Yi10YzS6pxewIkOreZUM9zq/MR0nSAOrSQeoA4o8WoJEkacl/th7nV+ZTiVCz883ozzfTt/Ot/mft1nqcX4dvX32r/woGB0FqEWlbPc5/Np9apvwMzdvL8fPrd35uNX6DgARGGCAOJyAM097cy8+m3/k/2Lx4ohFxeLXUvShJ3bPpd/59m+L3EaHqzxkIGUGmBPZ2epxfly/xG4em3I+mZfoPJGWkoZHH7y75yZfqAHUhQ1Quvwj5jmTPz/vki3811M+OeurGKXSB6WB2/+6Qv/u3kboglYQsFYdqCudCuX/3xt/r51Iwqwt5eQjX/qTH7975/nwz4tDI7JwxO44GPJat9Tj/9/yivoJ66ipTa64Suh6/u+Rrfg65ejpo3tqIWpj7d6d8OojezOxlGI3+COV+lGxKzXbZVI/z6/D3/tVoEK4tvTUywtXUH6+VSset9Di/Lj/51wiDLH4v0wbBiMVhBGiyEYRto8f5dflF/zkIi111N+k41dSaIc+m3/n37RG/qLcmqz8OAGMrUpON1GKEa+v+3SXPsj4uXoyaRkflauT9yZ3zj/eT0/33m7W19Zza6u4N9Ti/Fl8qqtgBpBPqDSwOpwzplGdDpG30OL8uP5v11v7zMkkD8+7Hs+l3/sP8aPP3dUGCdJBd/pUe51fk7WWgDvmTWe1J33y+sE9+MeudZoG5DvmnxnRZPD/vkv/F+0nK0RsfG8HnRzvl37yfLB/laftiYws9zjvvvPPOO/8/8D8BjObuTfHv5OcAAAAASUVORK5CYII=" alt="Scan to join"><span class="qrPrompt">SCAN TO JOIN</span><span class="qrSub">REQUEST TRACKS • VOTE • BEAT THE DJ</span></div>
+  <img class="attractVenue" src="../maida-vale-logo.png" alt="Maida Vale">
+  <div class="attractBottom"><span class="red">REQUEST</span> • VOTE • BEAT THE DJ</div>
+</section>
+<section id="tvUpcomingRoundScreen" class="tvUpcomingRound">
+  <img class="upcomingBrand" src="../beat-the-dj-logo.png" alt="Beat The DJ">
+  <img class="upcomingVenue" src="../maida-vale-logo.png" alt="Maida Vale">
+  <div class="upcomingEyebrow">THE NEXT BATTLE</div>
+  <div id="tvUpcomingRoundNo" class="upcomingRoundNo">ROUND <span class="red">—</span></div>
+  <div id="tvUpcomingTitle" class="upcomingTitle"></div>
+  <div id="tvUpcomingGeneric" class="upcomingGeneric">GET READY FOR THE <span class="red">NEXT BATTLE</span></div>
+  <div id="tvUpcomingCta" class="upcomingCta">GET READY TO VOTE</div>
+  <div class="upcomingQR"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAACiklEQVR4nO2aQY7bMAxFH2sDWSpADpCjKDfokQY9Um9gH6UHCGAtA8j4XVhK7Jl2ikE9boySCyGO3uIDBCmKlImPWP/lQzg477zzzjvvvPO/461Yi10YzS6pxewIkOreZUM9zq/MR0nSAOrSQeoA4o8WoJEkacl/th7nV+ZTiVCz883ozzfTt/Ot/mft1nqcX4dvX32r/woGB0FqEWlbPc5/Np9apvwMzdvL8fPrd35uNX6DgARGGCAOJyAM097cy8+m3/k/2Lx4ohFxeLXUvShJ3bPpd/59m+L3EaHqzxkIGUGmBPZ2epxfly/xG4em3I+mZfoPJGWkoZHH7y75yZfqAHUhQ1Quvwj5jmTPz/vki3811M+OeurGKXSB6WB2/+6Qv/u3kboglYQsFYdqCudCuX/3xt/r51Iwqwt5eQjX/qTH7975/nwz4tDI7JwxO44GPJat9Tj/9/yivoJ66ipTa64Suh6/u+Rrfg65ejpo3tqIWpj7d6d8OojezOxlGI3+COV+lGxKzXbZVI/z6/D3/tVoEK4tvTUywtXUH6+VSset9Di/Lj/51wiDLH4v0wbBiMVhBGiyEYRto8f5dflF/zkIi111N+k41dSaIc+m3/n37RG/qLcmqz8OAGMrUpON1GKEa+v+3SXPsj4uXoyaRkflauT9yZ3zj/eT0/33m7W19Zza6u4N9Ti/Fl8qqtgBpBPqDSwOpwzplGdDpG30OL8uP5v11v7zMkkD8+7Hs+l3/sP8aPP3dUGCdJBd/pUe51fk7WWgDvmxWe1J33y+sE9+MeudZoG5DvmnxnRZPD/vkv/F+0nK0RsfG8HnRzvl37yfLB/laftiYws9zjvvvPPOO/8/8D8BjObuTfHv5OcAAAAASUVORK5CYII=" alt="Scan to join"><strong>SCAN TO JOIN</strong></div>
 </section>
 <div class="redwash"></div><img class="brand" src="../beat-the-dj-logo.png" alt="Beat The DJ logo"><img class="venue" src="../maida-vale-logo.png" alt="Maida Vale logo"><header class="header"><div class="kicker">ROUND <span id="roundNumber">—</span> &nbsp;•&nbsp; <span class="liveNow">VOTING NOW</span></div><div class="title" id="roundTitle">—</div><div class="instruction">VOTE FOR THE TRACK YOU WANT TO HEAR</div></header><section class="board" id="votingBoard"></section><aside class="qrbox"><img class="qr" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAACiklEQVR4nO2aQY7bMAxFH2sDWSpADpCjKDfokQY9Um9gH6UHCGAtA8j4XVhK7Jl2ikE9boySCyGO3uIDBCmKlImPWP/lQzg477zzzjvvvPO/461Yi10YzS6pxewIkOreZUM9zq/MR0nSAOrSQeoA4o8WoJEkacl/th7nV+ZTiVCz883ozzfTt/Ot/mft1nqcX4dvX32r/woGB0FqEWlbPc5/Np9apvwMzdvL8fPrd35uNX6DgARGGCAOJyAM097cy8+m3/k/2Lx4ohFxeLXUvShJ3bPpd/59m+L3EaHqzxkIGUGmBPZ2epxfly/xG4em3I+mZfoPJGWkoZHH7y75yZfqAHUhQ1Quvwj5jmTPz/vki3811M+OeurGKXSB6WB2/+6Qv/u3kboglYQsFYdqCudCuX/3xt/r51Iwqwt5eQjX/qTH7975/nwz4tDI7JwxO44GPJat9Tj/9/yivoJ66ipTa64Suh6/u+Rrfg65ejpo3tqIWpj7d6d8OojezOxlGI3+COV+lGxKzXbZVI/z6/D3/tVoEK4tvTUywtXUH6+VSset9Di/Lj/51wiDLH4v0wbBiMVhBGiyEYRto8f5dflF/zkIi111N+k41dSaIc+m3/n37RG/qLcmqz8OAGMrUpON1GKEa+v+3SXPsj4uXoyaRkflauT9yZ3zj/eT0/33m7W19Zza6u4N9Ti/Fl8qqtgBpBPqDSwOpwzplGdDpG30OL8uP5v11v7zMkkD8+7Hs+l3/sP8aPP3dUGCdJBd/pUe51fk7WWgDvmTWe1J33y+sE9+MeudZoG5DvmnxnRZPD/vkv/F+0nK0RsfG8HnRzvl37yfLB/laftiYws9zjvvvPPOO/8/8D8BjObuTfHv5OcAAAAASUVORK5CYII=" alt="Scan to join QR code"><strong>SCAN TO JOIN</strong><span>REQUEST • VOTE • BEAT THE DJ</span></aside></main><script>
 const SUPABASE_URL="https://lxojmyujlljkhtnudzmr.supabase.co",SUPABASE_KEY="sb_publishable_fWygwIdemec7H3A61hLnTQ_RERWp1Ex";
@@ -167,11 +213,40 @@ function hideUpcomingEvents(){
   document.getElementById("upcomingEventsScreen").classList.add("hidden");
 }
 
+function hideSpecialTVScreens(){
+  document.getElementById("tvAttractScreen").classList.remove("active");
+  document.getElementById("tvUpcomingRoundScreen").classList.remove("active");
+}
+function showAttractScreen(){
+  hideUpcomingEvents();
+  hideSpecialTVScreens();
+  document.getElementById("tvAttractScreen").classList.add("active");
+}
+function showUpcomingRoundScreen(round){
+  hideUpcomingEvents();
+  hideSpecialTVScreens();
+  const screen=document.getElementById("tvUpcomingRoundScreen");
+  screen.classList.add("active");
+  document.getElementById("tvUpcomingRoundNo").innerHTML='ROUND <span class="red">'+esc(round.round_number||"")+'</span>';
+  document.getElementById("tvUpcomingTitle").textContent=String(round.title||"").toUpperCase();
+  document.getElementById("tvUpcomingTitle").style.display="block";
+  document.getElementById("tvUpcomingGeneric").style.display="none";
+}
+function showGenericUpcomingRoundScreen(){
+  hideUpcomingEvents();
+  hideSpecialTVScreens();
+  const screen=document.getElementById("tvUpcomingRoundScreen");
+  screen.classList.add("active");
+  document.getElementById("tvUpcomingRoundNo").innerHTML='ROUND <span class="red">—</span>';
+  document.getElementById("tvUpcomingTitle").style.display="none";
+  document.getElementById("tvUpcomingGeneric").style.display="block";
+}
 async function load(){
   try{
     const eventState=(await rpc("get_public_event_state"))?.[0] || null;
 
     if(!eventState || !eventState.active){
+      hideSpecialTVScreens();
       showUpcomingEvents();
       let board=document.getElementById("votingBoard");
       board.className="board";
@@ -182,8 +257,27 @@ async function load(){
 
     hideUpcomingEvents();
 
-    let rr=await rpc("get_public_round",{p_mode:"open"}),r=rr?.[0];
-    if(r){
+    const rr=await rpc("get_public_round",{p_mode:"open"});
+    const r=rr?.[0];
+
+    if(r && r.status==="building"){
+      document.querySelector(".header").classList.remove("tieHeader","winnerHeader");
+      document.querySelector(".header").classList.add("winnerHeader");
+      document.querySelector(".kicker").innerHTML='<span class="liveNow">BEAT THE DJ™</span>';
+      document.getElementById("roundTitle").textContent="GET READY...";
+      document.querySelector(".instruction").textContent="REQUESTS ARE BEING PREPARED FOR YOUR VOTES";
+      document.getElementById("votingBoard").innerHTML="";
+      if(r.show_upcoming){
+        showUpcomingRoundScreen(r);
+      }else{
+        showAttractScreen();
+      }
+      return;
+    }
+
+    hideSpecialTVScreens();
+
+    if(r && r.status==="voting"){
       document.querySelector(".header").classList.remove("tieHeader","winnerHeader");
       document.querySelector(".kicker").innerHTML='ROUND <span id="roundNumber">'+esc(r.round_number||"")+'</span> &nbsp;•&nbsp; <span class="liveNow">VOTING NOW</span>';
       document.getElementById("roundTitle").textContent=String(r.title||"").toUpperCase()||"VOTING NOW";
@@ -192,6 +286,7 @@ async function load(){
       render(o,Object.fromEntries((v||[]).map(x=>[x.option_id,Number(x.vote_count||0)])));
       return;
     }
+
     let cr=(await rpc("get_public_round",{p_mode:"closed"}))?.[0];
     if(cr){
       if(cr.winning_option_id && cr.dj_decision==="play"){
@@ -225,14 +320,8 @@ async function load(){
         return;
       }
     }
-    document.querySelector(".header").classList.remove("tieHeader","winnerHeader");
-    document.querySelector(".kicker").innerHTML='<span class="liveNow">BEAT THE DJ™</span>';
-    document.getElementById("roundTitle").textContent="GET READY...";
-    document.querySelector(".instruction").textContent="REQUESTS ARE BEING PREPARED FOR YOUR VOTES";
-    let board=document.getElementById("votingBoard");
-    board.className="board";
-    board.dataset.optionKey="get-ready";
-    board.innerHTML='<div class="standby"><h2>GET READY...</h2><p>Requests are being prepared for your votes.</p></div>';
+
+    showAttractScreen();
   }catch(e){console.error("TV load",e)}
 }
 load();setInterval(load,2000);window.addEventListener("online",load);
