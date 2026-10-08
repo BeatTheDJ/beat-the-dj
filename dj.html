@@ -1120,7 +1120,7 @@ async function loadEventState(){
   try{
     const result = await db
       .from("events")
-      .select("active,name")
+      .select("active,name,paused")
       .eq("id",EVENT_ID)
       .maybeSingle();
 
@@ -1129,6 +1129,7 @@ async function loadEventState(){
     }
 
     eventIsActive = !!result.data?.active;
+    const eventIsPaused = !eventIsActive && !!result.data?.paused;
 
     const statusText = document.getElementById("eventStatusText");
     const button = document.getElementById("eventToggleBtn");
@@ -1136,7 +1137,9 @@ async function loadEventState(){
     if(statusText){
       statusText.textContent = eventIsActive
         ? "🟢 EVENT ACTIVE"
-        : "🔴 EVENT PAUSED";
+        : eventIsPaused
+          ? "🔴 EVENT PAUSED"
+          : "⚫ EVENT ENDED";
       statusText.className =
         "event-status-text " +
         (eventIsActive ? "event-status-active" : "event-status-ended");
@@ -1148,7 +1151,11 @@ async function loadEventState(){
         "event-toggle " +
         (eventIsActive ? "end" : "start");
       button.textContent =
-        eventIsActive ? "PAUSE EVENT" : "RESUME EVENT";
+        eventIsActive
+          ? "PAUSE EVENT"
+          : eventIsPaused
+            ? "RESUME EVENT"
+            : "START EVENT";
     }
 
     const startButton = document.getElementById("startRoundBtn");
@@ -1156,11 +1163,11 @@ async function loadEventState(){
       startButton.disabled = !eventIsActive;
       startButton.title = eventIsActive
         ? ""
-        : "Start the event before starting a round.";
+        : eventIsPaused
+          ? "Resume the event before starting a round."
+          : "Start the event before starting a round.";
     }
 
-    // The main live-status indicator is owned by request loading.
-    // Event ACTIVE/ENDED is shown separately in the Event Control section.
     if(!document.getElementById("statusText").classList.contains("error")){
       setStatus("Live • requests updating",true);
     }
