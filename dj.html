@@ -2916,6 +2916,13 @@ async function saveRequestEdit(id,button){
       .eq("event_id",EVENT_ID);
 
     if(result.error)throw result.error;
+
+    button.textContent="✓ SAVED";
+    button.disabled=true;
+
+    const editor=document.getElementById("editRequest-"+id);
+    if(editor)editor.style.display="none";
+
     await loadRequests();
   }catch(error){
     console.error("Request edit error:",error);
