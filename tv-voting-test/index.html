@@ -39,6 +39,7 @@
 
 .tvAttract,.tvUpcomingRound{position:absolute;inset:0;z-index:21;display:none;overflow:hidden;color:#f4efe2}
 .tvAttract.active,.tvUpcomingRound.active{display:block}
+.tvUpcomingRound.active ~ .redwash,.tvUpcomingRound.active ~ .brand,.tvUpcomingRound.active ~ .venue,.tvUpcomingRound.active ~ .header,.tvUpcomingRound.active ~ .board,.tvUpcomingRound.active ~ .qrbox{display:none!important}
 .tvAttract:before,.tvUpcomingRound:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.18),rgba(0,0,0,.02) 55%,rgba(0,0,0,.28)),linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.2));pointer-events:none}
 .attractBrand{position:absolute;left:6.2vw;top:7vh;width:min(29vw,500px);z-index:2;filter:drop-shadow(0 10px 22px rgba(0,0,0,.7))}
 .attractTagline{position:absolute;left:7.3vw;top:34vh;font-family:Impact,"Arial Narrow",Arial,sans-serif;font-size:clamp(22px,2vw,38px);font-weight:900;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 5px 18px #000;z-index:2}
