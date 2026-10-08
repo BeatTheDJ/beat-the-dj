@@ -1599,7 +1599,7 @@ if(requestIds.length){
       (counts[option.id] || 0) === highest
     );
 
-  if(highest > 0 && winners.length > 1){
+  if(highest === 0 || winners.length > 1){
 
     document.getElementById("tieOptions").innerHTML =
       winners.map(option => `
