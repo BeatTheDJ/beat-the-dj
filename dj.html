@@ -1618,8 +1618,8 @@ if(requestIds.length){
           </div>
 
           <div class="time">
-            ${counts[option.id]}
-            ${counts[option.id] === 1 ? "vote" : "votes"}
+            ${counts[option.id] || 0}
+            ${(counts[option.id] || 0) === 1 ? "vote" : "votes"}
           </div>
 
           <div class="actions">
