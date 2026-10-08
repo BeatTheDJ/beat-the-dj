@@ -375,9 +375,45 @@ h1{
   border:1px solid #383838;
   color:var(--text);
   border-radius:13px;
-  padding:15px;
+  padding:12px;
   cursor:pointer;
   font:inherit;
+}
+
+.choice-main{
+  display:grid;
+  grid-template-columns:72px minmax(0,1fr);
+  gap:13px;
+  align-items:start;
+}
+
+.choice-art{
+  width:72px;
+  height:72px;
+  border-radius:9px;
+  overflow:hidden;
+  background:#111;
+  border:1px solid #333;
+  flex-shrink:0;
+}
+
+.choice-art img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.choice-details{
+  min-width:0;
+}
+
+.choice-details .track{
+  padding-top:2px;
+}
+
+.choice-details .artist{
+  margin-top:4px;
 }
 
 .choice:hover{
@@ -758,7 +794,7 @@ async function getOpenRound(){
 async function getOptions(roundId){
 
   const result = await db.rpc(
-    "get_public_options",
+    "get_public_options_with_artwork",
     {
       p_round_id: roundId
     }
@@ -897,24 +933,42 @@ function renderOptions(){
 
       }
 
+      const artworkUrl =
+        String(option.artwork_url || "").trim();
+
+      const artwork =
+        artworkUrl
+          ? `<div class="choice-art"><img src="${esc(artworkUrl)}" alt="" onerror="this.remove();this.parentElement.style.display='none'"></div>`
+          : `<div class="choice-art" aria-hidden="true"></div>`;
+
       button.innerHTML = `
 
-        <div class="track">
-          ${index + 1}. ${esc(option.track || option.label)}
-        </div>
+        <div class="choice-main">
 
-        ${
-          option.artist
-            ? `<div class="artist">${esc(option.artist)}</div>`
-            : ""
-        }
+          ${artwork}
 
-        <div class="option-requester">
-          ${
-            option.request_id
-              ? "REQUESTED BY " + esc(option.requesterName || "Unknown")
-              : "🎧︎ DJ'S CHOICE"
-          }
+          <div class="choice-details">
+
+            <div class="track">
+              ${index + 1}. ${esc(option.track || option.label)}
+            </div>
+
+            ${
+              option.artist
+                ? `<div class="artist">${esc(option.artist)}</div>`
+                : ""
+            }
+
+            <div class="option-requester">
+              ${
+                option.request_id
+                  ? "REQUESTED BY " + esc(option.requesterName || "Unknown")
+                  : "🎧︎ DJ'S CHOICE"
+              }
+            </div>
+
+          </div>
+
         </div>
 
         <div class="votes">
