@@ -1148,6 +1148,7 @@ async function loadBeatResult(){
 
     if(
       latestClosed.dj_decision !== "play" &&
+      latestClosed.dj_decision !== "tie_play" &&
       !djWon
     ){
 
@@ -1165,7 +1166,7 @@ async function loadBeatResult(){
       $("winnerMessage").innerHTML =
         '<span class="winner-name">' +
         esc(requesterName) +
-        '...</span>' +
+        '....</span>' +
         '<span class="winner-beat">THE DJ DECIDED TO PLAY YOUR SONG!</span>';
 
     }else if(djWon){
