@@ -1039,7 +1039,7 @@ async function loadEventState(){
     if(statusText){
       statusText.textContent = eventIsActive
         ? "🟢 EVENT ACTIVE"
-        : "🔴 EVENT ENDED";
+        : "🔴 EVENT PAUSED";
       statusText.className =
         "event-status-text " +
         (eventIsActive ? "event-status-active" : "event-status-ended");
@@ -1051,7 +1051,7 @@ async function loadEventState(){
         "event-toggle " +
         (eventIsActive ? "end" : "start");
       button.textContent =
-        eventIsActive ? "END EVENT" : "START EVENT";
+        eventIsActive ? "PAUSE EVENT" : "RESUME EVENT";
     }
 
     const startButton = document.getElementById("startRoundBtn");
@@ -1086,7 +1086,7 @@ async function toggleEvent(){
 
   if(!nextActive){
     const confirmed = confirm(
-      "End this event? New song requests and the public live view will be paused. Existing rounds and requests will not be deleted."
+      "Pause this event? The public page and TV display will pause, and new requests will be stopped. Existing rounds, votes, requests and history will be kept."
     );
     if(!confirmed){ return; }
   }
