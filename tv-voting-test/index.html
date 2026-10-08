@@ -295,7 +295,9 @@ async function load(){
           const el=card?.querySelector(".requester");
           if(el){
             const name=String(names[x.request_id]||"").trim();
-            el.textContent=name?"REQUESTED BY "+name:"";
+            el.textContent=x.request_id
+              ? (name?"REQUESTED BY "+name:"")
+              : "🎧︎ DJ'S CHOICE";
           }
         });
       }catch(e){
