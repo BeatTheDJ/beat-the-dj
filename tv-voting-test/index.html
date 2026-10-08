@@ -174,7 +174,7 @@ function renderWinner(w){
   let art=w.artwork_url?'<div class="winnerArt"><img src="'+esc(w.artwork_url)+'" alt="Winner artwork"></div>':'<div class="winnerFallback"></div>';
   let tieDecision=w.dj_decision==="tie_play";
   let message=tieDecision
-    ? (esc(requester)+"... THE DJ DECIDED TO PLAY YOUR SONG!")
+    ? (esc(requester)+"....THE DJ DECIDED TO PLAY YOUR SONG!")
     : djChoice
       ? "THE DJ'S CHOICE WON THE VOTE!"
       : (esc(requester)+"... YOU BEAT THE DJ!");
@@ -315,7 +315,7 @@ async function load(){
 
     let cr=(await rpc("get_public_round",{p_mode:"closed"}))?.[0];
     if(cr){
-      if(cr.winning_option_id && cr.dj_decision==="play"){
+      if(cr.winning_option_id && (cr.dj_decision==="play" || cr.dj_decision==="tie_play")){
         let w=(await rpc("get_public_winner",{p_round_id:cr.id}))?.[0];
         if(!isCurrentLoad()) return;
         if(w){
