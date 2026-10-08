@@ -861,6 +861,11 @@ footer{
     </div>
     <button id="eventToggleBtn" type="button" class="event-toggle" disabled>CHECKING...</button>
   </div>
+  <div style="margin-top:14px;padding-top:14px;border-top:1px solid #333;">
+    <div style="font-size:11px;font-weight:900;letter-spacing:.08em;color:#aaa;margin-bottom:7px;">FINISH EVENT</div>
+    <button id="endDeleteEventBtn" type="button" class="event-toggle" style="width:100%;background:#3a1111;color:#fff;border:1px solid #ff5555;">END / DELETE EVENT</button>
+  </div>
+  </div>
 </section>
 
 <footer>
@@ -1121,6 +1126,9 @@ async function toggleEvent(){
 document
   .getElementById("eventToggleBtn")
   .addEventListener("click",toggleEvent);
+document
+  .getElementById("endDeleteEventBtn")
+  .addEventListener("click",endDeleteEvent);
 
   function setStartRoundControls(isOpen){
 
@@ -1148,6 +1156,37 @@ document
       : "START NEW ROUND";
   }
 }
+async function endDeleteEvent(){
+  const button = document.getElementById("endDeleteEventBtn");
+  if(!button || button.disabled){ return; }
+
+  const confirmed = confirm(
+    "END / DELETE THIS EVENT? This permanently deletes this event's rounds, votes, options, requests and results. This cannot be undone. The reusable artwork cache will NOT be deleted."
+  );
+  if(!confirmed){ return; }
+
+  button.disabled = true;
+  button.textContent = "ENDING...";
+
+  try{
+    const result = await db.rpc("end_delete_event",{p_event_id:EVENT_ID});
+    if(result.error) throw result.error;
+
+    eventIsActive = false;
+    alert("Event ended. The event data has been cleared and the system is ready for the next event.");
+
+    await loadEventState();
+    await loadRequests();
+    await loadRound();
+    await loadVoteTotals();
+    await loadRoundResult();
+  }catch(error){
+    console.error("End event error:",error);
+    alert(error.message || "The event could not be ended. Nothing has been changed.");
+    await loadEventState();
+  }
+}
+
 
 async function startNewRound(){
 
