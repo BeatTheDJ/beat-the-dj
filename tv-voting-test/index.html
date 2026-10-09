@@ -173,13 +173,18 @@ function renderWinner(w){
   let djChoice=!w.request_id;
   let art=w.artwork_url?'<div class="winnerArt"><img src="'+esc(w.artwork_url)+'" alt="Winner artwork"></div>':'<div class="winnerFallback"></div>';
   let tieDecision=w.dj_decision==="tie_play";
-  let message=tieDecision
-    ? (esc(requester)+"....THE DJ DECIDED TO PLAY YOUR SONG!")
-    : djChoice
-      ? "THE DJ'S CHOICE WON THE VOTE!"
-      : (esc(requester)+"... YOU BEAT THE DJ!");
+  let djWon=w.dj_decision==="reject";
+  let message=djWon
+    ? ("THE DJ WINS! "+esc(requester)+" DID NOT BEAT THE DJ. BETTER LUCK NEXT TIME "+esc(requester)+"!")
+    : tieDecision && djChoice
+      ? "THE DJ'S CHOICE WON THE TIE BREAK!"
+      : tieDecision
+        ? (esc(requester)+"....THE DJ DECIDED TO PLAY YOUR SONG!")
+        : djChoice
+          ? "THE DJ'S CHOICE WON THE VOTE!"
+          : (esc(requester)+"... YOU BEAT THE DJ!");
   let name="";
-  board.innerHTML='<article class="winnerCard">'+art+'<div class="winnerTrack">'+esc(w.track||"")+'</div><div class="winnerArtist">'+esc(w.artist||"")+'</div><div class="winnerVotes">'+Number(w.vote_count||0)+' VOTE'+(Number(w.vote_count||0)===1?"":"S")+'</div>'+name+'<div class="winnerMessage '+(djChoice?"dj":"winnerPulse")+'">'+message+'</div></article>';
+  board.innerHTML='<article class="winnerCard">'+art+'<div class="winnerTrack">'+esc(w.track||"")+'</div><div class="winnerArtist">'+esc(w.artist||"")+'</div><div class="winnerVotes">'+Number(w.vote_count||0)+' VOTE'+(Number(w.vote_count||0)===1?"":"S")+'</div>'+name+'<div class="winnerMessage '+((djChoice||djWon)?"dj":"winnerPulse")+'">'+message+'</div></article>';
 }
 function setClosedHeader(round,isTie){
   document.querySelector(".header").classList.remove("winnerHeader");
@@ -315,7 +320,7 @@ async function load(){
 
     let cr=(await rpc("get_public_round",{p_mode:"closed"}))?.[0];
     if(cr){
-      if(cr.winning_option_id && (cr.dj_decision==="play" || cr.dj_decision==="tie_play")){
+      if(cr.winning_option_id && (cr.dj_decision==="play" || cr.dj_decision==="tie_play" || cr.dj_decision==="reject")){
         let w=(await rpc("get_public_winner",{p_round_id:cr.id}))?.[0];
         if(!isCurrentLoad()) return;
         if(w){
