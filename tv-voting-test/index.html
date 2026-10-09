@@ -243,13 +243,31 @@ function showGenericUpcomingRoundScreen(){
 }
 let loadGeneration = 0;
 
+function showTvConnectionError(){
+  let notice = document.getElementById("tvConnectionError");
+  if(!notice){
+    notice = document.createElement("div");
+    notice.id = "tvConnectionError";
+    notice.setAttribute("role","status");
+    notice.setAttribute("aria-live","polite");
+    notice.style.cssText = "position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;background:rgba(0,0,0,.94);color:#f5f5f2;font-family:Arial,sans-serif;";
+    notice.innerHTML = '<div style="font-size:clamp(24px,4vw,52px);font-weight:1000;letter-spacing:.04em;color:#ff3030;">CONNECTION INTERRUPTED</div><div style="margin-top:18px;font-size:clamp(16px,2vw,28px);font-weight:800;">RECONNECTING…</div><div style="margin-top:12px;font-size:14px;color:#bbb;">The display will return automatically when the connection is restored.</div>';
+    document.body.appendChild(notice);
+  }
+}
+
+function clearTvConnectionError(){
+  document.getElementById("tvConnectionError")?.remove();
+}
+
 async function load(){
   const thisLoad = ++loadGeneration;
+  const isCurrentLoad = () => thisLoad === loadGeneration;
   try{
-    const isCurrentLoad = () => thisLoad === loadGeneration;
     const eventState=(await rpc("get_public_event_state"))?.[0] || null;
 
     if(!isCurrentLoad()) return;
+    clearTvConnectionError();
 
     if(!eventState || !eventState.active){
       hideSpecialTVScreens();
@@ -361,7 +379,10 @@ async function load(){
     if(!isCurrentLoad()) return;
     showAttractScreen();
   }catch(e){
-    if(isCurrentLoad()) console.error("TV load",e);
+    if(isCurrentLoad()){
+      console.error("TV load",e);
+      showTvConnectionError();
+    }
   }
 }
 load();setInterval(load,2000);window.addEventListener("online",load);
