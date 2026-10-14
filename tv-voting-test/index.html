@@ -187,7 +187,7 @@ function renderWinner(w,totalVotes){
           ? "THE DJ'S CHOICE WON THE VOTE!"
           : (esc(requester)+"... YOU BEAT THE DJ!");
   let name="";
-  board.innerHTML='<article class="winnerCard">'+art+'<div class="winnerTrack">'+esc(w.track||"")+'</div><div class="winnerArtist">'+esc(w.artist||"")+'</div><div class="winnerVotes">'+Number(w.vote_count||0)+' VOTE'+(Number(w.vote_count||0)===1?"":"S")+'</div>'+name+'<div class="winnerMessage '+((djChoice||djWon)?"dj":"winnerPulse")+'">'+message+'</div></article>';
+  board.innerHTML='<article class="winnerCard">'+art+'<div class="winnerTrack">'+esc(w.track||"")+'</div><div class="winnerArtist">'+esc(w.artist||"")+'</div><div class="winnerVotes">'+(totalVotes?Math.round(Number(w.vote_count||0)/totalVotes*100):0)+'% VOTE SHARE</div>'+name+'<div class="winnerMessage '+((djChoice||djWon)?"dj":"winnerPulse")+'">'+message+'</div></article>';
 }
 function setClosedHeader(round,isTie){
   document.querySelector(".header").classList.remove("winnerHeader");
