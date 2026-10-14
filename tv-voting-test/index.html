@@ -139,6 +139,7 @@ function render(os,cs,names){
 }
 function renderResults(os,cs){
   let list=(os||[]).slice().sort((a,b)=>Number(a.position||0)-Number(b.position||0)).slice(0,4);
+  let total=list.reduce((sum,o)=>sum+Number(cs[o.id]||0),0);
   let max=Math.max(0,...list.map(o=>Number(cs[o.id]||0)));
   let board=document.getElementById("votingBoard");
   let key="results:"+list.map(o=>String(o.id)+":"+Number(cs[o.id]||0)).join("|");
@@ -146,8 +147,8 @@ function renderResults(os,cs){
   board.dataset.optionKey=key;
   board.className="resultsBoard";
   board.innerHTML=list.map(o=>{
-    let v=Number(cs[o.id]||0),leading=max>0&&v===max;
-    return '<article class="resultsCard '+(leading?"leading":"")+'">'+art(o)+'<div class="track">'+esc(o.track||o.label||"")+'</div><div class="artist">'+esc(o.artist||"")+'</div><div class="votes">'+v+'<small>VOTE'+(v===1?"":"S")+'</small></div><div class="status">'+(leading?"LEADING VOTE":"VOTE TOTAL")+'</div></article>';
+    let v=Number(cs[o.id]||0),p=total?Math.round(v/total*100):0,leading=max>0&&v===max;
+    return '<article class="resultsCard '+(leading?"leading":"")+'">'+art(o)+'<div class="track">'+esc(o.track||o.label||"")+'</div><div class="artist">'+esc(o.artist||"")+'</div><div class="votes">'+p+'%<small>VOTE SHARE</small></div><div class="status">'+(leading?"LEADING VOTE":"VOTE SHARE")+'</div></article>';
   }).join("")+'<div class="resultsNote"><b>YOU vs THE DJ. WHO WINS?</b></div>';
 }
 function renderTie(os,cs){
