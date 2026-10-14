@@ -1305,6 +1305,9 @@ async function endDeleteEvent(){
     console.error("End event error:",error);
     alert(error.message || "The event could not be ended. Nothing has been changed.");
     await loadEventState();
+  }finally{
+    button.disabled = false;
+    button.textContent = "END / DELETE EVENT";
   }
 }
 
@@ -2819,15 +2822,64 @@ if(openRoundResult.data){
   );
 }
     
+    const closedRoundsResult = await db
+      .from("rounds")
+      .select("id,round_number,winning_option_id,dj_decision")
+      .eq("event_id",EVENT_ID)
+      .eq("status","closed")
+      .order("round_number",{ascending:false});
+
+    if(closedRoundsResult.error){
+      throw closedRoundsResult.error;
+    }
+
+    const closedRounds = closedRoundsResult.data || [];
+    const closedRoundIds = closedRounds.map(round => round.id);
+    let djChoiceHistory = [];
+
+    if(closedRoundIds.length){
+      const djChoicesResult = await db
+        .from("options")
+        .select("id,artist,track,label,round_id,request_id,position")
+        .in("round_id",closedRoundIds)
+        .is("request_id",null)
+        .order("position",{ascending:true});
+
+      if(djChoicesResult.error){
+        throw djChoicesResult.error;
+      }
+
+      djChoiceHistory = (djChoicesResult.data || []).map(option => {
+        const round = closedRounds.find(item => item.id === option.round_id);
+        return {
+          id:"dj-choice-" + option.id,
+          artist:option.artist || "",
+          song:option.track || option.label || "",
+          requester_name:"🎧 DJ'S CHOICE",
+          status:"dj_choice",
+          isDjChoice:true,
+          round_number:round?.round_number || "",
+          isWinner:Boolean(
+            round &&
+            round.winning_option_id === option.id &&
+            (round.dj_decision === "play" || round.dj_decision === "tie_play")
+          )
+        };
+      });
+    }
+
     const requests = result.data || [];
 
     const actionableRequests = requests.filter(request =>
       request.status === "pending" || !request.status || request.status === "submitted"
     );
 
-    const historyRequests = requests.filter(request =>
-      request.status === "played" || request.status === "rejected"
-    );
+    const historyRequests = [
+      ...djChoiceHistory,
+      ...requests.filter(request =>
+        request.status === "played" || request.status === "rejected"
+      )
+    ];
 
     const displayRequests = [...actionableRequests, ...historyRequests];
 
@@ -2870,7 +2922,7 @@ if(openRoundResult.data){
       historyRequests.length +
       " history";
 
-    if(!requests.length){
+    if(!requests.length && !djChoiceHistory.length){
       box.innerHTML =
         '<div class="empty">No requests yet.</div>';
 
@@ -2899,6 +2951,17 @@ if(openRoundResult.data){
 }
 
 const renderRequest = request => {
+      if(request.isDjChoice){
+        return `
+          <div class="request status-submitted">
+            <div class="song">${esc(request.song)}</div>
+            <div class="artist">${esc(request.artist)}</div>
+            <div class="requester">🎧 DJ'S CHOICE • ROUND ${esc(request.round_number)}</div>
+            <div class="request-status status-submitted-text">${request.isWinner ? "✓ WINNING DJ'S CHOICE" : "ROUND COMPLETED"}</div>
+          </div>
+        `;
+      }
+
       const time = request.created_at
         ? new Date(request.created_at).toLocaleTimeString(
             [],
