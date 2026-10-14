@@ -442,6 +442,10 @@ h1{
   background:radial-gradient(circle,#f01d2d 0 5px,#0a0a0a 6px 19px,transparent 20px),repeating-radial-gradient(circle,rgba(244,239,226,.2) 0 1px,transparent 2px 7px);
 }
 
+.choice-art.has-image::before{
+  display:none;
+}
+
 .choice-art img{
   display:block;
   width:100%;
@@ -984,7 +988,7 @@ function renderOptions(){
 
       const artwork =
         artworkUrl
-          ? `<div class="choice-art"><img src="${esc(artworkUrl)}" alt="" onerror="this.remove()"></div>`
+          ? `<div class="choice-art has-image"><img src="${esc(artworkUrl)}" alt="" onerror="this.parentElement.classList.remove('has-image');this.remove()"></div>`
           : `<div class="choice-art" aria-hidden="true"></div>`;
 
       button.innerHTML = `
