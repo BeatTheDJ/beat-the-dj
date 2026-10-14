@@ -1161,7 +1161,12 @@ async function loadBeatResult(){
     $("winnerCard")
       .classList.toggle("dj-win",djWon);
 
-    if(latestClosed.dj_decision === "tie_play"){
+    if(latestClosed.dj_decision === "tie_play" && isDjChoice){
+
+      $("winnerMessage").innerHTML =
+        '<span class="winner-beat">THE DJ\'S CHOICE WON THE TIE BREAK!</span>';
+
+    }else if(latestClosed.dj_decision === "tie_play"){
 
       $("winnerMessage").innerHTML =
         '<span class="winner-name">' +
