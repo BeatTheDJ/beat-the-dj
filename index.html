@@ -354,6 +354,13 @@ h1{
   object-fit:cover;
 }
 
+.winner-artwork.no-artwork{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#111;
+}
+
 .winner-card.dj-win .winner-artwork{
   border-color:#444;
   box-shadow:none;
@@ -418,6 +425,21 @@ h1{
   background:#111;
   border:1px solid #333;
   flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+
+.choice-art::before,
+.winner-artwork.no-artwork::before{
+  content:"";
+  display:block;
+  width:52%;
+  height:52%;
+  border-radius:50%;
+  border:2px solid rgba(244,239,226,.32);
+  background:radial-gradient(circle,#f01d2d 0 5px,#0a0a0a 6px 19px,transparent 20px),repeating-radial-gradient(circle,rgba(244,239,226,.2) 0 1px,transparent 2px 7px);
 }
 
 .choice-art img{
@@ -962,7 +984,7 @@ function renderOptions(){
 
       const artwork =
         artworkUrl
-          ? `<div class="choice-art"><img src="${esc(artworkUrl)}" alt="" onerror="this.remove();this.parentElement.style.display='none'"></div>`
+          ? `<div class="choice-art"><img src="${esc(artworkUrl)}" alt="" onerror="this.remove()"></div>`
           : `<div class="choice-art" aria-hidden="true"></div>`;
 
       button.innerHTML = `
@@ -1205,11 +1227,13 @@ async function loadBeatResult(){
 
     if(winnerArtwork){
       $("winnerArtwork").innerHTML =
-        `<img src="${esc(winnerArtwork)}" alt="" onerror="this.remove();document.getElementById("winnerArtwork").classList.add("hidden")">`;
+        `<img src="${esc(winnerArtwork)}" alt="" onerror="this.parentElement.classList.add('no-artwork');this.remove()">`;
       $("winnerArtwork").classList.remove("hidden");
+      $("winnerArtwork").classList.remove("no-artwork");
     }else{
       $("winnerArtwork").innerHTML = "";
-      $("winnerArtwork").classList.add("hidden");
+      $("winnerArtwork").classList.remove("hidden");
+      $("winnerArtwork").classList.add("no-artwork");
     }
 
     $("winnerTrack").textContent =
