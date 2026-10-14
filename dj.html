@@ -1305,6 +1305,9 @@ async function endDeleteEvent(){
     console.error("End event error:",error);
     alert(error.message || "The event could not be ended. Nothing has been changed.");
     await loadEventState();
+  }finally{
+    button.textContent = "END / DELETE EVENT";
+    button.disabled = false;
   }
 }
 
