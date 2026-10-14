@@ -166,7 +166,7 @@ function renderTie(os,cs){
     return '<article class="tieCard">'+art(o)+'<div class="track">'+esc(o.track||o.label||"")+'</div><div class="artist">'+esc(o.artist||"")+'</div><div class="tieVotes">'+p+'%<small>VOTE SHARE</small></div><div class="tieChoice">FINALIST</div></article>';
   }).join("")+'<div class="tieCenter">VS</div><div class="tieBanner"><b>THE DJ DECIDES</b></div>';
 }
-function renderWinner(w){
+function renderWinner(w,totalVotes){
   let board=document.getElementById("votingBoard");
   let key="winner:"+w.id+":"+w.winning_option_id;
   if(board.dataset.optionKey===key)return;
@@ -187,7 +187,7 @@ function renderWinner(w){
           ? "THE DJ'S CHOICE WON THE VOTE!"
           : (esc(requester)+"... YOU BEAT THE DJ!");
   let name="";
-  board.innerHTML='<article class="winnerCard">'+art+'<div class="winnerTrack">'+esc(w.track||"")+'</div><div class="winnerArtist">'+esc(w.artist||"")+'</div><div class="winnerVotes">'+Number(w.vote_count||0)+' VOTE'+(Number(w.vote_count||0)===1?"":"S")+'</div>'+name+'<div class="winnerMessage '+((djChoice||djWon)?"dj":"winnerPulse")+'">'+message+'</div></article>';
+  board.innerHTML='<article class="winnerCard">'+art+'<div class="winnerTrack">'+esc(w.track||"")+'</div><div class="winnerArtist">'+esc(w.artist||"")+'</div><div class="winnerVotes">'+(totalVotes?Math.round(Number(w.vote_count||0)/totalVotes*100):0)+'% VOTE SHARE</div>'+name+'<div class="winnerMessage '+((djChoice||djWon)?"dj":"winnerPulse")+'">'+message+'</div></article>';
 }
 function setClosedHeader(round,isTie){
   document.querySelector(".header").classList.remove("winnerHeader");
@@ -324,8 +324,13 @@ async function load(){
     let cr=(await rpc("get_public_round",{p_mode:"closed"}))?.[0];
     if(cr){
       if(cr.winning_option_id && (cr.dj_decision==="play" || cr.dj_decision==="tie_play" || cr.dj_decision==="reject")){
-        let w=(await rpc("get_public_winner",{p_round_id:cr.id}))?.[0];
+        let [wResult, voteRows]=await Promise.all([
+          rpc("get_public_winner",{p_round_id:cr.id}),
+          rpc("get_public_vote_counts",{p_round_id:cr.id})
+        ]);
         if(!isCurrentLoad()) return;
+        let w=(wResult||[])[0];
+        let totalVotes=(voteRows||[]).reduce((sum,row)=>sum+Number(row.vote_count||0),0);
         if(w){
           if(!isCurrentLoad()) return;
           hideUpcomingEvents();
@@ -335,7 +340,7 @@ async function load(){
           document.querySelector(".kicker").innerHTML='ROUND <span id="roundNumber">'+esc(cr.round_number||"")+"</span>";
           document.getElementById("roundTitle").textContent="WINNER!";
           document.querySelector(".instruction").textContent="THE VOTE IS IN";
-          renderWinner(w);
+          renderWinner(w,totalVotes);
           return;
         }
       }
