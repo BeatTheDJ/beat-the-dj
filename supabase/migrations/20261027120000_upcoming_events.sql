@@ -48,3 +48,41 @@ create policy "Authorised DJ can delete upcoming events"
 create index if not exists upcoming_events_display_order_idx
   on public.upcoming_events (display_order);
 
+
+-- Replace the complete listing in one transaction, restricted to the authorised DJ.
+create or replace function public.replace_upcoming_events(p_events jsonb)
+returns void
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  if auth.uid() is distinct from '48be01ee-0677-4611-943f-0c3c441ee74c'::uuid then
+    raise exception 'Not authorised to manage upcoming events';
+  end if;
+
+  if p_events is null or jsonb_typeof(p_events) <> 'array' or jsonb_array_length(p_events) > 3 then
+    raise exception 'Provide between zero and three upcoming events';
+  end if;
+
+  if exists (
+    select 1
+    from jsonb_to_recordset(p_events) as e(event_date date, venue text, event_time text)
+    where e.event_date is null
+       or e.venue is null or char_length(btrim(e.venue)) not between 1 and 120
+       or e.event_time is null or char_length(btrim(e.event_time)) not between 1 and 80
+  ) then
+    raise exception 'Each event needs a valid date, venue and time';
+  end if;
+
+  delete from public.upcoming_events;
+
+  insert into public.upcoming_events(event_date, venue, event_time, display_order)
+  select e.event_date, btrim(e.venue), btrim(e.event_time), e.ordinality::smallint
+  from jsonb_to_recordset(p_events) with ordinality as e(event_date date, venue text, event_time text, ordinality bigint)
+  order by e.ordinality;
+end;
+$$;
+
+revoke all on function public.replace_upcoming_events(jsonb) from public, anon;
+grant execute on function public.replace_upcoming_events(jsonb) to authenticated;
