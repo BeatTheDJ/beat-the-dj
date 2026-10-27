@@ -1012,10 +1012,10 @@ document.getElementById("saveUpcomingEventsBtn").addEventListener("click",async(
   button.disabled=true;button.textContent="SAVING...";
   try{
     const auth=await db.auth.getSession();if(!auth.data.session)throw new Error("Your DJ session has expired. Log in again to save.");
-    // Save through the dedicated table. Delete/reinsert only this listing table, never event/request data.
-    const cleared=await db.from("upcoming_events").delete().gte("display_order",1);if(cleared.error)throw cleared.error;
-    const rows=upcomingEvents.map((e,index)=>({event_date:e.event_date,venue:String(e.venue).trim(),event_time:String(e.event_time).trim(),display_order:index+1}));
-    if(rows.length){const saved=await db.from("upcoming_events").insert(rows);if(saved.error)throw saved.error;}
+    // The database function replaces only this listing table atomically; it never touches event/request data.
+    const rows=upcomingEvents.map(e=>({event_date:e.event_date,venue:String(e.venue).trim(),event_time:String(e.event_time).trim()}));
+    const saved=await db.rpc("replace_upcoming_events",{p_events:rows});
+    if(saved.error)throw saved.error;
     await loadUpcomingEvents();setUpcomingEventsMessage("Upcoming events saved. Refresh the public page to see the latest listings.");
   }catch(error){console.error("Save upcoming events failed:",error);setUpcomingEventsMessage("Could not save upcoming events: "+(error.message||"Unknown error"),true);}
   finally{button.disabled=false;button.textContent="SAVE EVENTS";}
