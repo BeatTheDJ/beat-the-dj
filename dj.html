@@ -1013,7 +1013,7 @@ document.getElementById("saveUpcomingEventsBtn").addEventListener("click",async(
   try{
     const auth=await db.auth.getSession();if(!auth.data.session)throw new Error("Your DJ session has expired. Log in again to save.");
     // The database function replaces only this listing table atomically; it never touches event/request data.
-    const rows=upcomingEvents.map(e=>({event_date:e.event_date,venue:String(e.venue).trim(),event_time:String(e.event_time).trim()}));
+    const rows=upcomingEvents.map((e,index)=>({event_date:e.event_date,venue:String(e.venue).trim(),event_time:String(e.event_time).trim(),display_order:index+1}));
     const saved=await db.rpc("replace_upcoming_events",{p_events:rows});
     if(saved.error)throw saved.error;
     await loadUpcomingEvents();setUpcomingEventsMessage("Upcoming events saved. Refresh the public page to see the latest listings.");
