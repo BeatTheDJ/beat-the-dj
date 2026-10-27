@@ -62,25 +62,31 @@ begin
   end if;
 
   if p_events is null or jsonb_typeof(p_events) <> 'array' or jsonb_array_length(p_events) > 3 then
-    raise exception 'Provide between zero and three upcoming events';
+    raise exception 'Provide zero to three upcoming events';
   end if;
 
   if exists (
     select 1
-    from jsonb_to_recordset(p_events) as e(event_date date, venue text, event_time text)
+    from jsonb_to_recordset(p_events) as e(event_date date, venue text, event_time text, display_order smallint)
     where e.event_date is null
        or e.venue is null or char_length(btrim(e.venue)) not between 1 and 120
        or e.event_time is null or char_length(btrim(e.event_time)) not between 1 and 80
+       or e.display_order is null or e.display_order not between 1 and 3
   ) then
-    raise exception 'Each event needs a valid date, venue and time';
+    raise exception 'Each event needs a valid date, venue, time and display order';
+  end if;
+
+  if (select count(distinct e.display_order) from jsonb_to_recordset(p_events) as e(display_order smallint))
+     <> jsonb_array_length(p_events) then
+    raise exception 'Event display orders must be unique';
   end if;
 
   delete from public.upcoming_events;
 
   insert into public.upcoming_events(event_date, venue, event_time, display_order)
-  select e.event_date, btrim(e.venue), btrim(e.event_time), e.ordinality::smallint
-  from jsonb_to_recordset(p_events) with ordinality as e(event_date date, venue text, event_time text, ordinality bigint)
-  order by e.ordinality;
+  select e.event_date, btrim(e.venue), btrim(e.event_time), e.display_order
+  from jsonb_to_recordset(p_events) as e(event_date date, venue text, event_time text, display_order smallint)
+  order by e.display_order;
 end;
 $$;
 
