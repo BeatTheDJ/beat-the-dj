@@ -967,7 +967,48 @@ footer{
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+
+// Upcoming event listings manager. The companion migration must be applied before saving works.
+const upcomingEventsRows = document.getElementById("upcomingEventsRows");
+const upcomingEventsMessage = document.getElementById("upcomingEventsMessage");
+let upcomingEvents = [];
+function setUpcomingEventsMessage(message, isError=false){ upcomingEventsMessage.textContent=message; upcomingEventsMessage.style.color=isError?"#ff7777":"#aaa"; }
+function renderUpcomingEvents(){
+  upcomingEventsRows.innerHTML="";
+  upcomingEvents.forEach((event,index)=>{
+    const row=document.createElement("div");
+    row.style.cssText="border:1px solid #383838;border-radius:10px;padding:12px;margin-top:10px;background:#101010;";
+    row.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;"><strong style="font-size:12px;color:#e8ff38;">EVENT '+(index+1)+'</strong><button type="button" data-remove-event="'+index+'" style="width:auto;padding:7px 10px;background:#3a1111;border:1px solid #884444;color:#fff;">REMOVE</button></div><label for="upcomingDate'+index+'">DATE</label><input id="upcomingDate'+index+'" type="date" value="'+esc(event.event_date||"")+'" data-event-field="event_date" data-event-index="'+index+'"><label for="upcomingVenue'+index+'">VENUE</label><input id="upcomingVenue'+index+'" type="text" maxlength="120" value="'+esc(event.venue||"")+'" placeholder="e.g. Maida Vale, Sheffield" data-event-field="venue" data-event-index="'+index+'"><label for="upcomingTime'+index+'">TIME</label><input id="upcomingTime'+index+'" type="text" maxlength="80" value="'+esc(event.event_time||"")+'" placeholder="e.g. 8pm–3am" data-event-field="event_time" data-event-index="'+index+'">';
+    upcomingEventsRows.appendChild(row);
+  });
+  upcomingEventsRows.querySelectorAll("[data-event-field]").forEach(input=>input.addEventListener("input",()=>{upcomingEvents[Number(input.dataset.eventIndex)][input.dataset.eventField]=input.value;}));
+  upcomingEventsRows.querySelectorAll("[data-remove-event]").forEach(button=>button.addEventListener("click",()=>{upcomingEvents.splice(Number(button.dataset.removeEvent),1);renderUpcomingEvents();setUpcomingEventsMessage("Removed from editor. Select SAVE EVENTS to save this change.");}));
+  const addButton=document.getElementById("addUpcomingEventBtn");addButton.disabled=upcomingEvents.length>=3;addButton.style.opacity=addButton.disabled?".45":"1";
+}
+async function loadUpcomingEvents(){
+  const result=await db.from("upcoming_events").select("id,event_date,venue,event_time,display_order").order("display_order",{ascending:true});
+  if(result.error){setUpcomingEventsMessage("Unable to load saved events. The database migration may not be applied yet. "+result.error.message,true);return;}
+  upcomingEvents=(result.data||[]).map(row=>({...row,event_date:row.event_date||""}));renderUpcomingEvents();
+  setUpcomingEventsMessage(upcomingEvents.length?"Loaded "+upcomingEvents.length+" saved event(s).":"No events saved in this manager yet; existing public listings are unchanged.");
+}
+document.getElementById("addUpcomingEventBtn").addEventListener("click",()=>{if(upcomingEvents.length<3){upcomingEvents.push({event_date:"",venue:"",event_time:""});renderUpcomingEvents();}});
+document.getElementById("saveUpcomingEventsBtn").addEventListener("click",async()=>{
+  const button=document.getElementById("saveUpcomingEventsBtn");
+  if(upcomingEvents.some(e=>!e.event_date||!String(e.venue||"").trim()||!String(e.event_time||"").trim())){setUpcomingEventsMessage("Complete the date, venue and time for every event, or remove the incomplete row.",true);return;}
+  button.disabled=true;button.textContent="SAVING...";
+  try{
+    const auth=await db.auth.getSession();if(!auth.data.session)throw new Error("Your DJ session has expired. Log in again to save.");
+    // Save through the dedicated table. Delete/reinsert only this listing table, never event/request data.
+    const cleared=await db.from("upcoming_events").delete().gte("display_order",1);if(cleared.error)throw cleared.error;
+    const rows=upcomingEvents.map((e,index)=>({event_date:e.event_date,venue:String(e.venue).trim(),event_time:String(e.event_time).trim(),display_order:index+1}));
+    if(rows.length){const saved=await db.from("upcoming_events").insert(rows);if(saved.error)throw saved.error;}
+    await loadUpcomingEvents();setUpcomingEventsMessage("Upcoming events saved. Refresh the public page to see the latest listings.");
+  }catch(error){console.error("Save upcoming events failed:",error);setUpcomingEventsMessage("Could not save upcoming events: "+(error.message||"Unknown error"),true);}
+  finally{button.disabled=false;button.textContent="SAVE EVENTS";}
+});
+
+</script>
 
 <script>
 const SUPABASE_URL =
