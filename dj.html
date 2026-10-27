@@ -2776,6 +2776,7 @@ async function loadVoteTotals(){
 
     const openEditor=document.querySelector(".request-edit[style*='display: block']");
     const openEditorId=openEditor ? openEditor.id.replace("editRequest-","") : "";
+    const openEditorRequester=openEditor ? document.getElementById("editRequester-"+openEditorId)?.value || "" : "";
     const openEditorArtist=openEditor ? document.getElementById("editArtist-"+openEditorId)?.value || "" : "";
     const openEditorSong=openEditor ? document.getElementById("editSong-"+openEditorId)?.value || "" : "";
 
@@ -2941,6 +2942,8 @@ if(openRoundResult.data){
   return `
     <button type="button" class="request-edit-toggle" onclick="toggleRequestEdit('${request.id}')">✎ EDIT REQUEST</button>
     <div id="editRequest-${request.id}" class="request-edit">
+      <label for="editRequester-${request.id}">Requester Name / Nickname</label>
+      <input id="editRequester-${request.id}" type="text" maxlength="60" value="${esc(request.requester_name || "")}">
       <label for="editArtist-${request.id}">Artist</label>
       <input id="editArtist-${request.id}" type="text" maxlength="100" value="${esc(request.artist)}">
       <label for="editSong-${request.id}">Song</label>
@@ -3086,11 +3089,13 @@ ${requestEditMarkup(request)}
 
     if(openEditorId){
       const restoredEditor=document.getElementById("editRequest-"+openEditorId);
+      const restoredRequester=document.getElementById("editRequester-"+openEditorId);
       const restoredArtist=document.getElementById("editArtist-"+openEditorId);
       const restoredSong=document.getElementById("editSong-"+openEditorId);
 
       if(restoredEditor){
         restoredEditor.style.display="block";
+        if(restoredRequester) restoredRequester.value=openEditorRequester;
         if(restoredArtist) restoredArtist.value=openEditorArtist;
         if(restoredSong) restoredSong.value=openEditorSong;
       }
@@ -3134,15 +3139,17 @@ function toggleRequestEdit(id){
 }
 
 async function saveRequestEdit(id,button){
+  const requesterInput=document.getElementById("editRequester-"+id);
   const artistInput=document.getElementById("editArtist-"+id);
   const songInput=document.getElementById("editSong-"+id);
-  if(!artistInput||!songInput)return;
+  if(!requesterInput||!artistInput||!songInput)return;
 
+  const requesterName=requesterInput.value.trim();
   const artist=artistInput.value.trim();
   const song=songInput.value.trim();
 
-  if(!artist||!song){
-    alert("Please enter both an artist and a song.");
+  if(!requesterName||!artist||!song){
+    alert("Please enter a requester name, artist and song.");
     return;
   }
 
@@ -3151,7 +3158,7 @@ async function saveRequestEdit(id,button){
 
   try{
     const result=await db.from("requests")
-      .update({artist:artist,song:song})
+      .update({requester_name:requesterName,artist:artist,song:song})
       .eq("id",id)
       .eq("event_id",EVENT_ID);
 
