@@ -600,6 +600,13 @@ footer{
   border-radius:16px;
   border:1px solid var(--line);
 }
+.ended-artwork{position:relative;width:100%;}
+.dynamic-upcoming-events{display:none;position:absolute;left:6%;top:47.2%;width:88%;height:34%;padding:1.2% 2%;background:#100d0e;border:2px solid #b51e25;border-radius:12px;overflow:hidden;flex-direction:column;justify-content:space-around;gap:1%;}
+.dynamic-upcoming-events.visible{display:flex;}
+.dynamic-event-row{min-height:0;flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;border:1px solid #7d2529;border-radius:8px;background:linear-gradient(100deg,#1a1516,#241719,#151112);padding:1% 2%;overflow:hidden;}
+.dynamic-event-date{color:#f5e7d2;font-size:clamp(10px,2.2vw,18px);font-weight:1000;letter-spacing:.04em;text-transform:uppercase;line-height:1.1;}
+.dynamic-event-venue{color:#f5e7d2;font-size:clamp(9px,1.65vw,14px);font-weight:800;text-transform:uppercase;line-height:1.1;margin-top:3px;}
+.dynamic-event-time{color:#e8ff38;font-size:clamp(9px,1.55vw,13px);font-weight:900;line-height:1.1;margin-top:3px;}
 
 label{
   display:block;
@@ -666,7 +673,10 @@ input:focus{
 </div>
 
 <section id="endedLanding" class="ended-landing hidden">
-  <img id="endedLandingImage" src="ended-event.svg" alt="Beat The DJ event ended — upcoming events at Maida Vale">
+  <div class="ended-artwork">
+    <img id="endedLandingImage" src="ended-event.svg" alt="Beat The DJ event ended — upcoming events at Maida Vale">
+    <div id="dynamicUpcomingEvents" class="dynamic-upcoming-events" aria-label="Upcoming Beat The DJ events"></div>
+  </div>
 </section>
 
 <section id="roundCard" class="card hidden">
@@ -1449,6 +1459,26 @@ async function getEventState(){
   return result.data?.[0] || null;
 }
 
+
+
+let cachedUpcomingEvents = null;
+async function loadPublicUpcomingEvents(){
+  const container=$("dynamicUpcomingEvents");
+  if(!container)return;
+  const result=await db.from("upcoming_events").select("event_date,venue,event_time,display_order").order("display_order",{ascending:true});
+  if(result.error){console.warn("Upcoming event listings unavailable; using artwork defaults.",result.error.message);return;}
+  const events=result.data||[];
+  if(!events.length)return;
+  cachedUpcomingEvents=events;
+  container.innerHTML=events.map(event=>{
+    const date=new Date(event.event_date+"T12:00:00");
+    const formatted=Number.isNaN(date.getTime())?event.event_date:date.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+    return '<div class="dynamic-event-row"><div class="dynamic-event-date">'+escapeHtml(formatted)+'</div><div class="dynamic-event-venue">'+escapeHtml(event.venue)+'</div><div class="dynamic-event-time">'+escapeHtml(event.event_time)+'</div></div>';
+  }).join("");
+  container.classList.add("visible");
+}
+function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));}
+
 let refreshInFlight = false;
 
 async function refresh(){
@@ -1463,6 +1493,7 @@ async function refresh(){
     const eventState = await getEventState();
 
     if(!eventState || !eventState.active){
+      loadPublicUpcomingEvents();
       const landingImage = $("endedLandingImage");
       if(landingImage){
         landingImage.src = eventState?.paused ? "paused-event.svg" : "ended-event.svg";
