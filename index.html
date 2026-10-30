@@ -1373,12 +1373,35 @@ async function castVote(
 
     button.classList.remove("picked");
 
+    const responseStatus =
+      error.context?.status ||
+      error.status ||
+      0;
+
+    let friendlyMessage =
+      "Sorry, your vote couldn't be submitted. Please try again.";
+
+    if(
+      responseStatus === 429 ||
+      String(error.message || "").includes("IP_VOTE_LIMIT")
+    ){
+      friendlyMessage =
+        "You've reached the voting limit for this connection. Thanks for taking part!";
+    }else if(
+      String(error.message || "").includes("ALREADY_VOTED")
+    ){
+      friendlyMessage =
+        "You've already voted in this round. Thanks for taking part!";
+    }else if(
+      String(error.message || "").includes("VOTING_CLOSED")
+    ){
+      friendlyMessage =
+        "Voting has now closed for this round.";
+    }
+
     $("message").innerHTML =
       '<span class="error">' +
-      esc(
-        error.message ||
-        "Vote failed."
-      ) +
+      esc(friendlyMessage) +
       "</span>";
 
   }
