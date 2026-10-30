@@ -1332,14 +1332,17 @@ async function castVote(
   try{
 
     const result =
-      await db.functions.invoke(
-        "cast-vote-protected",
+      await db.rpc(
+        "cast_vote",
         {
-          body: {
-            round_id: currentRound.id,
-            option_id: optionId,
-            voter_token: voterToken
-          }
+          p_round_id:
+            currentRound.id,
+
+          p_option_id:
+            optionId,
+
+          p_voter_token:
+            voterToken
         }
       );
 
