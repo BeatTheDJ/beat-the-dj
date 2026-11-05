@@ -308,6 +308,10 @@ async function load(){
       return;
     }
 
+    // Clear the ended/paused landing overlay immediately when an event is active,
+    // before waiting for round data or taking any early-return/error path.
+    hideUpcomingEvents();
+
     const rr=await rpc("get_public_round",{p_mode:"open"});
     if(!isCurrentLoad()) return;
     const r=rr?.[0];
