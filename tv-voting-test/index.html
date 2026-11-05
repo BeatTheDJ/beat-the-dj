@@ -94,6 +94,11 @@
 #upcomingEventsScreen .eventMoreInner{font-size:clamp(14px,1.5vw,27px);font-weight:1000;line-height:1.05;color:#f4efe2;}
 #upcomingEventsScreen .eventMore .red{display:block;color:#f32636;margin-top:.6vh;}
 #upcomingEventsScreen .landingFooter{display:none;}
+
+/* Consistent date hierarchy: every card uses a large day number and one month/year line */
+#upcomingEventsScreen .eventDate{display:flex;flex-direction:column;align-items:flex-start;gap:.08em;font-size:clamp(22px,2.6vw,48px);line-height:.98;min-height:2.05em;margin-top:.25vh;}
+#upcomingEventsScreen .eventDateDay{font-size:1.2em;line-height:.9;font-weight:1000;white-space:nowrap;}
+#upcomingEventsScreen .eventDateMonth{font-size:.62em;line-height:1.08;font-weight:900;letter-spacing:.015em;white-space:nowrap;}
 </style></head><body><main class="stage"><div class="bg"></div>
 <section id="upcomingEventsScreen" class="tvLanding hidden">
   <div class="landingTop">
@@ -246,7 +251,7 @@ function showUpcomingEvents(){
   const key=upcomingEvents.map(e=>e.day+"|"+e.date+"|"+e.name+"|"+e.venue).join("||");
   if(grid.dataset.key!==key){
     grid.dataset.key=key;
-    grid.innerHTML=upcomingEvents.map(e=>'<article class="eventCard"><div class="eventDay">'+esc(e.day)+'</div><div class="eventDate">'+esc(e.date)+'</div><div class="eventRule"></div><div class="eventName">'+esc(e.name)+'</div><div class="eventVenue">'+esc(e.venue)+'</div></article>').join("");
+    grid.innerHTML=upcomingEvents.map(e=>{const m=String(e.date).match(/^(\\d{1,2})\\s+([A-Z]+)\\s*(\\d{4})?$/i);const dateMarkup=m?'<div class="eventDate"><span class="eventDateDay">'+esc(m[1])+'</span><span class="eventDateMonth">'+esc(m[2])+(m[3]?' '+esc(m[3]):'')+'</span></div>':'<div class="eventDate">'+esc(e.date)+'</div>';return '<article class="eventCard"><div class="eventDay">'+esc(e.day)+'</div>'+dateMarkup+'<div class="eventRule"></div><div class="eventName">'+esc(e.name)+'</div><div class="eventVenue">'+esc(e.venue)+'</div></article>';}).join("");
   }
 }
 
