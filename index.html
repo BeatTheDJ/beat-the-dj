@@ -1473,8 +1473,10 @@ async function loadPublicUpcomingEvents(){
   if(!events.length)return;
   cachedUpcomingEvents=events;
   const heading=container.querySelector(".dynamic-upcoming-heading");
+  const pauseNotice=container.querySelector(".public-paused-notice");
   container.innerHTML="";
   if(heading)container.appendChild(heading);
+  if(pauseNotice)container.appendChild(pauseNotice);
   const list=document.createElement("div");
   list.className="dynamic-event-list";
   list.innerHTML=events.map(event=>{
