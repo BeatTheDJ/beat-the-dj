@@ -698,7 +698,7 @@ input:focus{
   <div id="winnerArtist" class="winner-artist"></div>
 </section>
 
-  <section id="requestCard" class="card">
+  <section id="requestCard" class="card hidden">
   <h2>Request a track</h2>
   <div id="requestRoundSub" class="round-sub">Submit a song request.  Will YOU Beat The DJ?</div>
 
@@ -1716,6 +1716,11 @@ async function refresh(){
     updateCountdown();
 
   }catch(error){
+
+    $("requestCard").classList.add("hidden");
+    $("waitingCard").classList.remove("hidden");
+    $("waitingTitle").textContent = "CHECKING EVENT STATUS";
+    $("waitingSub").textContent = "Requests are unavailable until the event status is confirmed.";
 
     console.error(
       "Beat the DJ error:",
