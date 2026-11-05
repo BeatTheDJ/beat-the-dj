@@ -1500,7 +1500,7 @@ async function refresh(){
   try{
     const eventState = await getEventState();
 
-    if(!eventState || !eventState.active){
+    if(!eventState || !eventState.active || eventState.paused){
       loadPublicUpcomingEvents();
       const landingImage = $("endedLandingImage");
       if(landingImage){
