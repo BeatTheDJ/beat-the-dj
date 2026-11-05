@@ -3034,6 +3034,10 @@ openRoundResult.data.status === "building" ? `
 
 </div>
 
+<button onclick="archiveRequest('${request.id}',this)">
+  ↪ MOVE TO HISTORY
+</button>
+
 ` : request.status === "submitted" ? `
 
 <div class="request-status status-submitted-text">
