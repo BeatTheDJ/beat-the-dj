@@ -74,6 +74,8 @@
 .stage.landingMode > .qrbox{display:none}
 .stage.landingMode .redwash{display:block;opacity:.35}
 .tvAttractFrame{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#000}
+/* Keep hidden state stronger than the landing screen's layout rule. */
+#upcomingEventsScreen.tvLanding.hidden{display:none!important;}
 /* Upcoming-events landing screen visual refresh */
 #upcomingEventsScreen.tvLanding{position:absolute;inset:0;z-index:30;padding:2.4vh 4.3vw 2vh;display:flex;flex-direction:column;gap:1.2vh;background:radial-gradient(ellipse at 50% 80%,rgba(255,0,35,.22),transparent 55%),linear-gradient(180deg,rgba(5,0,2,.92),rgba(8,0,2,.68));}
 #upcomingEventsScreen .landingTop{display:flex;align-items:center;justify-content:space-between;flex:0 0 15%;min-height:0;}
