@@ -1522,6 +1522,7 @@ async function refresh(){
       $("status").classList.add("hidden");
       $("liveNote").classList.add("hidden");
       const isPaused = !!eventState?.paused;
+      $("dynamicUpcomingEvents").classList.toggle("is-paused", isPaused);
       $("waitingTitle").textContent = isPaused
         ? "EVENT PAUSED"
         : "EVENT ENDED";
