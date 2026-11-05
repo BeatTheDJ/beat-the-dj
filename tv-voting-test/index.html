@@ -197,13 +197,26 @@ function setClosedHeader(round,isTie){
   document.querySelector(".instruction").textContent=isTie?"THE DJ HAS THE DECIDING VOTE":"THE DJ IS DECIDING THE WINNER";
 }
 
-const upcomingEvents = [
-  {day:"FRIDAY",date:"30 OCT",name:"HALLOWEEN SPECIAL",venue:"AT MAIDA VALE"},
-  {day:"FRIDAY",date:"6 NOV",name:"BEAT THE DJ",venue:"AT MAIDA VALE"},
-  {day:"FRIDAY",date:"13 NOV",name:"BEAT THE DJ",venue:"AT MAIDA VALE"}
+let upcomingEvents = [
+  {day:"FRIDAY",date:"30 OCT",name:"HALLOWEEN SPECIAL",venue:"AT MAIDA VALE"}
 ];
+let upcomingEventsLoaded = false;
+async function fetchUpcomingEvents(){
+  try{
+    const response=await fetch(SUPABASE_URL+"/rest/v1/upcoming_events?select=event_date,venue,event_time,display_order&order=display_order.asc",{headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY}});
+    if(!response.ok)throw Error("upcoming events HTTP "+response.status);
+    const rows=await response.json();
+    if(!Array.isArray(rows)||!rows.length)return;
+    upcomingEvents=rows.map(e=>{
+      const d=new Date(String(e.event_date)+"T12:00:00");
+      return {day:d.toLocaleDateString("en-GB",{weekday:"long"}).toUpperCase(),date:d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}).toUpperCase(),name:"BEAT THE DJ",venue:String(e.venue||"").toUpperCase()+" • "+String(e.event_time||"").toUpperCase()};
+    });
+    upcomingEventsLoaded=true;
+  }catch(e){console.warn("TV upcoming events",e);}
+}
 
 function showUpcomingEvents(){
+  if(!upcomingEventsLoaded)fetchUpcomingEvents().then(()=>{if(upcomingEventsLoaded)showUpcomingEvents();});
   const stage=document.querySelector(".stage");
   const screen=document.getElementById("upcomingEventsScreen");
   stage.classList.add("landingMode");
