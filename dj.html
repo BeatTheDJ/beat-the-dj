@@ -474,6 +474,15 @@ button{
   margin-top:14px;
 }
 
+.archive-action{
+  background:#292929;
+  color:#e8ff38;
+  border:1px solid #666;
+  box-shadow:none;
+  font-size:12px;
+  padding:10px 8px;
+}
+
 .open-voting{
   margin-top:8px;
   background:#4caf50;
@@ -3032,11 +3041,10 @@ openRoundResult.data.status === "building" ? `
       `
   }
 
+  <button class="archive-action" onclick="archiveRequest('${request.id}',this)">
+    ↪ MOVE TO HISTORY
+  </button>
 </div>
-
-<button onclick="archiveRequest('${request.id}',this)">
-  ↪ MOVE TO HISTORY
-</button>
 
 ` : request.status === "submitted" ? `
 
@@ -3044,7 +3052,7 @@ openRoundResult.data.status === "building" ? `
   ✓ ACCEPTED — READY FOR A ROUND
 </div>
 
-<button onclick="archiveRequest('${request.id}',this)">
+<button class="archive-action" onclick="archiveRequest('${request.id}',this)">
   ↪ MOVE TO HISTORY
 </button>
 
