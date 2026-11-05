@@ -1478,23 +1478,6 @@ async function loadPublicUpcomingEvents(){
 }
 function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));}
 
-let cachedUpcomingEvents = null;
-async function loadPublicUpcomingEvents(){
-  const container=$("dynamicUpcomingEvents");
-  if(!container)return;
-  const result=await db.from("upcoming_events").select("event_date,venue,event_time,display_order").order("display_order",{ascending:true});
-  if(result.error){console.warn("Upcoming event listings unavailable; using artwork defaults.",result.error.message);return;}
-  const events=result.data||[];
-  if(!events.length)return;
-  cachedUpcomingEvents=events;
-  container.innerHTML=events.map(event=>{
-    const date=new Date(event.event_date+"T12:00:00");
-    const formatted=Number.isNaN(date.getTime())?event.event_date:date.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-    return '<div class="dynamic-event-row"><div class="dynamic-event-date">'+escapeHtml(formatted)+'</div><div class="dynamic-event-venue">'+escapeHtml(event.venue)+'</div><div class="dynamic-event-time">'+escapeHtml(event.event_time)+'</div></div>';
-  }).join("");
-  container.classList.add("visible");
-}
-function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));}
 let refreshInFlight = false;
 
 async function refresh(){
